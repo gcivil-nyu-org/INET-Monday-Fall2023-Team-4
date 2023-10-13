@@ -20,7 +20,13 @@ def register(request):
 			form.save()
 			username = form.cleaned_data.get('username')
 			email = form.cleaned_data.get('email')
+			password = form.cleaned_data.get('password1')
 			
+			user = authenticate(username=username,password=password)
+			login(request,user)
+			
+			
+			"""
 			htmly = get_template('user/Email.html')
 			d = { 'username': username }
 			subject, from_email, to = 'welcome', 'your_email@gmail.com', email
@@ -28,9 +34,10 @@ def register(request):
 			msg = EmailMultiAlternatives(subject, html_content, from_email, [to])
 			msg.attach_alternative(html_content, "text/html")
 			msg.send()
+			""" 
 			
 			messages.success(request, f'Your account has been created ! You are now able to log in')
-			return redirect('login')
+			return redirect('users:index')
 	else:
 		form = UserRegisterForm()
 	return render(request, 'user/register.html', {'form': form, 'title':'register here'})
@@ -45,9 +52,9 @@ def Login(request):
 		user = authenticate(request, username = username, password = password)
 		if user is not None:
 			form = login(request, user)
-			messages.success(request, f' welcome {username} !!')
-			return redirect('index')
+			messages.success(request, f' welcome {user.first_name} !!')
+			return redirect('users:index')
 		else:
-			messages.info(request, f'account done not exit plz sign in')
+			messages.info(request, f'account does not exist plz sign in')
 	form = AuthenticationForm()
 	return render(request, 'user/login.html', {'form':form, 'title':'log in'})
