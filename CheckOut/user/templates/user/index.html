@@ -12,7 +12,6 @@
 
 <title>{{title}}</title>
 
-
 <!-- bootstrap file -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -86,6 +85,9 @@
 	<center><h1>Welcome back {{user.username}}!</h1></center>
 	{% else %}
 	<center><h1>Check Out</h1></center>
+	<div>
+		<center><button type="button" class="btn btn-info"><a href="/libraries">View Libraries</a></button></center>
+	</div>
 	{% endif %}
 	{% endblock %}
 </div>
