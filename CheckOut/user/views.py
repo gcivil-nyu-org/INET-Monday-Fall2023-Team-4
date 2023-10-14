@@ -55,7 +55,7 @@ def Login(request):
 		user = authenticate(request, username = username, password = password)
 		if user is not None:
 			form = login(request, user)
-			messages.success(request, f' welcome {user.first_name} !!')
+			messages.success(request, f' welcome {user.username} !!')
 			return redirect('users:index')
 		else:
 			messages.info(request, f'account does not exist plz sign in')
@@ -63,7 +63,6 @@ def Login(request):
 	return render(request, 'user/login.html', {'form':form, 'title':'log in'})
 
 @login_required
-
 def user_profile(request):
     if request.method == 'POST':
         user_form = UpdateUserForm(request.POST, instance=request.user)
@@ -71,7 +70,7 @@ def user_profile(request):
         if user_form.is_valid():
             user_form.save()
             messages.success(request, 'Your profile is updated successfully')
-            return redirect(to='user_profile')
+            return redirect(to='users:user_profile')
     else:
         user_form = UpdateUserForm(instance=request.user)
         
