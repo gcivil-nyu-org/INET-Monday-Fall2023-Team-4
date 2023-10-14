@@ -66,6 +66,7 @@
 
 			{% if user.is_authenticated %}
 			<li><a href="{% url "logout" %}"><span class="glyphicon glyphicon-log-out"></span>  Logout</a></li>
+			<li><a href="{% url "users:user_profile" %}"><span class="glyphicon glyphicon-log-out"></span>  User Profile</a></li>
 			{% else %}
 			<li><a href="{% url "users:register" %}"><span class="glyphicon glyphicon-user"></span>  Sign up</a></li>
 			<li><a href="{% url "users:login" %}"><span class="glyphicon glyphicon-log-in"></span>  Log in</a></li>
