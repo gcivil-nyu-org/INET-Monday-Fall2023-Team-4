@@ -58,3 +58,7 @@ def Login(request):
 			messages.info(request, f'account does not exist plz sign in')
 	form = AuthenticationForm()
 	return render(request, 'user/login.html', {'form':form, 'title':'log in'})
+
+@login_required
+def user_profile(request):
+    return render(request, 'user/profile.html')
