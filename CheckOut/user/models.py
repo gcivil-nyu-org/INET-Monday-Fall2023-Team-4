@@ -3,13 +3,13 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
-class UserProfile(models.Model):
+# class UserProfile(models.Model):
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.TextField()
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     bio = models.TextField()
 
-    def __str__(self):
-        return self.user.username
+#     def __str__(self):
+#         return self.user.username
 
-    def get_absolute_url(self):
-        return reverse("_detail", kwargs={"pk": self.pk})
+#     def get_absolute_url(self):
+#         return reverse("_detail", kwargs={"pk": self.pk})
