@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.core.validators import validate_email
+from django.core.validators import RegexValidator
 # from .models import UserProfile
 
 class UserRegisterForm(UserCreationForm):
@@ -11,7 +12,7 @@ class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(required=True, label='Email', widget=forms.TextInput(attrs={'placeholder': 'email','class': 'form-control'}))
     password1 = forms.CharField(max_length=20, required=True, label='Password', widget=forms.PasswordInput(attrs={'placeholder': 'Password','class': 'form-control'}))
     password2 = forms.CharField(max_length=20, required=True, label='Confirm Password', widget=forms.PasswordInput(attrs={'placeholder': 'Re-enter Password','class': 'form-control'}))
- 
+    
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
@@ -19,10 +20,10 @@ class UserRegisterForm(UserCreationForm):
     def clean_email(self):  
         email = self.cleaned_data['email'].lower()  
         new = User.objects.filter(email=email)  
-        if new.count():  
-            raise forms.ValidationError("Email Already Exist")  
-        if not validate_email(email):
-            raise forms.ValidationError("Incorrect email format!") 
+        #if new.count():
+        #    raise forms.ValidationError("Email Already Exist")  
+        #if not validate_email(email):
+        #    raise forms.ValidationError("Incorrect email format!") 
         return email  
         
     def clean_password1(self):
@@ -33,12 +34,21 @@ class UserRegisterForm(UserCreationForm):
             raise forms.ValidationError("Password cannot only contain characters")
         else:
             return password
-        
 
 class UpdateUserForm(forms.ModelForm):
     username = forms.CharField(max_length=20, required=True)
     email = forms.EmailField(required=True) # TODO: send confirmation email to change?
-    
+
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ['username', 'email']			
+
+class ValidateForm(forms.Form):
+	alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
+	code = forms.CharField(max_length=10, validators=[alphanumeric])
+	
+	def clean_code(self):
+		code = self.cleaned_data.get('code')
+		if code.isalnum():
+			return code
+		raise forms.ValidationError("Code can only be alphanumeric")

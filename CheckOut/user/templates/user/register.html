@@ -3,16 +3,40 @@
 {% block start %}
 
 <div class="content-section col-md-8 col-md-offset-2">
+{% if not verify_code %}
 <form method="POST" style="border: 1px solid black; margin: 4%; padding:10%; border-radius:1%;">
 	{% csrf_token %}
 	<fieldset class="form-group">
 	{{ form | crispy }}
 	</fieldset>
 	<center>
-	<button style="background: black; padding:2%; font-size: 2rem; color:white;" class="btn btn-outline-info" type="submit"><span class="glyphicon glyphicon-check"></span>  sign up</button>
+	<button style="background: black; padding:2%; font-size: 2rem; color:white;" class="btn btn-outline-info" name='signup' type="submit"><span class="glyphicon glyphicon-check"></span>  sign up</button>
 	</center>
 	<br />
 	<sub><a href="{% url "users:login" %}" style="text-decoration: none; color: blue; padding:3%; cursor:pointer;">Already have an account ?</a></sub>
 </form>
+{% else %}
+{% if email_send_failed %}
+<div class="panel panel-danger">
+	<div class="panel-heading">Email send failed, try again later.</div>
+</div>
+{% else %}
+{% if validate_failed %}
+<div class="panel-group">
+	<div class="panel panel-danger">
+		<div class="panel-heading">{{error_text}}</div>
+	</div>
+</div>
+{% endif %}
+<form method="POST" style="border: 1px solid black; margin: 4%; padding:10%; border-radius:1%;">
+	{% csrf_token %}
+	<div class="form-group">
+		<label for="exampleInputEmail1">A verification code has been sent to your email</label>
+		<input type="Text" class="form-control" id="code" name="code" aria-describedby="Verification Code" placeholder="Verification Code">
+	</div>
+	<button type="submit" name="verify" class="btn btn-primary">Submit</button>
+</form>
+{% endif %}
+{% endif %}
 </div>
 {% endblock start %}
