@@ -66,11 +66,13 @@ class UserRegisterForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower()
+        new = User.objects.filter(email=email)
+        if new.count():
+            raise forms.ValidationError("Email Already Exist")
+        if not validate_email(email):
+            raise forms.ValidationError("Incorrect email format!")
+        email = self.cleaned_data["email"].lower()
         new = CustomUser.objects.filter(email=email)
-        # if new.count():
-        #    raise forms.ValidationError("Email Already Exist")
-        # if not validate_email(email):
-        #    raise forms.ValidationError("Incorrect email format!")
         return email
 
     def clean_password1(self):
