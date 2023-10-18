@@ -1,3 +1,4 @@
 *.pcy
 .db.sqlite3
 settings.py
+.DS_Store

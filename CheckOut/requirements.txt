@@ -1,5 +1,7 @@
 asgiref==3.7.2
+crispy-bootstrap4==2022.1
 Django==4.2.6
+django-crispy-forms==2.0
 gunicorn==21.2.0
 packaging==23.2
 sqlparse==0.4.4
