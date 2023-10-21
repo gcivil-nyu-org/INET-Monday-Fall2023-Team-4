@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class CustomUser(AbstractUser):
-    pass
+    # pass
 
     STATUS = (
         ('reader', 'Reader'),
@@ -26,6 +26,11 @@ class CustomUser(AbstractUser):
             return 'nyu'
         else:
             return 'reader'
+        
+    # def save(self, *args, **kwargs):
+    #     self.email = self.cleaned_data['email'].lower()
+    #     self.status = CustomUser.get_user_status(self.email)
+    #     super(CustomUser, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.username

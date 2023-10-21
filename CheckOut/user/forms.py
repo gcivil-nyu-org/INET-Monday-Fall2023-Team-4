@@ -17,7 +17,7 @@ class UserRegisterForm(UserCreationForm):
     
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'username', 'email', ] # 'status']
+        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2'] # 'status']
     
     def clean_email(self):  
         email = self.cleaned_data['email'].lower()
