@@ -69,17 +69,15 @@ class Migration(migrations.Migration):
                 ("email", models.EmailField(max_length=254, unique=True)),
                 ("first_name", models.CharField(blank=True, max_length=50, null=True)),
                 ("last_name", models.CharField(blank=True, max_length=50, null=True)),
-                ("password1", models.CharField(max_length=20)),
-                ("password2", models.CharField(max_length=20)),
                 (
                     "status",
                     models.CharField(
                         choices=[
-                            ("regular", "regular"),
-                            ("librarian", "librarian"),
-                            ("nyu", "nyu"),
+                            ("reader", "Reader"),
+                            ("librarian", "Librarian"),
+                            ("nyu", "NYU Associated"),
                         ],
-                        default="regular",
+                        default="reader",
                         max_length=100,
                     ),
                 ),
