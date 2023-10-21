@@ -13,11 +13,10 @@ class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(required=True, label='Email', widget=forms.TextInput(attrs={'placeholder': 'email','class': 'form-control'}))
     password1 = forms.CharField(max_length=20, required=True, label='Password', widget=forms.PasswordInput(attrs={'placeholder': 'Password','class': 'form-control'}))
     password2 = forms.CharField(max_length=20, required=True, label='Confirm Password', widget=forms.PasswordInput(attrs={'placeholder': 'Re-enter Password','class': 'form-control'}))
-    # status = forms.CharField(widget=forms.HiddenInput)
     
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2'] # 'status']
+        fields = ['first_name', 'last_name', 'username', 'email',]
     
     def clean_email(self):  
         email = self.cleaned_data['email'].lower()
@@ -36,14 +35,6 @@ class UserRegisterForm(UserCreationForm):
             raise forms.ValidationError("Password cannot only contain characters")
         else:
             return password
-    
-    # def save(self, commit=True):
-    #     user = super(UserRegisterForm, self).save(commit=False)
-    #     user.email = self.cleaned_data['email'].lower()
-    #     user.status = CustomUser.get_user_status(user.email)
-    #     if commit:
-    #         user.save()
-    #     return user
 
 
 class UpdateUserForm(forms.ModelForm):
