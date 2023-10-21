@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import PasswordChangeView
@@ -115,7 +115,7 @@ def register(request):
     )
 
 
-def Login(request):
+def user_login(request):
     if request.method == "POST":
         # TODO: use AuthenticationForm
 
@@ -124,10 +124,10 @@ def Login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             form = login(request, user)
-            messages.success(request, f" welcome {user.username} !!")
+            messages.success(request, f"Welcome {user.username}!")
             return redirect("users:index")
         else:
-            messages.info(request, f"account does not exist plz sign in")
+            messages.info(request, f"Account does not exist. Please sign up.")
     form = AuthenticationForm()
     return render(request, "user/login.html", {"form": form, "title": "log in"})
 
