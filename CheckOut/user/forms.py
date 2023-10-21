@@ -68,6 +68,8 @@ class UserRegisterForm(UserCreationForm):
             "last_name",
             "username",
             "email",
+            "password1",
+            "password2",
         ]  # 'status']
 
     def clean_email(self):
