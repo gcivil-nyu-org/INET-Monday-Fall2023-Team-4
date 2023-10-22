@@ -129,7 +129,7 @@ class UpdateUserForm(forms.ModelForm):
                 "Email already exists! Please use another email."
             )
         is_valid = validate_email(email, check_mx=True)
-        if is_valid is None:
+        if not is_valid:
             raise forms.ValidationError("Incorrect email format!")
         return email
 
