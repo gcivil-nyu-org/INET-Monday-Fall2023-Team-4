@@ -1,4 +1,5 @@
 {% extends "user/index.html" %} {% load crispy_forms_tags %} {% block start %}
+{% if not verify_code %}
 {% if user_form.errors %}
 <div class="alert alert-danger alert-dismissible" role="alert">
   <div id="form_errors">
@@ -11,25 +12,64 @@
   </button>
 </div>
 {% endif %}
-<div class="form-content">
+
+<div class="content-section col-lg-12 col-md-12 col-sm-12 tutorial-style" style="min-height:65vh;">
+  <legend class="border-bottom mb-4">Profile Information:</legend>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    <div class="media">
+      <div class="media-body">
+          <h2 class="account-heading">{{ user_form.instance.username }}
+              <small class="text-muted">({{ user_form.instance.status }})</small>
+          </h2>
+          <p class="text-secondary">{{ user_form.instance.first_name }} {{ user_form.instance.last_name }}</p>
+          <p class="text-secondary">{{ user_form.instance.email }}</p>
+      </div>
+  </div>
     <div class="form-row">
       <div class="col-md-5">
         <div class="form-group">
           <label class="small mb-1">Username:</label>
           {{ user_form.username }}
+          <label class="small mb-1">First Name:</label>
+          {{ user_form.first_name }}
+          <label class="small mb-1">Last Name:</label>
+          {{ user_form.last_name }}
           <label class="small mb-1">Email:</label>
           {{ user_form.email }}
         </div>
         <div class="form-group">
-          <a href="{% url "users:password_change" %}">Change Password</a>
+          <button name="update" type="submit" class="btn btn-dark btn-lg">Save Changes</button>
+          <button type="reset" class="btn btn-dark btn-lg">Reset</button>
+          <button class="btn btn-dark btn-lg"><a href="{% url "users:password_change" %}">Change Password</button>
         </div>
       </div>
     </div>
-    <br /><br />
-    <button type="submit" class="btn btn-dark btn-lg">Save Changes</button>
-    <button type="reset" class="btn btn-dark btn-lg">Reset</button>
   </form>
 </div>
+{% else %}
+{% if email_send_failed %}
+<div class="panel panel-danger">
+	<div class="panel-heading">Email send failed, try again later.</div>
+</div>
+{% else %}
+{% if validate_failed %}
+<div class="panel-group">
+	<div class="panel panel-danger">
+		<div class="panel-heading">{{error_text}}</div>
+	</div>
+</div>
+{% endif %}
+<form method="POST" style="border: 1px solid black; margin: 4%; padding:10%; border-radius:1%;">
+	{% csrf_token %}
+	<div class="form-group">
+		<label for="exampleInputEmail1">A verification code has been sent to your email</label>
+		<input type="Text" class="form-control" id="code" name="code" aria-describedby="Verification Code" placeholder="Verification Code">
+	</div>
+	<button type="submit" name="verify" class="btn btn-primary">Submit</button>
+</form>
+{% endif %}
+{% endif %}
+</div>
 {% endblock start %}
+
