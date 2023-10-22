@@ -64,10 +64,12 @@ class UserRegisterForm(UserCreationForm):
         email = self.cleaned_data["email"].lower()
         new = CustomUser.objects.filter(email=email)
         if new.count():
-            raise forms.ValidationError("Email Already Exist")
-        if not validate_email(email):
+            raise forms.ValidationError(
+                "Email already exists! Please use another email."
+            )
+        is_valid = validate_email(email)
+        if not is_valid:
             raise forms.ValidationError("Incorrect email format!")
-
         return email
 
     def clean_password1(self):
@@ -128,7 +130,7 @@ class UpdateUserForm(forms.ModelForm):
             raise forms.ValidationError(
                 "Email already exists! Please use another email."
             )
-        is_valid = validate_email(email, check_mx=True)
+        is_valid = validate_email(email)
         if not is_valid:
             raise forms.ValidationError("Incorrect email format!")
         return email
