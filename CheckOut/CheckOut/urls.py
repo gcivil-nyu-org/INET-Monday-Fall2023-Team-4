@@ -19,10 +19,14 @@ from django.urls import path, include
 from user import views as user_view
 from django.contrib.auth import views as auth
 
-app_name = 'checkout'
+app_name = "checkout"
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('user.urls')),
-	path('logout/', auth.LogoutView.as_view(template_name ='user/index.html'), name ='logout'),
-    path('libraries/', include('libraries.urls')),
+    path("admin/", admin.site.urls),
+    path("", include("user.urls")),
+    path(
+        "logout/",
+        auth.LogoutView.as_view(template_name="user/index.html"),
+        name="logout",
+    ),
+    path("libraries/", include("libraries.urls")),
 ]
