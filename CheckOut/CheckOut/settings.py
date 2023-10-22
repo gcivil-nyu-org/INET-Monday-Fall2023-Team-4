@@ -136,5 +136,5 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 ## TODO: register gmail for app
-EMAIL_HOST_USER = "librarycheckout.app@gmail.com"
-EMAIL_HOST_PASSWORD = "Zurkak-saqvyh-xichu6"
+EMAIL_HOST_USER = "info.checkout123@gmail.com"
+EMAIL_HOST_PASSWORD = "gcrm jpip spjg momu"

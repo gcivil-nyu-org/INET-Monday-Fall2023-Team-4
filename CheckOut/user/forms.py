@@ -60,12 +60,14 @@ class UserRegisterForm(UserCreationForm):
     )
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = [
             "first_name",
             "last_name",
             "username",
             "email",
+            "password1",
+            "password2",
         ]
 
     def clean_email(self):
@@ -76,7 +78,13 @@ class UserRegisterForm(UserCreationForm):
         if not validate_email(email):
             raise forms.ValidationError("Incorrect email format!")
         email = self.cleaned_data["email"].lower()
-        new = CustomUser.objects.filter(email=email)
+        new = User.objects.filter(email=email)
+        if new.count():
+            raise forms.ValidationError("Email already exists! Please sign in.")
+        is_valid = validate_email(email, check_mx=True)
+        print(email, is_valid)
+        if is_valid is None:
+            raise forms.ValidationError("Incorrect email format!")
         return email
 
     def clean_password1(self):
@@ -127,7 +135,7 @@ class UpdateUserForm(forms.ModelForm):
     )
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = ["username", "first_name", "last_name", "email"]
 
     def clean_email(self):

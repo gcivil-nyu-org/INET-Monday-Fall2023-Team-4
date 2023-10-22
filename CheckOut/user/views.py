@@ -83,7 +83,10 @@ def register(request):
 
                         user = authenticate(username=username, password=password)
                         login(request, user)
-                        messages.success(request, f"Your account has been created!")
+                        messages.success(
+                            request,
+                            f"Your account has been created ! You are now able to log in",
+                        )
                         del request.session["verification_code"]
                         return redirect("users:index")
                     else:
@@ -91,7 +94,7 @@ def register(request):
                             "title": "validate code",
                             "verify_code": True,
                             "validate_failed": True,
-                            "error_text": "Incorrect Validation Code: make sure you entered in the right code.",
+                            "error_text": "Incorrect Validation Code, make sure you entered in the right code.",
                         }
                         return render(request, "user/register.html", context)
                 else:
@@ -108,11 +111,11 @@ def register(request):
     else:
         form = UserRegisterForm()
     return render(
-        request, "user/register.html", {"form": form, "title": "Register here"}
+        request, "user/register.html", {"form": form, "title": "register here"}
     )
 
 
-def user_login(request):
+def Login(request):
     if request.method == "POST":
         # TODO: use AuthenticationForm
 
@@ -121,10 +124,10 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             form = login(request, user)
-            messages.success(request, f"Welcome {user.username}!")
+            messages.success(request, f" welcome {user.username} !!")
             return redirect("users:index")
         else:
-            messages.info(request, f"Account does not exist. Please sign up.")
+            messages.info(request, f"account does not exist plz sign in")
     form = AuthenticationForm()
     return render(request, "user/login.html", {"form": form, "title": "log in"})
 
