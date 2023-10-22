@@ -1,5 +1,3 @@
-import re
-import re
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.validators import RegexValidator
@@ -63,11 +61,15 @@ class UserRegisterForm(UserCreationForm):
     def clean_email(self):
         email = self.cleaned_data["email"].lower()
         new = CustomUser.objects.filter(email=email)
-        if new.count():
-            raise forms.ValidationError("Email Already Exist")
-        if not validate_email(email):
+        if email != self.instance.email and new.count():
+            raise forms.ValidationError(
+                "Email already exists! Please use another email."
+            )
+        print(email)
+        print(validate_email(email, check_mx=True))
+        is_valid = validate_email(email)
+        if not is_valid:
             raise forms.ValidationError("Incorrect email format!")
-
         return email
 
     def clean_password1(self):
