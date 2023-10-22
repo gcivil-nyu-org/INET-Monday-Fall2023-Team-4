@@ -15,6 +15,7 @@ from django.urls import reverse_lazy
 from smtplib import SMTP, SMTPException
 import time
 import random, string
+import random, string
 
 from .forms import UserRegisterForm, UpdateUserForm
 from django.views import View
@@ -116,7 +117,7 @@ def register(request):
     )
 
 
-def user_login(request):
+def Login(request):
     if request.method == "POST":
         # TODO: use AuthenticationForm
 
@@ -125,10 +126,10 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             form = login(request, user)
-            messages.success(request, f"Welcome {user.username}!")
+            messages.success(request, f" welcome {user.username} !!")
             return redirect("users:index")
         else:
-            messages.info(request, f"Account does not exist. Please sign up.")
+            messages.info(request, f"account does not exist plz sign in")
     form = AuthenticationForm()
     return render(request, "user/login.html", {"form": form, "title": "log in"})
 
