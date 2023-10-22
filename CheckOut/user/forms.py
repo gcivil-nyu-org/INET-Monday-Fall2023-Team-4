@@ -1,19 +1,8 @@
 import re
 from django import forms
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.core.validators import RegexValidator
-
 from validate_email import validate_email
-
-# from .models import UserProfile
-
-from .models import CustomUser
-
-from validate_email import validate_email
-
-# from .models import UserProfile
-
 from .models import CustomUser
 
 
@@ -72,7 +61,7 @@ class UserRegisterForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower()
-        new = User.objects.filter(email=email)
+        new = CustomUser.objects.filter(email=email)
         if new.count():
             raise forms.ValidationError("Email Already Exist")
         if not validate_email(email):
@@ -95,7 +84,7 @@ class UpdateUserForm(forms.ModelForm):
         super(UpdateUserForm, self).__init__(*args, **kwargs)
         try:
             self.fields["email"].initial = self.instance.email
-        except User.DoesNotExist:
+        except CustomUser.DoesNotExist:
             pass
 
     username = forms.CharField(
@@ -133,7 +122,7 @@ class UpdateUserForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower()
-        new = User.objects.filter(email=email)
+        new = CustomUser.objects.filter(email=email)
         if email != self.instance.email and new.count():
             raise forms.ValidationError(
                 "Email already exists! Please use another email."
