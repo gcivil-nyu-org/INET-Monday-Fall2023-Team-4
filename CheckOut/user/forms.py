@@ -10,6 +10,10 @@ from validate_email import validate_email
 
 from .models import CustomUser
 
+from validate_email import validate_email
+
+# from .models import UserProfile
+
 
 class UserRegisterForm(UserCreationForm):
     first_name = forms.CharField(
