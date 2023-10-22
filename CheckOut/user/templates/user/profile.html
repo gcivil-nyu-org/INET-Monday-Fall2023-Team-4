@@ -1,6 +1,5 @@
-{% extends "user/index.html" %}
-{% load crispy_forms_tags %}
-{% block start %}
+{% extends "user/index.html" %} {% load crispy_forms_tags %} {% block start %}
+{% if not verify_code %}
 {% if user_form.errors %}
 <div class="alert alert-danger alert-dismissible" role="alert">
   <div id="form_errors">
@@ -18,6 +17,15 @@
   <legend class="border-bottom mb-4">Profile Information:</legend>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    <div class="media">
+      <div class="media-body">
+          <h2 class="account-heading">{{ user_form.instance.username }}
+              <small class="text-muted">({{ user_form.instance.status }})</small>
+          </h2>
+          <p class="text-secondary">{{ user_form.instance.first_name }} {{ user_form.instance.last_name }}</p>
+          <p class="text-secondary">{{ user_form.instance.email }}</p>
+      </div>
+  </div>
     <div class="form-row">
       <div class="col-md-5">
         <div class="form-group">
