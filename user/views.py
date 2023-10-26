@@ -26,7 +26,7 @@ def register(request):
             if form.is_valid():
                 vcode = "".join(random.choices(string.ascii_letters, k=5))
                 email = form.cleaned_data.get("email")
-                print(f'vcode: {vcode}')
+                print(f"vcode: {vcode}")
                 request.session["verification_code"] = {
                     "code": vcode,
                     "ttl": (time.time() + 300),
@@ -34,7 +34,7 @@ def register(request):
                 subject, from_email, message = (
                     "Verify Your Email",
                     "test@gmail.com",
-                    f'This is your verification code: {vcode}',
+                    f"This is your verification code: {vcode}",
                 )
                 try:
                     send_mail(
@@ -66,7 +66,7 @@ def register(request):
             if validate_form.is_valid():
                 code = validate_form.cleaned_data.get("code")
                 validation_token = request.session.get("verification_code")
-                print(f'{validation_token}\n Time Now: {time.time()}')
+                print(f"{validation_token}\n Time Now: {time.time()}")
                 if validation_token and validation_token["ttl"] > time.time():
                     if code == validation_token["code"]:
                         post_req = request.session.pop("register_form")
@@ -80,7 +80,7 @@ def register(request):
                         login(request, user)
                         messages.success(
                             request,
-                            'Your account has been created ! You are now able to log in',
+                            "Your account has been created ! You are now able to log in",
                         )
                         del request.session["verification_code"]
                         return redirect("users:index")
@@ -120,10 +120,10 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             form = login(request, user)
-            messages.success(request, f'Welcome {user.username}!')
+            messages.success(request, f"Welcome {user.username}!")
             return redirect("users:index")
         else:
-            messages.info(request, 'Account does not exist. Please sign up.')
+            messages.info(request, "Account does not exist. Please sign up.")
     form = AuthenticationForm()
     return render(request, "user/login.html", {"form": form, "title": "log in"})
 
@@ -149,7 +149,7 @@ def user_profile(request):
                 if user_form.is_valid():
                     vcode = "".join(random.choices(string.ascii_letters, k=5))
                     email = user_form.cleaned_data.get("email")
-                    print(f'vcode: {vcode}')
+                    print(f"vcode: {vcode}")
                     request.session["verification_code"] = {
                         "code": vcode,
                         "ttl": (time.time() + 300),
@@ -157,7 +157,7 @@ def user_profile(request):
                     subject, from_email, message = (
                         "Confirm your new email",
                         "test@gmail.com",
-                        f'This is your verification code: {vcode}',
+                        f"This is your verification code: {vcode}",
                     )
                     try:
                         send_mail(
@@ -187,14 +187,14 @@ def user_profile(request):
             if validate_form.is_valid():
                 code = validate_form.cleaned_data.get("code")
                 validation_token = request.session.get("verification_code")
-                print(f'{validation_token}\n Time Now: {time.time()}')
+                print(f"{validation_token}\n Time Now: {time.time()}")
                 if validation_token and validation_token["ttl"] > time.time():
                     if code == validation_token["code"]:
                         post_req = request.session.pop("profile_form")
                         user_form = UpdateUserForm(post_req, instance=request.user)
                         user_form.save()
                         messages.success(
-                            request, 'Your account has been updated successfully'
+                            request, "Your account has been updated successfully"
                         )
                         del request.session["verification_code"]
                         return redirect("users:user_profile")
