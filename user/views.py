@@ -1,24 +1,17 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, get_user_model
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import UserRegisterForm, ValidateForm
-from .forms import UserRegisterForm, ValidateForm
+from .forms import UserRegisterForm, ValidateForm, UpdateUserForm
 from django.core.mail import send_mail
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import get_template
-from django.template import Context
 from django.urls import reverse_lazy
-from smtplib import SMTP, SMTPException
+from smtplib import SMTPException
 import time
-import random, string
-import random, string
-
-from .forms import UserRegisterForm, UpdateUserForm
-from django.views import View
+import random
+import string
 
 
 def index(request):
@@ -33,7 +26,7 @@ def register(request):
             if form.is_valid():
                 vcode = "".join(random.choices(string.ascii_letters, k=5))
                 email = form.cleaned_data.get("email")
-                print(f"vcode: {vcode}")
+                print(f'vcode: {vcode}')
                 request.session["verification_code"] = {
                     "code": vcode,
                     "ttl": (time.time() + 300),
@@ -41,7 +34,7 @@ def register(request):
                 subject, from_email, message = (
                     "Verify Your Email",
                     "test@gmail.com",
-                    f"This is your verification code: {vcode}",
+                    f'This is your verification code: {vcode}',
                 )
                 try:
                     send_mail(
@@ -73,7 +66,7 @@ def register(request):
             if validate_form.is_valid():
                 code = validate_form.cleaned_data.get("code")
                 validation_token = request.session.get("verification_code")
-                print(f"{validation_token}\n Time Now: {time.time()}")
+                print(f'{validation_token}\n Time Now: {time.time()}')
                 if validation_token and validation_token["ttl"] > time.time():
                     if code == validation_token["code"]:
                         post_req = request.session.pop("register_form")
@@ -87,7 +80,7 @@ def register(request):
                         login(request, user)
                         messages.success(
                             request,
-                            f"Your account has been created ! You are now able to log in",
+                            'Your account has been created ! You are now able to log in',
                         )
                         del request.session["verification_code"]
                         return redirect("users:index")
@@ -96,7 +89,8 @@ def register(request):
                             "title": "validate code",
                             "verify_code": True,
                             "validate_failed": True,
-                            "error_text": "Incorrect Validation Code, make sure you entered in the right code.",
+                            "error_text": "Incorrect Validation Code, \
+make sure you entered in the right code.",
                         }
                         return render(request, "user/register.html", context)
                 else:
@@ -126,10 +120,10 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             form = login(request, user)
-            messages.success(request, f"Welcome {user.username}!")
+            messages.success(request, f'Welcome {user.username}!')
             return redirect("users:index")
         else:
-            messages.info(request, f"Account does not exist. Please sign up.")
+            messages.info(request, 'Account does not exist. Please sign up.')
     form = AuthenticationForm()
     return render(request, "user/login.html", {"form": form, "title": "log in"})
 
@@ -155,7 +149,7 @@ def user_profile(request):
                 if user_form.is_valid():
                     vcode = "".join(random.choices(string.ascii_letters, k=5))
                     email = user_form.cleaned_data.get("email")
-                    print(f"vcode: {vcode}")
+                    print(f'vcode: {vcode}')
                     request.session["verification_code"] = {
                         "code": vcode,
                         "ttl": (time.time() + 300),
@@ -163,7 +157,7 @@ def user_profile(request):
                     subject, from_email, message = (
                         "Confirm your new email",
                         "test@gmail.com",
-                        f"This is your verification code: {vcode}",
+                        f'This is your verification code: {vcode}',
                     )
                     try:
                         send_mail(
@@ -193,14 +187,14 @@ def user_profile(request):
             if validate_form.is_valid():
                 code = validate_form.cleaned_data.get("code")
                 validation_token = request.session.get("verification_code")
-                print(f"{validation_token}\n Time Now: {time.time()}")
+                print(f'{validation_token}\n Time Now: {time.time()}')
                 if validation_token and validation_token["ttl"] > time.time():
                     if code == validation_token["code"]:
                         post_req = request.session.pop("profile_form")
                         user_form = UpdateUserForm(post_req, instance=request.user)
                         user_form.save()
                         messages.success(
-                            request, f"Your account has been updated successfully"
+                            request, 'Your account has been updated successfully'
                         )
                         del request.session["verification_code"]
                         return redirect("users:user_profile")
@@ -209,7 +203,8 @@ def user_profile(request):
                             "title": "validate code",
                             "verify_code": True,
                             "validate_failed": True,
-                            "error_text": "Incorrect Validation Code, make sure you entered in the right code.",
+                            "error_text": "Incorrect Validation Code, \
+make sure you entered in the right code.",
                         }
                         return render(request, "user/profile.html", context)
                 else:

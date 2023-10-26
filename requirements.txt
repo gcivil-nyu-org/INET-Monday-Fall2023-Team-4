@@ -2,6 +2,7 @@ asgiref==3.7.2
 black==23.10.0
 click==8.1.7
 colorama==0.4.6
+coverage==6.5.0
 crispy-bootstrap4==2022.1
 Django==4.2.6
 django-crispy-forms==2.0
