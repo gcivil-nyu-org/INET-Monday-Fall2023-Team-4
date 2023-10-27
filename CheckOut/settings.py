@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-ha2r#15cuib7b$eh#!*%8dc#0t)s*v3n(g$yi&ep($kkgy&%j8
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "checkout-env.eba-9f9crzri.us-east-1.elasticbeanstalk.com",
+    "checkout-env.eba-a2fjneg3.us-west-2.elasticbeanstalk.com",
     "127.0.0.1",
     "172.31.40.50",
 ]

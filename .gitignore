@@ -1,3 +1,8 @@
+*.pyc
+.db.sqlite3
+.DS_Store
+__pycache__/
+.vscode
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

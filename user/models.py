@@ -22,7 +22,7 @@ class CustomUser(AbstractUser):
     ]
 
     def get_user_status(email):
-        domain = re.search("@[\w.]+", email).group()
+        domain = re.search(r"@[\w.]+", email).group()
         if domain == "@nyu.edu":
             return "nyu"
         else:
