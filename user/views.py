@@ -1,0 +1,232 @@
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
+from .forms import UserRegisterForm, ValidateForm, UpdateUserForm
+from django.core.mail import send_mail
+from django.urls import reverse_lazy
+from smtplib import SMTPException
+import time
+import random
+import string
+
+
+def index(request):
+    return render(request, "user/index.html", {"title": "index"})
+
+
+def register(request):
+    if request.method == "POST":
+        if "signup" in request.POST:
+            form = UserRegisterForm(request.POST)
+            request.session["register_form"] = request.POST
+            if form.is_valid():
+                vcode = "".join(random.choices(string.ascii_letters, k=5))
+                email = form.cleaned_data.get("email")
+                print(f"vcode: {vcode}")
+                request.session["verification_code"] = {
+                    "code": vcode,
+                    "ttl": (time.time() + 300),
+                }
+                subject, from_email, message = (
+                    "Verify Your Email",
+                    "test@gmail.com",
+                    f"This is your verification code: {vcode}",
+                )
+                try:
+                    send_mail(
+                        subject,
+                        message,
+                        from_email,
+                        [email],
+                        fail_silently=False,
+                    )
+                    context = {
+                        "form": form,
+                        "title": "validate code",
+                        "verify_code": True,
+                    }
+                    return render(request, "user/register.html", context)
+                except SMTPException as e:
+                    print(e)
+                    context = {
+                        "form": form,
+                        "title": "validate code",
+                        "verify_code": True,
+                        "email_send_failed": True,
+                    }
+                    return render(request, "user/register.html", context)
+        elif "verify" in request.POST:
+            print("Verify stuff")
+            validate_form = ValidateForm(request.POST)
+            print(request.POST)
+            if validate_form.is_valid():
+                code = validate_form.cleaned_data.get("code")
+                validation_token = request.session.get("verification_code")
+                print(f"{validation_token}\n Time Now: {time.time()}")
+                if validation_token and validation_token["ttl"] > time.time():
+                    if code == validation_token["code"]:
+                        post_req = request.session.pop("register_form")
+                        form = UserRegisterForm(post_req)
+                        form.save()
+                        username = form.cleaned_data.get("username")
+                        email = form.cleaned_data.get("email")
+                        password = form.cleaned_data.get("password1")
+
+                        user = authenticate(username=username, password=password)
+                        login(request, user)
+                        messages.success(
+                            request,
+                            "Your account has been created ! You are now able to log in",
+                        )
+                        del request.session["verification_code"]
+                        return redirect("users:index")
+                    else:
+                        context = {
+                            "title": "validate code",
+                            "verify_code": True,
+                            "validate_failed": True,
+                            "error_text": "Incorrect Validation Code, \
+make sure you entered in the right code.",
+                        }
+                        return render(request, "user/register.html", context)
+                else:
+                    context = {
+                        "title": "validate code",
+                        "verify_code": True,
+                        "validate_failed": True,
+                        "error_text": "The verification code has expired.",
+                    }
+                    return render(request, "user/register.html", context)
+            else:
+                print("Failed validation")
+
+    else:
+        form = UserRegisterForm()
+    return render(
+        request, "user/register.html", {"form": form, "title": "register here"}
+    )
+
+
+def user_login(request):
+    if request.method == "POST":
+        # TODO: use AuthenticationForm
+
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            form = login(request, user)
+            messages.success(request, f"Welcome {user.username}!")
+            return redirect("users:index")
+        else:
+            messages.info(request, "Account does not exist. Please sign up.")
+    form = AuthenticationForm()
+    return render(request, "user/login.html", {"form": form, "title": "log in"})
+
+
+@login_required
+def user_profile(request):
+    if request.method == "POST":
+        user_form = UpdateUserForm(request.POST, instance=request.user)
+        print("this one", request.POST)
+        # if "change_password" in re
+        if "update" in request.POST:
+            if request.POST["email"] == request.user.email:
+                print("no email update")
+                if user_form.is_valid():
+                    user_form.save()
+                    messages.success(request, "Your profile is updated successfully")
+                    return redirect("users:user_profile")
+                    # return render(request, "user/profile.html")
+            # email changed
+            request.session["profile_form"] = request.POST
+            if request.POST["email"] != request.user.email:
+                print("email changed")
+                if user_form.is_valid():
+                    vcode = "".join(random.choices(string.ascii_letters, k=5))
+                    email = user_form.cleaned_data.get("email")
+                    print(f"vcode: {vcode}")
+                    request.session["verification_code"] = {
+                        "code": vcode,
+                        "ttl": (time.time() + 300),
+                    }
+                    subject, from_email, message = (
+                        "Confirm your new email",
+                        "test@gmail.com",
+                        f"This is your verification code: {vcode}",
+                    )
+                    try:
+                        send_mail(
+                            subject,
+                            message,
+                            from_email,
+                            [email],
+                            fail_silently=False,
+                        )
+                        context = {
+                            "form": user_form,
+                            "title": "validate code",
+                            "verify_code": True,
+                        }
+                        return render(request, "user/profile.html", context)
+                    except SMTPException as e:
+                        print(e)
+                        context = {
+                            "form": user_form,
+                            "title": "validate code",
+                            "verify_code": True,
+                            "email_send_failed": True,
+                        }
+                        return render(request, "user/profile.html", context)
+        elif "verify" in request.POST:
+            validate_form = ValidateForm(request.POST)
+            if validate_form.is_valid():
+                code = validate_form.cleaned_data.get("code")
+                validation_token = request.session.get("verification_code")
+                print(f"{validation_token}\n Time Now: {time.time()}")
+                if validation_token and validation_token["ttl"] > time.time():
+                    if code == validation_token["code"]:
+                        post_req = request.session.pop("profile_form")
+                        user_form = UpdateUserForm(post_req, instance=request.user)
+                        user_form.save()
+                        messages.success(
+                            request, "Your account has been updated successfully"
+                        )
+                        del request.session["verification_code"]
+                        return redirect("users:user_profile")
+                    else:
+                        context = {
+                            "title": "validate code",
+                            "verify_code": True,
+                            "validate_failed": True,
+                            "error_text": "Incorrect Validation Code, \
+make sure you entered in the right code.",
+                        }
+                        return render(request, "user/profile.html", context)
+                else:
+                    context = {
+                        "title": "validate code",
+                        "verify_code": True,
+                        "validate_failed": True,
+                        "error_text": "The verification code has expired.",
+                    }
+                    return render(request, "user/profile.html", context)
+            else:
+                print("Failed validation")
+    else:
+        user_form = UpdateUserForm(instance=request.user)
+    return render(
+        request,
+        "user/profile.html",
+        {"user_form": user_form, "title": "update your profile"},
+    )
+
+
+class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
+    template_name = "user/change_password.html"
+    success_message = "Successfully Changed Your Password"
+    success_url = reverse_lazy("users:index")

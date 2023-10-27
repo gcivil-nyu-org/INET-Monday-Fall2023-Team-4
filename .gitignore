@@ -1,5 +1,16 @@
 *.pyc
-.db.sqlite3
-.DS_Store
+*.cpython-311.pyc
 __pycache__/
+db.sqlite3
+.DS_Store
 .vscode
+
+.env
+
+_migrations/*
+!_migrations/__init__.py
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
