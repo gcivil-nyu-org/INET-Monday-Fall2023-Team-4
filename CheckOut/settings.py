@@ -24,7 +24,6 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -32,6 +31,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "checkout-env.eba-a2fjneg3.us-west-2.elasticbeanstalk.com",
+    "localhost",
     "127.0.0.1",
     "172.31.40.50",
 ]
