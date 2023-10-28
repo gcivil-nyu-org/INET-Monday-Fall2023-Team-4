@@ -9,7 +9,6 @@ install:
 - curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C ./coverall
 
 before_script:
-- python manage.py makemigrations 
 - python manage.py migrate
 
 script:
