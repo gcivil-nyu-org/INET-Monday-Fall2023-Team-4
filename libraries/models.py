@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 # Create your models here.
 
@@ -26,4 +27,19 @@ class Library(models.Model):
         ordering = ["-branch"]
 
     def __str__(self):
-        return self.BRANCH
+        return self.branch
+
+    def get_today_hours(self):
+        days_in_week = [
+            self.monday,
+            self.tuesday,
+            self.wednesday,
+            self.thursday,
+            self.friday,
+            self.saturday,
+            self.sunday,
+        ]
+
+        curr_time = datetime.now()
+        weekday = curr_time.weekday()
+        return days_in_week[weekday]

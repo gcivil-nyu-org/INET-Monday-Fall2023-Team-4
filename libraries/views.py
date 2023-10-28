@@ -21,7 +21,6 @@ class LibraryDetailView(DetailView):
 
 class LibraryListView(ListView):
     model = Library
-
     paginate_by = 10
 
     # def get_context_data(self, **kwargs):
