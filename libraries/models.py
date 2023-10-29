@@ -25,6 +25,7 @@ class Library(models.Model):
 
     class Meta:
         ordering = ["-branch"]
+        db_table = "library"
 
     def __str__(self):
         return self.branch

@@ -7,22 +7,22 @@
 
   <body>
     <div class="container-fluid">
-      <h1>Find Your Library</h1>
+      <h1 class="p-3">Find Your Library</h1>
     </div>
 
     <div class="container-fluid">
       {% for library in page_obj %}
-      <h4><a href="{{library.link}}">{{ library.branch }}</a></h4>
+      <h4 class="px-3"><a href="{{library.link}}">{{ library.branch }}</a></h4>
       <p>
-        <address class="fs-4"> 
+        <address class="fs-4 px-3"> 
         {{ library.address }}, {{ library.city }}, {{ library.postcode }}
         </address> 
-        <p class="fs-5">
+        <p class="fs-5 px-3">
         {% bs_icon 'telephone-fill' %} Phone: {{ library.phone }} <br />
         {% bs_icon 'alarm-fill' %} Today's Hours: {{ library.get_today_hours }} <br />
         </p>
-        <p class="fs-5" href="#opening_hours_{{library.id}}" data-bs-toggle="collapse">{% bs_icon 'calendar-event-fill' %}View all opening hours {% bs_icon 'chevron-down' %}</p>
-        <p id="opening_hours_{{library.id}}" class="collapse">
+        <p class="fs-5 px-3" href="#opening_hours_{{library.id}}" data-bs-toggle="collapse">{% bs_icon 'calendar-event-fill' %}View all opening hours {% bs_icon 'chevron-down' %}</p>
+        <p id="opening_hours_{{library.id}}" class="collapse px-3">
             Monday: {{library.monday}} <br />
             Tuesday: {{library.tuesday}} <br />
             Wednesday: {{library.wednesday}} <br />
@@ -35,7 +35,7 @@
       {% endfor %}
     </div>
 
-    <div class="container-fluid">
+    <div class="d-flex justify-content-center">
       <nav aria-label="Page navigation example">
         <ul class="pagination">
           {% if page_obj.has_previous %}
