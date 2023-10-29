@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "bootstrap5",
+    "django_bootstrap_icons",
 ]
 
 AUTH_USER_MODEL = "user.CustomUser"
@@ -89,10 +91,21 @@ WSGI_APPLICATION = "CheckOut.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": env("ENGINE"),
+        "NAME": env("RDS_DB_NAME"),
+        "USER": env("RDS_USERNAME"),
+        "PASSWORD": env("RDS_PASSWORD"),
+        "HOST": env("RDS_HOSTNAME"),
+        "PORT": env("RDS_PORT"),
     }
 }
 
