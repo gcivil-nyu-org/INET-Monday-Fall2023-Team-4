@@ -1,6 +1,4 @@
 from django.urls import path
-
-from . import views
 from libraries.views import LibraryDetailView, LibraryListView
 
 app_name = "libraries"
