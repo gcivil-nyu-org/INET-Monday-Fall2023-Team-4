@@ -16,7 +16,6 @@ script:
 - ./coverall/coveralls report --repo-token=$COVERALL_TOKEN ./coverage.xml
 
 deploy:
-  skip_cleanup: true
   provider: elasticbeanstalk
   access_key_id: "$AWS_KEY"
   secret_access_key: "$AWS_SECRET"
