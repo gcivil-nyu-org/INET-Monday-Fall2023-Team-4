@@ -100,12 +100,12 @@ WSGI_APPLICATION = "CheckOut.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "ebdb",
-        "USER": "admin",
-        "PASSWORD": "password",
-        "HOST": "awseb-e-sq2uvzfvcd-stack-awsebrdsdatabase-si51asyjlonr.crtzh4ckk2i1.us-west-2.rds.amazonaws.com",
-        "PORT": 3306,
+        "ENGINE": env("ENGINE"),
+        "NAME": env("RDS_DB_NAME"),
+        "USER": env("RDS_USERNAME"),
+        "PASSWORD": env("RDS_PASSWORD"),
+        "HOST": env("RDS_HOSTNAME"),
+        "PORT": env("RDS_PORT"),
     }
 }
 
