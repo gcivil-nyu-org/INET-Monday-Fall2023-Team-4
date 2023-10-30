@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.template.loader import get_template
 from django.test import Client
 from django.test import RequestFactory
-from django.template.loader import get_template
 
 from libraries.models import Library
 from libraries.views import index
@@ -62,7 +61,6 @@ class LibrariesTestCase(TestCase):
         )
 
     def test_library_ordering(self):
-        branch1 = Library.objects.get(id=1)
         ordering = Library._meta.ordering
         self.assertEquals(ordering[0], "-branch")
 
