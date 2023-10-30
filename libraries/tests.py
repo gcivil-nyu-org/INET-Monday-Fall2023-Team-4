@@ -10,6 +10,9 @@ c = Client()
 
 
 class IndexViewTest(TestCase):
+    class Meta:
+        db_table = "libraries_library"
+
     def test_index_view(self):
         factory = RequestFactory()
         request = factory.get("/")
@@ -20,6 +23,9 @@ class IndexViewTest(TestCase):
 
 
 class LibrariesTestCase(TestCase):
+    class Meta:
+        db_table = "libraries_library"
+
     def setUp(self):
         Library.objects.create(
             id=1,
