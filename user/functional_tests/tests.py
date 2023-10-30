@@ -3,6 +3,7 @@ from user.forms import UserRegisterForm
 from django.urls import reverse
 from user.models import CustomUser
 from user.views import user_profile
+from django.contrib.messages.storage.fallback import FallbackStorage
 
 
 class LoginViewTest(TestCase):
@@ -72,19 +73,26 @@ class UserProfileViewTest(TestCase):
     def test_profile_credential_change(self):
         newformdata = self.testvalidformdata.copy()
         newformdata["first_name"] = "newfirstname"
-        request = {"user": self.testvalidform["username"]}
+        request = {"user": self.testvalidform["username"], "update": ""}
         request.update(newformdata)
         self.login()
         req = self.factory.post(reverse("users:user_profile"), request)
         req.user = self.user
+        req.session = self.client.session
+        setattr(req, "session", "session")
+        messages = FallbackStorage(req)
+        setattr(req, "_messages", messages)
         response = user_profile(req)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
     def test_profile_email_credential_change(self):
         newformdata = self.testvalidformdata.copy()
         newformdata["email"] = "test@email.com"
-        req = self.factory.post(reverse("users:user_profile"), newformdata)
+        request = {"update": ""}
+        request.update(newformdata)
+        req = self.factory.post(reverse("users:user_profile"), request)
         req.user = self.user
+        req.session = self.client.session
         response = user_profile(req)
         self.assertEqual(response.status_code, 200)
 
