@@ -1,66 +1,66 @@
 from django.test import TestCase
-from django.urls import reverse
 from django.template.loader import get_template
-from django.http import HttpRequest
 from django.test import Client
 from django.test import RequestFactory
-from django.http import HttpResponse
-from django.template import Template, Context
 from django.template.loader import get_template
 
 from libraries.models import Library
-from libraries.views import index, LibraryListView, LibraryDetailView
+from libraries.views import index
 
 c = Client()
+
 
 class IndexViewTest(TestCase):
     def test_index_view(self):
         factory = RequestFactory()
-        request = factory.get('/')
+        request = factory.get("/")
         response = index(request)
         self.assertEqual(response.status_code, 200)
-        expected_template = get_template('libraries/index.html') 
-        self.assertEqual(response.content, expected_template.render({}).encode()) 
-        
+        expected_template = get_template("libraries/index.html")
+        self.assertEqual(response.content, expected_template.render({}).encode())
+
+
 class LibrariesTestCase(TestCase):
     def setUp(self):
         Library.objects.create(
-            id=1, 
-            branch="Library Test Case Branch", 
-            address="123 Test Unit Drive", 
-            city="Coveralls", 
-            postcode="65432", 
-            phone="(123)456-7890", 
-            monday="9:00AM - 5:00PM", 
-            tuesday="9:00AM - 5:00PM", 
-            wednesday="9:00AM - 5:00PM", 
-            thursday="9:00AM - 5:00PM", 
-            friday="9:00AM - 5:00PM", 
-            saturday="9:00AM - 5:00PM", 
-            sunday="9:00AM - 5:00PM", 
-            latitude=0.0, 
-            longitude=0.0, 
-            link="https://github.com/gcivil-nyu-org/INET-Monday-Fall2023-Team-4", 
-            NYU=1)
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/INET-Monday-Fall2023-Team-4",
+            NYU=1,
+        )
         Library.objects.create(
-            id=2, 
-            branch="Library Unit Test Branch", 
-            address="123 Test Unit Drive", 
-            city="Coveralls", 
-            postcode="65432", 
-            phone="(123)456-7890", 
-            monday="9:00AM - 5:00PM", 
-            tuesday="9:00AM - 5:00PM", 
-            wednesday="9:00AM - 5:00PM", 
-            thursday="9:00AM - 5:00PM", 
-            friday="9:00AM - 5:00PM", 
-            saturday="9:00AM - 5:00PM", 
-            sunday="9:00AM - 5:00PM", 
-            latitude=0.0, 
-            longitude=0.0, 
-            link="https://github.com/gcivil-nyu-org/INET-Monday-Fall2023-Team-4", 
-            NYU=0)
-        
+            id=2,
+            branch="Library Unit Test Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/INET-Monday-Fall2023-Team-4",
+            NYU=0,
+        )
+
     def test_library_ordering(self):
         branch1 = Library.objects.get(id=1)
         ordering = Library._meta.ordering
