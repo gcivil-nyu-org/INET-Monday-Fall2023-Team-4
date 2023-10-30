@@ -10,8 +10,6 @@ c = Client()
 
 
 class IndexViewTest(TestCase):
-    class Meta:
-        db_table = "libraries_library"
 
     def test_index_view(self):
         factory = RequestFactory()
@@ -23,8 +21,6 @@ class IndexViewTest(TestCase):
 
 
 class LibrariesTestCase(TestCase):
-    class Meta:
-        db_table = "libraries_library"
 
     def setUp(self):
         Library.objects.create(
@@ -76,17 +72,14 @@ class LibrariesTestCase(TestCase):
         self.assertEqual(getattr(branch1, "branch"), "Library Test Case Branch")
         self.assertTrue(getattr(branch2, "branch"), "Library Unit Test Branch")
 
-    # def test_get_today_hours(self):
-    #     days_in_week = [
-    #         self.monday,
-    #         self.tuesday,
-    #         self.wednesday,
-    #         self.thursday,
-    #         self.friday,
-    #         self.saturday,
-    #         self.sunday,
-    #     ]
-    #     current_time = datetime.now()
-    #     weekday = current_time.weekday()
-    #     result = Library.get_today_hours(self)
-    #     self.assertEqual(weekday.lower(), result)
+    def test_get_today_hours(self):
+        self.monday = "9:00 AM - 6:00 PM"
+        self.tuesday = "9:00 AM - 6:00 PM"
+        self.wednesday = "9:00 AM - 6:00 PM"
+        self.thursday = "9:00 AM - 6:00 PM"
+        self.friday = "9:00 AM - 6:00 PM"
+        self.saturday = "9:00 AM - 6:00 PM"
+        self.sunday = "9:00 AM - 6:00 PM"
+
+        expected_hours = "9:00 AM - 6:00 PM"
+        self.assertEqual(Library.get_today_hours(self), expected_hours)
