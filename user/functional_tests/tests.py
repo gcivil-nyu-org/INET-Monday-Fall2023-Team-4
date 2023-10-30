@@ -4,9 +4,7 @@ from django.urls import reverse
 from user.models import CustomUser
 from user.views import user_profile
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.core.exceptions import ValidationError
 from unittest.mock import patch
-from django.core.mail import send_mail
 from smtplib import SMTPException
 
 
