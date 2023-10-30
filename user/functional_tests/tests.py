@@ -1,4 +1,4 @@
-from django.test import TestCase,RequestFactory
+from django.test import TestCase, RequestFactory
 from user.forms import UserRegisterForm
 from django.urls import reverse
 from user.models import CustomUser
@@ -72,21 +72,21 @@ class UserProfileViewTest(TestCase):
     def test_profile_credential_change(self):
         newformdata = self.testvalidformdata.copy()
         newformdata["first_name"] = "newfirstname"
-        request = {"user": self.testvalidform['username']}
+        request = {"user": self.testvalidform["username"]}
         request.update(newformdata)
         self.login()
         req = self.factory.post(reverse("users:user_profile"), request)
         req.user = self.user
         response = user_profile(req)
-        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.status_code, 200)
 
     def test_profile_email_credential_change(self):
         newformdata = self.testvalidformdata.copy()
-        newformdata['email'] = "test@email.com"
-        req = self.factory.post(reverse('users:user_profile'),newformdata)
+        newformdata["email"] = "test@email.com"
+        req = self.factory.post(reverse("users:user_profile"), newformdata)
         req.user = self.user
         response = user_profile(req)
-        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.status_code, 200)
 
 
 class UserViewTest(TestCase):
