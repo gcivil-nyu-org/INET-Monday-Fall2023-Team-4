@@ -99,14 +99,17 @@ WSGI_APPLICATION = "CheckOut.wsgi.application"
 # }
 
 DATABASES = {
-    "default": {
-        "ENGINE": env("ENGINE"),
-        "NAME": env("RDS_DB_NAME"),
-        "USER": env("RDS_USERNAME"),
-        "PASSWORD": env("RDS_PASSWORD"),
-        "HOST": env("RDS_HOSTNAME"),
-        "PORT": env("RDS_PORT"),
-    }
+	'default': {
+		'ENGINE': env('ENGINE'),
+		'NAME': env('RDS_DB_NAME'),
+		'USER': env('RDS_USERNAME'),
+		'PASSWORD': env('RDS_PASSWORD'),
+		'HOST': env('RDS_HOSTNAME'),
+		'PORT': env('RDS_PORT'),
+		'OPTIONS': {
+            'sql_mode': 'traditional',
+        }
+	}
 }
 
 
