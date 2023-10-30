@@ -1,6 +1,8 @@
-from django.test import TestCase
+from django.test import TestCase,RequestFactory
 from user.forms import UserRegisterForm
 from django.urls import reverse
+from user.models import CustomUser
+from user.views import user_profile
 
 
 class LoginViewTest(TestCase):
@@ -38,6 +40,53 @@ class LoginViewTest(TestCase):
         response = self.client.post(reverse("users:register"), postdata)
         response = self.client.post(reverse("users:login"), formdata)
         self.assertRedirects(response, reverse("users:index"))
+
+
+class UserProfileViewTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        formdata = {
+            "first_name": "test3first",
+            "last_name": "test3last",
+            "password1": "testP@ssword1",
+            "password2": "testP@ssword1",
+            "username": "test3",
+            "email": "test3@email.com",
+        }
+        self.user = CustomUser.objects.create(
+            username=formdata["username"],
+            email=formdata["email"],
+            first_name=formdata["first_name"],
+            last_name=formdata["last_name"],
+        )
+        self.testvalidformdata = formdata
+        self.testvalidform = UserRegisterForm(data=formdata)
+
+    def login(self):
+        self.client.login(username="test3", password="testP@ssword1")
+
+    def test_profile_page(self):
+        response = self.client.get(reverse("users:user_profile"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_profile_credential_change(self):
+        newformdata = self.testvalidformdata.copy()
+        newformdata["first_name"] = "newfirstname"
+        request = {"user": self.testvalidform['username']}
+        request.update(newformdata)
+        self.login()
+        req = self.factory.post(reverse("users:user_profile"), request)
+        req.user = self.user
+        response = user_profile(req)
+        self.assertEqual(response.status_code,200)
+
+    def test_profile_email_credential_change(self):
+        newformdata = self.testvalidformdata.copy()
+        newformdata['email'] = "test@email.com"
+        req = self.factory.post(reverse('users:user_profile'),newformdata)
+        req.user = self.user
+        response = user_profile(req)
+        self.assertEqual(response.status_code,200)
 
 
 class UserViewTest(TestCase):
