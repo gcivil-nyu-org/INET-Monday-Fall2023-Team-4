@@ -4,6 +4,10 @@ from django.urls import reverse
 from user.models import CustomUser
 from user.views import user_profile
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.core.exceptions import ValidationError
+from unittest.mock import patch
+from django.core.mail import send_mail
+from smtplib import SMTPException
 
 
 class LoginViewTest(TestCase):
@@ -41,6 +45,12 @@ class LoginViewTest(TestCase):
         response = self.client.post(reverse("users:register"), postdata)
         response = self.client.post(reverse("users:login"), formdata)
         self.assertRedirects(response, reverse("users:index"))
+
+    def test_register_email_failure(self):
+        with patch("user.views.send_mail") as mocked_send_mail:
+            mocked_send_mail.side_effect = SMTPException("Simulated SMTP exception")
+            response = self.client.post(reverse("users:register"), {"signup": ""})
+            self.assertEqual(response.status_code, 200)
 
 
 class UserProfileViewTest(TestCase):

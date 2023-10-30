@@ -28,3 +28,7 @@ class CustomUserTest(TestCase):
     def test_return_str(self):
         test1 = CustomUser.objects.get(email="test@email.com")
         self.assertEqual(test1.username, "test")
+
+    def test_string_representation(self):
+        test2 = CustomUser.objects.get(email="test@nyu.edu")
+        self.assertEqual(str(test2), "test2")

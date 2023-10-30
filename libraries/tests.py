@@ -70,6 +70,10 @@ class LibrariesTestCase(TestCase):
         self.assertEqual(getattr(branch1, "branch"), "Library Test Case Branch")
         self.assertTrue(getattr(branch2, "branch"), "Library Unit Test Branch")
 
+    def test_string_representation(self):
+        branch1 = Library.objects.get(id=1)
+        self.assertEqual(str(branch1), "Library Test Case Branch")
+
     def test_get_today_hours(self):
         self.monday = "9:00 AM - 6:00 PM"
         self.tuesday = "9:00 AM - 6:00 PM"
