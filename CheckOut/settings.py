@@ -40,6 +40,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    "bookClub",
     "user.apps.UserConfig",
     "libraries.apps.LibrariesConfig",
     "crispy_forms",
