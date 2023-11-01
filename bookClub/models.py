@@ -8,7 +8,7 @@ class BookClub(models.Model):
     description = models.TextField()
     currentBook = models.CharField(max_length=150)
     meetingSchedule = models.TextField()
-    libraryId = models.ForeignKey(Library, on_delete=models.CASCADE)
-    adminId = models.SmallIntegerField()
+    libraryId = models.ForeignKey(Library, on_delete=models.CASCADE,related_name='book_clubs')
+    admin = models.ForeignKey(CustomUser,  on_delete=models.CASCADE,related_name='book_club_admin')
     members = models.ManyToManyField(CustomUser, related_name="book_clubs")
 
