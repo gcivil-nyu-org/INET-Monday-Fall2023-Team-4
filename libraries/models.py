@@ -1,8 +1,6 @@
 from django.db import models
 from datetime import datetime
 
-# Create your models here.
-
 
 class Library(models.Model):
     id = models.AutoField(primary_key=True)
@@ -24,7 +22,7 @@ class Library(models.Model):
     NYU = models.CharField(max_length=255)
 
     class Meta:
-        ordering = ["-branch"]
+        ordering = ["branch"]
         db_table = "library"
 
     def __str__(self):
