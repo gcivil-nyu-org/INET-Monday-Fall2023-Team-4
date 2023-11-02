@@ -1,8 +1,6 @@
 from django.db import models
 from datetime import datetime
 
-# Create your models here.
-
 
 class Library(models.Model):
     id = models.AutoField(primary_key=True)
