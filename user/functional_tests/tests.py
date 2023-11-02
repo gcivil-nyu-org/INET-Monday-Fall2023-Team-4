@@ -171,7 +171,9 @@ class UserFormsTestCase(TestCase):
         formdata["password1"] = "abcdefg"
         form = UserRegisterForm(formdata)
         self.assertFalse(form.is_valid())
-        self.assertIn("Password cannot only contain characters", form.errors["password1"])
+        self.assertIn(
+            "Password cannot only contain characters", form.errors["password1"]
+        )
 
     def test_update_user_form(self):
         self.user = CustomUser.objects.create(email="existing@update.com")
