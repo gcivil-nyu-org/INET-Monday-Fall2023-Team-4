@@ -4,6 +4,7 @@ from libraries.models import Library
 import datetime
 
 # Create your models here.
+
 class BookClub(models.Model):
     DAYS_OF_THE_WEEK = [
         ("monday", "Monday"),
@@ -44,3 +45,4 @@ class BookClub(models.Model):
         on_delete=models.CASCADE,
         related_name='book_club_admin')
     members = models.ManyToManyField(CustomUser, related_name="book_clubs")
+    
