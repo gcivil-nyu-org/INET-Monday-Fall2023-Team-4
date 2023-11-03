@@ -1,5 +1,38 @@
-<h1>{{ object.branch }}</h1>
-<p>Address: {{ object.address }}</p>
-<p>City: {{ object.city }}</p>
-<p>Phone: {{ object.phone }}</p>
-<p>Today's hours: {{ now }}</p>
+{% extends "user/base.html" %}
+<!DOCTYPE html>
+
+<html>
+  <head>
+    {% comment %}
+    <title>{% block title %}{% endblock %}</title>
+    {% endcomment %} {% load bootstrap5 %} {% bootstrap_css %} {%
+    bootstrap_javascript %} {% load bootstrap_icons %}
+  </head>
+  {% block content %}
+  <body>
+    <div class="card d-flex align-items-center justify-content-center">
+        <h3 class="p-3">{{ library.branch }}</h3>
+        <p>
+          <address class="fs-4 px-3"> 
+          {{ library.address }}, {{ library.city }}, {{ library.postcode }}
+          </address> 
+          <p class="fs-5 px-3">
+          {% bs_icon 'telephone-fill' %} Phone: {{ library.phone }} <br />
+          {% bs_icon 'alarm-fill' %} Today's Hours: {{ library.get_today_hours }} <br />
+          </p>
+          <p class="fs-5 px-3" href="#opening_hours_{{library.id}}" data-bs-toggle="collapse">{% bs_icon 'calendar-event-fill' %}View all opening hours {% bs_icon 'chevron-down' %}</p>
+          <p id="opening_hours_{{library.id}}" class="collapse px-3">
+              Monday: {% if library.monday == null %} Closed {% else %} {{ library.monday }} {% endif %} <br />
+              Tuesday: {% if library.tuesday == null %} Closed {% else %} {{library.tuesday}} {% endif %} <br />
+              Wednesday: {% if library.wednesday == null %} Closed {% else %} {{library.wednesday}} {% endif %} <br />
+              Thursday: {% if library.thursday == null %} Closed {% else %} {{library.thursday}} {% endif %}<br />
+              Friday: {% if library.friday == null %} Closed {% else %} {{ library.friday }} {% endif %} <br />
+              Saturday: {% if library.saturday == null %} Closed {% else %} {{ library.saturday }} {% endif %} <br />
+              Sunday: {% if library.sunday == null %} Closed {% else %} {{ library.sunday }} {% endif %} <br />
+          </p>
+        </p>
+    </div>
+    
+  </body>
+  {% endblock %}
+</html>
