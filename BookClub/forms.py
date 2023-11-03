@@ -14,4 +14,3 @@ class BookClubForm(ModelForm):
             "meetingStartTime",
             "meetingEndTime",
             "meetingOccurence")
-

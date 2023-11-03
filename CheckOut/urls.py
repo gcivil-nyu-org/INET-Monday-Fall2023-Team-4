@@ -28,4 +28,5 @@ urlpatterns = [
         name="logout",
     ),
     path("libraries/", include("libraries.urls")),
+    path("CreateBookClub",include("BookClub.urls"),name="BookClubCreation")
 ]
