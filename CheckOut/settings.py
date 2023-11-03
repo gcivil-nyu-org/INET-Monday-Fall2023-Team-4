@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "bootstrap5",
     "django_bootstrap_icons",
-    "BookClub.apps.BookClubConfig"
+    "BookClub.apps.BookClubConfig",
 ]
 
 AUTH_USER_MODEL = "user.CustomUser"

@@ -6,26 +6,52 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('libraries', '0004_alter_library_table'),
+        ("libraries", "0004_alter_library_table"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BookClub',
+            name="BookClub",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=150)),
-                ('description', models.TextField()),
-                ('currentBook', models.CharField(max_length=150)),
-                ('meetingSchedule', models.TextField()),
-                ('admin', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='book_club_admin', to=settings.AUTH_USER_MODEL)),
-                ('libraryId', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='book_clubs', to='libraries.library')),
-                ('members', models.ManyToManyField(related_name='book_clubs', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=150)),
+                ("description", models.TextField()),
+                ("currentBook", models.CharField(max_length=150)),
+                ("meetingSchedule", models.TextField()),
+                (
+                    "admin",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="book_club_admin",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "libraryId",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="book_clubs",
+                        to="libraries.library",
+                    ),
+                ),
+                (
+                    "members",
+                    models.ManyToManyField(
+                        related_name="book_clubs", to=settings.AUTH_USER_MODEL
+                    ),
+                ),
             ],
         ),
     ]
