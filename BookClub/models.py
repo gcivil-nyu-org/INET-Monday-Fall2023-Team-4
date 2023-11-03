@@ -35,6 +35,12 @@ class BookClub(models.Model):
         max_length=150,
         null=True,  # Allows the field to be null
         blank=True)  # drop down choice in forms
-    libraryId = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='book_clubs')
-    admin = models.ForeignKey(CustomUser,  on_delete=models.CASCADE, related_name='book_club_admin')
+    libraryId = models.ForeignKey(
+        Library,
+        on_delete=models.CASCADE,
+        related_name='book_clubs')
+    admin = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='book_club_admin')
     members = models.ManyToManyField(CustomUser, related_name="book_clubs")
