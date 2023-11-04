@@ -5,7 +5,9 @@
   <head>
     {% comment %}
     <title>{% block title %}{% endblock %}</title>
-    {% endcomment %} {% load bootstrap5 %} {% bootstrap_css %} {%
+    {% endcomment %} 
+    <link rel="stylesheet" href="./cards.css" type="text/css"/>
+    {% load bootstrap5 %} {% bootstrap_css %} {%
     bootstrap_javascript %} {% load bootstrap_icons %}
   </head>
   {% block content %}
@@ -33,21 +35,22 @@
           <p class="fs-5 px-3"><a href="{{ library.link }}" style="text-decoration:none; color: unset">{% bs_icon 'info-square-fill' %}Vist library's official page for more details</a></p>
         </p>
     </div>
-    {% comment %} <div class="container-fluid">
-        <p>Check out our book clubs!</p>
+    <div class="container-fluid p-3">
+        <h2 class="font-weight-light">Check out our book_clubs!</h2>
+        <div class="d-flex overflow-auto" style="height: 450px">
         {% for bc in book_clubs %}
-        <li class="card">
-            <div>
-              <h3 class="card-title">{{bc.name}}</h3>
-              <div class="card-content">{{ bc.description }}</div>
+        <div class="card p-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ bc.name }}</h5>
+                <p class="card-text">{{ bc.description }}</p>
+                <p class="card-text">Currently reading: {{ bc.currentBook }}</p>
+                <p class="card-text">Meeting day: {{ bc.meetingDay }}</p>
+                <p class="card-text">Meeting time: {{ bc.meetingStartTime }} - {{ bc.meetingEndTime }}</p>
             </div>
-            <div class="card-link-wrapper">
-              <a href="" class="card-link">...</a>
-            </div>
-        </li>
+        </div>
         {% endfor %}
-    </div> {% endcomment %}
-    
+        </div>
+    </div>
   </body>
   {% endblock %}
 </html>

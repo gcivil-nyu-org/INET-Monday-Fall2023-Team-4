@@ -5,6 +5,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.db.models import Q
 from libraries.models import Library
+from BookClub.models import BookClub
 
 
 def index(request):
@@ -16,10 +17,10 @@ def index(request):
 class LibraryDetailView(DetailView):
     model = Library
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context["book_clubs"] = BookClub.objects.filter(libraryId=self.object.id)
-    #     return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["book_clubs"] = BookClub.objects.filter(libraryId=self.object.id)
+        return context
 
 
 class LibraryListView(ListView):
