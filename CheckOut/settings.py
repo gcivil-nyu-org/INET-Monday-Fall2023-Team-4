@@ -40,7 +40,6 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    "bookClub",
     "user.apps.UserConfig",
     "libraries.apps.LibrariesConfig",
     "crispy_forms",
@@ -53,7 +52,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "bootstrap5",
     "django_bootstrap_icons",
-    "BookClub.apps.BookClubConfig"
+    "BookClub.apps.BookclubConfig",
 ]
 
 AUTH_USER_MODEL = "user.CustomUser"
