@@ -16,10 +16,10 @@ def index(request):
 class LibraryDetailView(DetailView):
     model = Library
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # context["book_club_data"] = BookClub.objects.filter(libraryId=self.object.id)
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context["book_clubs"] = BookClub.objects.filter(libraryId=self.object.id)
+    #     return context
 
 
 class LibraryListView(ListView):

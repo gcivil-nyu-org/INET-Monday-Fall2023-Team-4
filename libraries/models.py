@@ -23,8 +23,8 @@ class Library(models.Model):
     NYU = models.CharField(max_length=255)
 
     class Meta:
-        ordering = ["branch"]
         managed = False
+        ordering = ["branch"]
         db_table = "library"
 
     def __str__(self):
