@@ -5,34 +5,56 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('BookClub', '0001_initial'),
+        ("BookClub", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='bookclub',
-            name='meetingSchedule',
+            model_name="bookclub",
+            name="meetingSchedule",
         ),
         migrations.AddField(
-            model_name='bookclub',
-            name='meetingDay',
-            field=models.CharField(blank=True, choices=[('monday', 'Monday'), ('tuesday', 'Tuesday'), ('wednesday', 'Wednesday'), ('thursday', 'Thursday'), ('friday', 'Friday'), ('saturday', 'Saturday'), ('sunday', 'Sunday')], max_length=150, null=True),
+            model_name="bookclub",
+            name="meetingDay",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("monday", "Monday"),
+                    ("tuesday", "Tuesday"),
+                    ("wednesday", "Wednesday"),
+                    ("thursday", "Thursday"),
+                    ("friday", "Friday"),
+                    ("saturday", "Saturday"),
+                    ("sunday", "Sunday"),
+                ],
+                max_length=150,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='bookclub',
-            name='meetingEndTime',
+            model_name="bookclub",
+            name="meetingEndTime",
             field=models.TimeField(default=datetime.time(18, 0)),
         ),
         migrations.AddField(
-            model_name='bookclub',
-            name='meetingOccurence',
-            field=models.CharField(blank=True, choices=[(1, 'One-Time'), (2, 'Weekly'), (3, 'Bi-weekly'), (4, 'Monthly')], max_length=150, null=True),
+            model_name="bookclub",
+            name="meetingOccurence",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    (1, "One-Time"),
+                    (2, "Weekly"),
+                    (3, "Bi-weekly"),
+                    (4, "Monthly"),
+                ],
+                max_length=150,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='bookclub',
-            name='meetingStartTime',
+            model_name="bookclub",
+            name="meetingStartTime",
             field=models.TimeField(default=datetime.time(17, 0)),
         ),
     ]
