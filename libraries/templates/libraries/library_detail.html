@@ -36,7 +36,7 @@
         </p>
     </div>
     <div class="container-fluid p-3">
-        <h2 class="font-weight-light">Check out our book_clubs!</h2>
+        <h2 class="font-weight-light">Check out our book clubs!</h2>
         <div class="d-flex overflow-auto" style="height: 450px">
         {% for bc in book_clubs %}
         <div class="card p-3">
@@ -46,6 +46,18 @@
                 <p class="card-text">Currently reading: {{ bc.currentBook }}</p>
                 <p class="card-text">Meeting day: {{ bc.meetingDay }}</p>
                 <p class="card-text">Meeting time: {{ bc.meetingStartTime }} - {{ bc.meetingEndTime }}</p>
+                <form method="POST" id="joinForm" class="form-inline my-2 my-lg-0">
+                    {% csrf_token%}
+                    <input type="hidden" value="{{ user.id }}" name="user_id">
+                    <input type="hidden" value="{{ bc.id }}" name="bookclub_id">
+                    {% if bc in user_clubs %}
+                        {% comment %} <input type="hidden" value=true name="join"> {% endcomment %}
+                        <button type="submit" name="unjoin" class="btn btn-primary">Joined</button>
+                    {% else %}
+                        {% comment %} <input type="hidden" value=false name="join"> {% endcomment %}
+                        <button type="submit" name="join" class="btn btn-primary">Join</button>
+                    {% endif %}
+                </form>
             </div>
         </div>
         {% endfor %}
