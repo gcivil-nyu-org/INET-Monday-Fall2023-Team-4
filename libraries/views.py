@@ -1,6 +1,5 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.template import loader
-from django.shortcuts import render
 from django.urls import reverse
 
 from django.views import View
