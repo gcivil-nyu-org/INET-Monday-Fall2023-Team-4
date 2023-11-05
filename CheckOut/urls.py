@@ -28,5 +28,4 @@ urlpatterns = [
         name="logout",
     ),
     path("libraries/", include("libraries.urls")),
-    path("bookclub/", include("BookClub.urls")),
 ]

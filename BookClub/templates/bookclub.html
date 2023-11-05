@@ -1,9 +1,1 @@
-<center>
-    <h1>Create Book Club</h1>
-    <form action="" method=POST>
-        {% csrf_token %}
-        {{form.as_p}}
-        <input type = "submit" value =
-        "Submit" class = "btn btn-success" >
-    </form>
-</center>
+<a href="{% url 'create_book_club' library_id=library.id %}">Create Book Club</a>
