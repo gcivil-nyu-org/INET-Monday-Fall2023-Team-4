@@ -9,13 +9,43 @@ from .forms import UserRegisterForm, ValidateForm, UpdateUserForm
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
 from smtplib import SMTPException
+from django.core.exceptions import ObjectDoesNotExist
+from BookClub.models import BookClub
 import time
 import random
 import string
 
 
 def index(request):
-    return render(request, "user/index.html", {"title": "index"})
+    bookclubs_ids = BookClub.members.through.objects.filter(
+        customuser_id=request.user.id
+    )
+    bookclubs = []
+    for mapping in bookclubs_ids:
+        bookclubs.append(BookClub.objects.get(id=mapping.bookclub_id))
+    return render(
+        request,
+        "user/index.html",
+        {"title": "index", "subscriptions": bookclubs, "isfrontpage": True},
+    )
+
+
+def unsubscribe(request, slug):
+    print("unsubscribing")
+    if request.method == "POST":
+        try:
+            bc = BookClub.objects.get(id=slug)
+            if bc.admin == request.user:
+                messages.info(
+                    request,
+                    "Owner can not unsubscribe, please reassign ownership first",
+                )
+                return redirect("users:index")
+            bc.members.remove(request.user)
+            messages.info(request, "Unsubscribe action complete")
+        except ObjectDoesNotExist:
+            print("Something went wrong")
+    return redirect("users:index")
 
 
 def register(request):

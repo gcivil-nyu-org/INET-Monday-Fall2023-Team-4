@@ -1,9 +1,11 @@
 from django.test import TestCase, RequestFactory
-from user.forms import UserRegisterForm
+from user.forms import UserRegisterForm, UpdateUserForm, ValidateForm
 from django.urls import reverse
 from user.models import CustomUser
 from user.views import user_profile
 from django.contrib.messages.storage.fallback import FallbackStorage
+from unittest.mock import patch
+from smtplib import SMTPException
 
 
 class LoginViewTest(TestCase):
@@ -41,6 +43,12 @@ class LoginViewTest(TestCase):
         response = self.client.post(reverse("users:register"), postdata)
         response = self.client.post(reverse("users:login"), formdata)
         self.assertRedirects(response, reverse("users:index"))
+
+    def test_register_email_failure(self):
+        with patch("user.views.send_mail") as mocked_send_mail:
+            mocked_send_mail.side_effect = SMTPException("Simulated SMTP exception")
+            response = self.client.post(reverse("users:register"), {"signup": ""})
+            self.assertEqual(response.status_code, 200)
 
 
 class UserProfileViewTest(TestCase):
@@ -131,3 +139,67 @@ class UserViewTest(TestCase):
         postdata = {"verify": "", "code": code}
         response = self.client.post(reverse("users:register"), postdata)
         self.assertRedirects(response, reverse("users:index"))
+
+
+class UserFormsTestCase(TestCase):
+    def test_user_register_form(self):
+        self.user = CustomUser.objects.create(email="existing@email.com")
+        formdata = {
+            "first_name": "test3first",
+            "last_name": "test3last",
+            "password1": "testP@ssword1",
+            "password2": "testP@ssword1",
+            "username": "test3",
+            "email": "existing@email.com",
+        }
+        new_form = UserRegisterForm(formdata)
+        self.assertFalse(new_form.is_valid())
+        self.assertIn(
+            "Email already exists! Please use another email.", new_form.errors["email"]
+        )
+
+        formdata["email"] = "invalidemail"
+        form = UserRegisterForm(formdata)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Enter a valid email address.", form.errors["email"])
+
+        formdata["password1"] = "123456"
+        form = UserRegisterForm(formdata)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Password cannot only contain numbers", form.errors["password1"])
+
+        formdata["password1"] = "abcdefg"
+        form = UserRegisterForm(formdata)
+        self.assertFalse(form.is_valid())
+        self.assertIn(
+            "Password cannot only contain characters", form.errors["password1"]
+        )
+
+    def test_update_user_form(self):
+        self.user = CustomUser.objects.create(email="existing@update.com")
+        formdata = {
+            "first_name": "test3first",
+            "last_name": "test3last",
+            "password1": "testP@ssword1",
+            "password2": "testP@ssword1",
+            "username": "test3",
+            "email": "existing@update.com",
+        }
+        new_form = UpdateUserForm(formdata)
+        self.assertFalse(new_form.is_valid())
+        self.assertIn(
+            "Email already exists! Please use another email.", new_form.errors["email"]
+        )
+
+        formdata["email"] = "invalidemail"
+        form = UpdateUserForm(formdata)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Enter a valid email address.", form.errors["email"])
+
+    def test_validate_form(self):
+        data = {
+            "code": "special#code",
+        }
+        form = ValidateForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Only alphanumeric characters are allowed.", form.errors["code"])
