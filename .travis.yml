@@ -1,19 +1,19 @@
 language: python
 
 python:
-- "3.9"
+  - "3.9"
 
 install:
-- pip install -r requirements.txt
-- mkdir coverall
-- curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C ./coverall
+  - pip install -r requirements.txt
+  - mkdir coverall
+  - curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C ./coverall
 
 script:
-- black --check .
-- flake8 . --max-line-length=99
-- coverage run manage.py test --noinput
-- coverage xml
-- ./coverall/coveralls report --repo-token=$COVERALL_TOKEN ./coverage.xml
+  - black . --check
+  - flake8 . --max-line-length=99
+  - coverage run manage.py test --noinput
+  - coverage xml
+  - ./coverall/coveralls report --repo-token=$COVERALL_TOKEN ./coverage.xml
 
 deploy:
   provider: elasticbeanstalk

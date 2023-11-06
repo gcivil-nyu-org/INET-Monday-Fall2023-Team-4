@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block start %}
 
-<div class="content-section col-md-8 col-md-offset-2">
+<div class="content-section col-md-8 col-md-offset-2" style="margin: 0 auto">
 {% if not verify_code %}
 <form method="POST" style="border: 1px solid black; margin: 4%; padding:10%; border-radius:1%;">
 	{% csrf_token %}
