@@ -8,10 +8,6 @@ install:
   - mkdir coverall
   - curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C ./coverall
 
-before_script:
-  - python manage.py makemigrations
-  - python manage.py migrate
-
 script:
   - black . --check
   - flake8 . --max-line-length=99
