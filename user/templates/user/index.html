@@ -1,3 +1,4 @@
+{% extends "user/base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
 <!DOCTYPE html>
@@ -42,44 +43,10 @@
 
 
 </head>
-
+{% block content %}
 <body class="container-fluid">
 
-
-<header class="row">
-
-	<!-- navbar-->
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-	<div class="container-fluid">
-		<div class="navbar-header">
-		<button class="navbar-toggle" data-toggle="collapse" data-target="#mainNavBar">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-		</button>
-		<a class="navbar-brand" class="styleheader" href="{% url "users:index" %}">Check Out</a>
-		</div>
-		<div class="collapse navbar-collapse" id="mainNavBar">
-		<ul class="nav navbar-nav navbar-right">
-			<li><a href="{% url "users:index" %}">Home</a></li>
-
-			{% if user.is_authenticated %}
-			<li><a href="{% url "logout" %}"><span class="glyphicon glyphicon-log-out"></span>  Logout</a></li>
-			<li><a href="{% url "users:user_profile" %}"><span class="glyphicon glyphicon-log-out"></span>  User Profile</a></li>
-			{% else %}
-			<li><a href="{% url "users:register" %}"><span class="glyphicon glyphicon-user"></span>  Sign up</a></li>
-			<li><a href="{% url "users:login" %}"><span class="glyphicon glyphicon-log-in"></span>  Log in</a></li>
-			{% endif %}
-
-		</ul>
-		</div>
-	</div>
-	</nav>
-</header>
-<br/>
-<br>
-<br>
+{% include "user/base.html" %}
 <div class="row">
 	{% block start %}
 	{% if user.is_authenticated %}
@@ -149,5 +116,5 @@
 	{% endif %}
 </div>
 </body>
-
+{% endblock %}
 </html>

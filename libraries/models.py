@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import datetime
+from django.urls import reverse
 
 
 class Library(models.Model):
@@ -22,6 +23,7 @@ class Library(models.Model):
     NYU = models.CharField(max_length=255)
 
     class Meta:
+        managed = False
         ordering = ["branch"]
         db_table = "library"
 
@@ -42,3 +44,6 @@ class Library(models.Model):
         curr_time = datetime.now()
         weekday = curr_time.weekday()
         return days_in_week[weekday]
+
+    def get_absolute_url(self):
+        return reverse("libraries:library-detail", kwargs={"pk": self.pk})
