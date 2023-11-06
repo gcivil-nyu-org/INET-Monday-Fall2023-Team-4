@@ -50,15 +50,72 @@
 <div class="row">
 	{% block start %}
 	{% if user.is_authenticated %}
-	<center><h1>Welcome back {{user.first_name}}!</h1></center>
-	{% else %}
-	<center><h1>Check Out</h1></center>
-	{% endif %}
-	<div>
-		<center><button type="button" class="btn btn-info"><a href="{% url "libraries:library-list"%}">View Libraries</a></button></center>
+	<div class="container">
+		<center><h1>Welcome back {{user.first_name}}!</h1></center>
+		{% else %}
+		<center><h1>Check Out</h1></center>
+		{% endif %}
+		<div>
+			<center><button type="button" class="btn btn-info"><a href="{% url "libraries:library-list"%}">View Libraries</a></button></center>
+		</div>
+		</br>
 	</div>
 	{% endblock %}
+	{% if user.is_authenticated and isfrontpage %}
+	{% block subscriptions %}
+		<div class="container">
+			<div class="row">
+				<div class="col-4">
+					{% if subscriptions %}
+						<center><h2>Your Subscriptions</h2></center>
+					{% else %}
+						<center>Looks like your not subscribed to any book clubs.</center>
+					{% endif %}
+					{% for club in subscriptions %}
+						<div class="panel panel-default">
+							<div class="row">
+								<div class="panel-heading">
+									<div class="col-sm-8">
+										{% if club.admin == request.user %}
+											<p class="text-primary">OWNER</p>
+										{% else %}
+											<p class="text-primary">MEMBER</p>
+										{% endif %}
+										 Club Name: {{club.name}} - Meeting Day: {{club.meetingDay}} - Current Boook: {{club.currentBook}}
+									</div>
+									<div class="col-sm-4">
+										<div style="float: right;">
+											<form method="POST" action="{% url 'users:unsubscribe' club.id %}">
+												{% csrf_token %}
+												<button type="submit" class="btn btn-warning">Unsubscribe</button>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="panel-body">
+								{{club.description}}
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	{% endblock %}
+	{% endif %}
+	{% if not user.is_authenticated and isfrontpage %}
+		<div class="container">
+			<div class=".col-md-3">
+				<div class="panel panel-info">
+					<div class="panel-heading">
+							Login for to view subscriptions
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
 </div>
 </body>
 {% endblock %}
 </html>
+
