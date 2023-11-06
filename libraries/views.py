@@ -10,8 +10,8 @@ from django.views.generic.list import ListView
 from django.db.models import Q
 from libraries.models import Library
 from BookClub.models import BookClub
-from Subscription.models import Subscription
-from Subscription.forms import JoinClubForm
+
+from .forms import JoinClubForm
 
 from datetime import date
 
@@ -29,8 +29,10 @@ class LibraryDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["book_clubs"] = BookClub.objects.filter(libraryId=self.object.id)
-        subs = Subscription.objects.filter(user_id=self.request.user.id)
-        bc_pk_list = list(set(sub.book_club_id for sub in subs))
+        bookclubs_ids = BookClub.members.through.objects.filter(
+            customuser_id=self.request.user.id
+        )
+        bc_pk_list = [bc.bookclub_id for bc in bookclubs_ids]
         context["user_clubs"] = BookClub.objects.filter(pk__in=bc_pk_list)
         context["form"] = JoinClubForm()
 
@@ -64,19 +66,11 @@ class LibraryView(View):
         view = JoinClubFormView.as_view()
         form = JoinClubForm(request.POST)
         if form.is_valid():
+            bc = BookClub.objects.get(id=request.POST["bookclub_id"][0])
             if "unjoin" in request.POST:
-                sub = Subscription.objects.filter(
-                    user_id=request.user.id,
-                    book_club_id=int(request.POST["bookclub_id"][0]),
-                )
-                sub.delete()
+                bc.members.remove(request.user)
             else:
-                new_sub = Subscription(
-                    user_id=request.user.id,
-                    book_club_id=int(request.POST["bookclub_id"][0]),
-                    date_joined=date.today(),
-                )
-                new_sub.save()
+                bc.members.add(request.user)
         return view(request, *args, **kwargs)
 
 
