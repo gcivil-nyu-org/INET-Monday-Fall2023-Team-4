@@ -13,8 +13,6 @@ from BookClub.models import BookClub
 
 from .forms import JoinClubForm
 
-from datetime import date
-
 
 def index(request):
     template = loader.get_template("libraries/index.html")

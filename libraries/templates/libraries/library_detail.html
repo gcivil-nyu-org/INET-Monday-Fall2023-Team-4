@@ -46,6 +46,7 @@
                 <p class="card-text">Currently reading: {{ bc.currentBook }}</p>
                 <p class="card-text">Meeting day: {{ bc.meetingDay }}</p>
                 <p class="card-text">Meeting time: {{ bc.meetingStartTime }} - {{ bc.meetingEndTime }}</p>
+                {% if user.is_authenticated %}
                 <form method="POST" id="joinForm" class="form-inline my-2 my-lg-0">
                     {% csrf_token%}
                     <input type="hidden" value="{{ user.id }}" name="user_id">
@@ -58,6 +59,7 @@
                         <button type="submit" name="join" class="btn btn-primary">Join</button>
                     {% endif %}
                 </form>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
