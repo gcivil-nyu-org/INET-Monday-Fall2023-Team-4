@@ -15,10 +15,10 @@ class BookClub(models.Model):
         ("sunday", "Sunday"),
     ]
     OCCURENCE_CHOICES = [
-        (1, "One-Time"),
-        (2, "Weekly"),
-        (3, "Bi-weekly"),
-        (4, "Monthly"),
+        ("1", "One-Time"),
+        ("2", "Weekly"),
+        ("3", "Bi-weekly"),
+        ("4", "Monthly"),
     ]
     name = models.CharField(max_length=150)
     description = models.TextField()
