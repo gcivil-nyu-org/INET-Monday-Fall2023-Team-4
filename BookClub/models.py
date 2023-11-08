@@ -15,10 +15,10 @@ class BookClub(models.Model):
         ("sunday", "Sunday"),
     ]
     OCCURENCE_CHOICES = [
-        (1, "One-Time"),
-        (2, "Weekly"),
-        (3, "Bi-weekly"),
-        (4, "Monthly"),
+        ("one", "One-Time"),
+        ("weekly", "Weekly"),
+        ("bi-weekly", "Bi-weekly"),
+        ("monthly", "Monthly"),
     ]
     name = models.CharField(max_length=150)
     description = models.TextField()
@@ -44,3 +44,6 @@ class BookClub(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name="book_club_admin"
     )
     members = models.ManyToManyField(CustomUser, related_name="book_clubs")
+
+    def __str__(self):
+        return self.name

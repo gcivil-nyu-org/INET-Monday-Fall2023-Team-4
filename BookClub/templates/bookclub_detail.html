@@ -1,0 +1,38 @@
+{% extends "user/base.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="./cards.css" type="text/css"/>
+    {% load bootstrap5 %} {% bootstrap_css %} {%
+    bootstrap_javascript %} {% load bootstrap_icons %}
+    <title>{{ book_club.name }} Details</title>
+</head>
+{% block content %}
+<body>
+    <!-- Display Book Cover -->
+    <!-- {% if book_cover %}
+        <img src="{{ book_cover }}" alt="Book Cover">
+    {% else %}
+        <p>Book cover not available</p>
+    {% endif %} -->
+    <h1>{{ book_club.name }} Details</h1>
+    <p>Description: {{ book_club.description }}</p>
+    <p>Current Book: {{ book_club.currentBook }}</p>
+    <p>Meeting Day: {{ book_club.meetingDay }}</p>
+    <p>Meeting Start Time: {{ book_club.meetingStartTime }}</p>
+    <p>Meeting End Time: {{ book_club.meetingEndTime }}</p>
+    <p>Admin: {{book_club.admin}}</p>
+
+    <label for="members">Members:</label>
+        {% for member in book_club.members.all %}
+            <div class="col-sm-8">
+                {{ member.username }}
+            </div>
+        {% endfor %}
+
+    {% if request.user == book_club.admin %}
+        <a href="{% url 'edit_book_club' book_club.id %}" class="btn btn-primary">Edit Book Club</a>
+    {% endif %}
+</body>
+{% endblock %}
+</html>

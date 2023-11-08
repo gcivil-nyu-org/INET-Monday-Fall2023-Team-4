@@ -1,0 +1,30 @@
+{% extends "user/base.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="./cards.css" type="text/css"/>
+    {% load bootstrap5 %} {% bootstrap_css %} {%
+    bootstrap_javascript %} {% load bootstrap_icons %}
+    <title>Edit Book Club</title>
+</head>
+{% block content %}
+<body>
+    <h1>Edit Book Club: {{ book_club.name }}</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <div></div>
+
+        <label for="members">Members:</label>
+        {% for member in book_club.members.all %}
+            <div class="col-sm-8">
+                {{ member.username }}
+            </div>
+        {% endfor %}
+
+        <button type="submit">Save Changes</button>
+    </form>
+</body>
+{% endblock %}
+</html>
