@@ -14,6 +14,9 @@ def edit_book_club(request, book_club_id):
     if request.method == "POST":
         form = BookClubEditForm(request.POST, instance=book_club)
         if form.is_valid():
+            new_admin = form.cleaned_data["admin"]
+            if new_admin not in book_club.members.all():
+                book_club.members.add(new_admin)
             form.save()
             return redirect("book_club_detail", book_club_id=book_club.id)
     else:
