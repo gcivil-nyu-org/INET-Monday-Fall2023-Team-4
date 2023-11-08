@@ -1,0 +1,76 @@
+{% extends "user/base.html" %}
+<!DOCTYPE html>
+<html>
+	<head>
+		{% load bootstrap5 %} {% bootstrap_css %}
+		
+	</head>
+	{% block content %}
+	<body>
+		{% if messages %}
+		{% for message in messages %}
+			<div class="container-fluid p-0">
+				<div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+					{{ message }}
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			</div>
+		{% endfor %}
+		{% endif %}
+		<div class='container'>
+			{% if bookclub %}
+			<div class='container'>
+				<div class='row justify-content-center'>
+					<center><h1>{{bookclub.name}}</h1></center>
+				</div>
+				<div class='row justify-content-center'>
+					<center>
+					<p>{{bookclub.description}}</p>
+					<p>Current Book Reading: {{bookclub.currentBook}}</p>
+					<p>Meeting Time: {{bookclub.meetingDay}} , {{bookclub.meetingStartTime}} - {{bookclub.meetingEndTime}}</p>
+					<p>Current Amount of Members: {{member_count}}</p>
+					</center>
+				</div>
+			</div>
+			<div class='container' style='margin-bottom:10px'>
+				<div class='row justify-content-center'>
+					<center>
+						<form method="POST">
+							{% csrf_token %}
+							<button type="submit" name="chat" class="btn btn-primary">Chat Room</a></button>
+							<button type="submit" name="subscribe" class="btn btn-primary">Subscribe</a></button>
+							<button type="submit" name="Other" class="btn btn-primary">Other</a></button>
+						</form>
+					</center>
+				</div>
+			</div>
+			{% else %}
+			<div class='container'>
+				<center><h1>The Book Club you are trying to reach is either does not exist or you have no permission to view</h1></center>
+			</div>
+			{% endif %}
+			<div id="map" style='height:500px;width:500px'></div>
+			<script
+			   src="https://maps.googleapis.com/maps/api/js?key={{key}}&callback=initMap&v=weekly"
+			   defer
+			></script>
+			<script> 
+				let map;
+				function initMap() {
+					let location = { 'lat':{{lat}}, 'lng':{{lng}} };
+					map = new google.maps.Map(document.getElementById("map"), {
+						center: location,
+						zoom: 18,
+					});
+					new google.maps.Marker({
+						position: location,
+						map,
+						title: "Library!",
+					});
+				}
+				window.initMap = initMap;
+			</script>
+		</div>
+	</body>
+	{% endblock %}
+</html>
