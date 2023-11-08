@@ -85,10 +85,14 @@
 									</div>
 									<div class="col-sm-4">
 										<div style="float: right;">
-											<form method="POST" action="{% url 'users:unsubscribe' club.id %}">
-												{% csrf_token %}
-												<button type="submit" class="btn btn-warning">Unsubscribe</button>
-											</form>
+											{% if club.admin == request.user %}
+												<a href="{% url 'edit_book_club' club.id %}" class="btn btn-primary">Edit Book Club</a>
+											{% else %}
+												<form method="POST" action="{% url 'users:unsubscribe' club.id %}">
+													{% csrf_token %}
+													<button type="submit" class="btn btn-warning">Unsubscribe</button>
+												</form>
+											{% endif %}
 										</div>
 									</div>
 								</div>

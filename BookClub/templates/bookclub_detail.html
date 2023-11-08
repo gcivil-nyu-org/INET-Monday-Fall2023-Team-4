@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ book_club.name }} Details</title>
+</head>
+<body>
+    <h1>{{ book_club.name }} Details</h1>
+    <p>Description: {{ book_club.description }}</p>
+    <p>Current Book: {{ book_club.currentBook }}</p>
+    <p>Meeting Day: {{ book_club.meetingDay }}</p>
+    <p>Meeting Start Time: {{ book_club.meetingStartTime }}</p>
+    <p>Meeting End Time: {{ book_club.meetingEndTime }}</p>
+    {% if request.user == book_club.admin %}
+        <a href="{% url 'edit_book_club' book_club.id %}">Edit Book Club</a>
+    {% endif %}
+</body>
+</html>
