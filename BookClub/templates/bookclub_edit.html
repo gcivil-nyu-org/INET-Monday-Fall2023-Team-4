@@ -13,12 +13,6 @@
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <label for="id_admin">Admin:</label>
-        <select name="admin" id="id_admin">
-            {% for member in book_club.members.all %}
-                <option value="{{ member.id }}">{{ member.username }}</option>
-            {% endfor %}
-        </select>
         
         <div></div>
 
