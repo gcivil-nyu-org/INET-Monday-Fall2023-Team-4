@@ -12,29 +12,60 @@
   </head>
   {% block content %}
   <body>
-    <div class="card d-flex align-items-center justify-content-center">
-        <h3 class="p-3">{{ library.branch }}</h3>
-        <p>
-          <address class="fs-4 px-3"> 
-          {{ library.address }}, {{ library.city }}, {{ library.postcode }}
-          </address> 
-          <p class="fs-5 px-3">
-          {% bs_icon 'telephone-fill' %} Phone: {{ library.phone }} <br />
-          {% bs_icon 'alarm-fill' %} Today's Hours: {{ library.get_today_hours }} <br />
-          </p>
-          <p class="fs-5 px-3" href="#opening_hours_{{library.id}}" data-bs-toggle="collapse">{% bs_icon 'calendar-event-fill' %}View all opening hours {% bs_icon 'chevron-down' %}</p>
-          <p id="opening_hours_{{library.id}}" class="collapse px-3">
-              Monday: {% if library.monday == null %} Closed {% else %} {{ library.monday }} {% endif %} <br />
-              Tuesday: {% if library.tuesday == null %} Closed {% else %} {{library.tuesday}} {% endif %} <br />
-              Wednesday: {% if library.wednesday == null %} Closed {% else %} {{library.wednesday}} {% endif %} <br />
-              Thursday: {% if library.thursday == null %} Closed {% else %} {{library.thursday}} {% endif %}<br />
-              Friday: {% if library.friday == null %} Closed {% else %} {{ library.friday }} {% endif %} <br />
-              Saturday: {% if library.saturday == null %} Closed {% else %} {{ library.saturday }} {% endif %} <br />
-              Sunday: {% if library.sunday == null %} Closed {% else %} {{ library.sunday }} {% endif %} <br />
-          </p>
-          <p class="fs-5 px-3"><a href="{{ library.link }}" style="text-decoration:none; color: unset">{% bs_icon 'info-square-fill' %}Vist library's official page for more details</a></p>
-        </p>
-    </div>
+	<div class="container">
+		<div class="row">
+			<div class="col-6">
+				<div class="card d-flex align-items-center justify-content-center">
+					<h3 class="p-3">{{ library.branch }}</h3>
+					<p>
+					  <address class="fs-4 px-3"> 
+					  {{ library.address }}, {{ library.city }}, {{ library.postcode }}
+					  </address> 
+					  <p class="fs-5 px-3">
+					  {% bs_icon 'telephone-fill' %} Phone: {{ library.phone }} <br />
+					  {% bs_icon 'alarm-fill' %} Today's Hours: {{ library.get_today_hours }} <br />
+					  </p>
+					  <p class="fs-5 px-3" href="#opening_hours_{{library.id}}" data-bs-toggle="collapse">{% bs_icon 'calendar-event-fill' %}View all opening hours {% bs_icon 'chevron-down' %}</p>
+					  <p id="opening_hours_{{library.id}}" class="collapse px-3">
+						  Monday: {% if library.monday == null %} Closed {% else %} {{ library.monday }} {% endif %} <br />
+						  Tuesday: {% if library.tuesday == null %} Closed {% else %} {{library.tuesday}} {% endif %} <br />
+						  Wednesday: {% if library.wednesday == null %} Closed {% else %} {{library.wednesday}} {% endif %} <br />
+						  Thursday: {% if library.thursday == null %} Closed {% else %} {{library.thursday}} {% endif %}<br />
+						  Friday: {% if library.friday == null %} Closed {% else %} {{ library.friday }} {% endif %} <br />
+						  Saturday: {% if library.saturday == null %} Closed {% else %} {{ library.saturday }} {% endif %} <br />
+						  Sunday: {% if library.sunday == null %} Closed {% else %} {{ library.sunday }} {% endif %} <br />
+					  </p>
+					  <p class="fs-5 px-3"><a href="{{ library.link }}" style="text-decoration:none; color: unset">{% bs_icon 'info-square-fill' %}Vist library's official page for more details</a></p>
+					</p>
+				</div>
+			</div>
+			<div class="col-6">
+				<div class="card d-flex align-items-center justify-content-center" style="height:100%">
+					<div id="map" style='height:100%;width:100%;'>Looks like we have no location data for this location!</div>
+					<script
+					   src="https://maps.googleapis.com/maps/api/js?key={{key}}&callback=initMap&v=weekly"
+					   defer
+					></script>
+					<script> 
+						let map;
+						function initMap() {
+							let location = { 'lat':{{library.latitude}}, 'lng':{{library.longitude}} };
+							map = new google.maps.Map(document.getElementById("map"), {
+								center: location,
+								zoom: 18,
+							});
+							new google.maps.Marker({
+								position: location,
+								map,
+								title: "{{library.branch}}",
+							});
+						}
+						window.initMap = initMap;
+					</script>
+				</div>
+			</div>
+		</div>
+	</div>
     <div class="container-fluid p-3">
         <h2 class="font-weight-light">Check out our book clubs!</h2>
         <div class="d-flex overflow-auto" style="height: 450px">
