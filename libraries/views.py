@@ -46,6 +46,7 @@ class JoinClubFormView(SingleObjectMixin, FormView):
     success_url = "#"
 
     def post(self, request, *args, **kwargs):
+        print("pray")
         self.object = self.get_object()
         return super().post(request, *args, **kwargs)
 
