@@ -8,7 +8,13 @@ from django.http import HttpRequest
 from BookClub.models import BookClub
 from user.models import CustomUser
 from libraries.models import Library
-from libraries.views import index, LibraryListView, JoinClubFormView, LibraryDetailView
+from libraries.views import (
+    index,
+    LibraryListView,
+    LibraryView,
+    JoinClubFormView,
+    LibraryDetailView,
+)
 
 import datetime
 
@@ -233,7 +239,7 @@ class LibraryDetailViewTestCase(TestCase):
             admin=self.user,
         )
         self.library_detail_view = LibraryDetailView()
-        self.library_detail_view.object = self.bookclub  # Creating a BookClub object
+        self.library_detail_view.object = self.bookclub
 
     def test_get_context_data(self):
         user_id = 1
@@ -309,3 +315,47 @@ class JoinClubFormViewTestCase(TestCase):
         )
 
         self.assertEqual(url, expected_url)
+
+
+class LibraryViewTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(
+            username="Tester",
+            email="testers@nyu.edu",
+            first_name="Testing",
+            last_name="Testing",
+        )
+        self.library = Library.objects.create(
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.client = Client()
+        self.library_view = LibraryView()
+
+    def test_get_method(self):
+        response = self.client.get("/libraries/1")
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_method_unauthenticated(self):
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = AnonymousUser()
+
+        response = self.library_view.post(request)
+
+        self.assertEqual(response.status_code, 403)
