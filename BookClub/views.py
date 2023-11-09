@@ -10,7 +10,7 @@ def book_club_details(request,slug):
     context = {
 		'bookclub': bc,
 		'member_count': bc.members.all().count(),
-		'subscribed': bc.members.contains(request.user)
+		'subscribed': bc.members.contains(request.user) if request.user.is_authenticated else False
     }
     print(context)
     if request.method == "POST":

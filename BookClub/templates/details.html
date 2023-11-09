@@ -37,13 +37,14 @@
 					<center>
 						<form method="POST">
 							{% csrf_token %}
-							<button type="submit" name="chat" class="btn btn-primary">Chat Room</a></button>
-							{% if subscribed %}
-							<button type="submit" name="unsubscribe" class="btn btn-primary">Unsubscribe</a></button>
-							{% else %}
-							<button type="submit" name="subscribe" class="btn btn-primary">Subscribe</a></button>
+							{% if user.is_authenticated %}
+								<button type="submit" name="chat" class="btn btn-primary">Chat Room</a></button>
+								{% if subscribed %}
+								<button type="submit" name="unsubscribe" class="btn btn-primary">Unsubscribe</a></button>
+								{% else %}
+								<button type="submit" name="subscribe" class="btn btn-primary">Subscribe</a></button>
+								{% endif %}
 							{% endif %}
-							<button type="submit" name="Other" class="btn btn-primary">Other</a></button>
 						</form>
 					</center>
 				</div>
