@@ -3,7 +3,7 @@ from user.models import CustomUser
 
 # Create your tests here.
 
-
+#test
 class CustomUserTest(TestCase):
     def setUp(self):
         CustomUser.objects.create(
