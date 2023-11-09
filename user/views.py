@@ -110,7 +110,7 @@ def register(request):
                         login(request, user)
                         messages.success(
                             request,
-                            "Your account has been created ! You are now able to log in",
+                            "Your account has been created!",
                         )
                         del request.session["verification_code"]
                         return redirect("users:index")
