@@ -110,9 +110,6 @@ DATABASES = {
         "PASSWORD": env("RDS_PASSWORD"),
         "HOST": env("RDS_HOSTNAME"),
         "PORT": env("RDS_PORT"),
-        "TEST": {
-            "NAME": "testdb",
-        },
         "OPTIONS": {
             "sql_mode": "traditional",
         },
