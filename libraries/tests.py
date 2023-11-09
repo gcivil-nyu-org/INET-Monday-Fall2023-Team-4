@@ -1,11 +1,16 @@
 from django.test import TestCase, RequestFactory
 from django.template.loader import get_template
+from django.contrib.auth.models import AnonymousUser
 from django.test import Client
 from django.urls import reverse
 from django.http import HttpRequest
 
+from BookClub.models import BookClub
+from user.models import CustomUser
 from libraries.models import Library
-from libraries.views import index, LibraryListView
+from libraries.views import index, LibraryListView, JoinClubFormView, LibraryDetailView
+
+import datetime
 
 c = Client()
 
@@ -121,7 +126,6 @@ class TestLibraryListView(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
-        # Create sample data for testing
         self.library1 = Library.objects.create(
             id=1,
             branch="Test Case Branch",
@@ -188,3 +192,120 @@ class TestLibraryListView(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context_data["search_value"], "Branch")
+
+
+class LibraryDetailViewTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(
+            username="member",
+            email="member@nyu.edu",
+            first_name="test2first",
+            last_name="test2last",
+        )
+        self.library = Library.objects.create(
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.bookclub = BookClub.objects.create(
+            name="Test Book Club",
+            description="This is a test book club",
+            currentBook="Sample Book",
+            meetingDay="monday",
+            meetingStartTime=datetime.time(18, 0),
+            meetingEndTime=datetime.time(18, 0),
+            meetingOccurence="one",
+            libraryId=self.library,
+            admin=self.user,
+        )
+        self.library_detail_view = LibraryDetailView()
+        self.library_detail_view.object = self.bookclub  # Creating a BookClub object
+
+    def test_get_context_data(self):
+        user_id = 1
+        request = type("Request", (), {"user": type("User", (), {"id": user_id})})()
+
+        self.library_detail_view.request = request
+
+        context = self.library_detail_view.get_context_data()
+
+        book_clubs = list(
+            BookClub.objects.filter(libraryId=self.library_detail_view.object.id)
+        )
+        bookclubs_ids = BookClub.members.through.objects.filter(customuser_id=user_id)
+        bc_pk_list = [bc.bookclub_id for bc in bookclubs_ids]
+        user_clubs = list(BookClub.objects.filter(pk__in=bc_pk_list))
+
+        self.assertEqual(list(context["book_clubs"]), book_clubs)
+        self.assertEqual(list(context["user_clubs"]), user_clubs)
+        self.assertIsNotNone(context["form"])
+
+
+class JoinClubFormViewTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(
+            username="member",
+            email="member@nyu.edu",
+            first_name="test2first",
+            last_name="test2last",
+        )
+        self.library = Library.objects.create(
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.factory = RequestFactory()
+        self.join_club_form_view = JoinClubFormView()
+        self.join_club_form_view.object = self.library
+
+    def test_post_unauthenticated_user(self):
+        request = self.factory.post("/libraries/")
+        request.user = AnonymousUser()
+
+        self.join_club_form_view.request = request
+        response = self.join_club_form_view.post(request)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_success_url(self):
+        request = self.factory.get("/libraries/")
+        request.user = self.user
+
+        self.join_club_form_view.request = request
+        self.join_club_form_view.object = self.library
+
+        url = self.join_club_form_view.get_success_url()
+
+        expected_url = reverse(
+            "libraries:library-detail", kwargs={"pk": self.library.pk}
+        )
+
+        self.assertEqual(url, expected_url)
