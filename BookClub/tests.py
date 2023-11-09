@@ -1,10 +1,13 @@
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
+from django.http import HttpRequest
 from .forms import BookClubEditForm
 from .models import BookClub
+from .views import edit_book_club
 from user.models import CustomUser
 from libraries.models import Library
+import datetime
 
 
 class BookClubModelTest(TestCase):
@@ -105,13 +108,19 @@ class BookClubViewsTest(TestCase):
             first_name="test2first",
             last_name="test2last",
         )
+        self.non_member_user = CustomUser.objects.create(
+            username="non_member",
+            email="non_member@yahoo.com",
+            first_name="test3first",
+            last_name="test3last",
+        )
         self.book_club = BookClub.objects.create(
             name="Test Book Club",
             description="This is a test book club",
             currentBook="Sample Book",
             meetingDay="monday",
-            meetingStartTime=timezone.now(),
-            meetingEndTime=timezone.now(),
+            meetingStartTime=datetime.time(18, 0),
+            meetingEndTime=datetime.time(18, 0),
             meetingOccurence="one",
             libraryId=self.library,
             admin=self.admin_user,
@@ -148,3 +157,59 @@ class BookClubViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "bookclub_detail.html")
         self.assertEqual(response.context["book_club"], self.book_club)
+
+    def test_edit_book_club_view_post(self):
+        form_data = {
+            "admin": self.non_member_user.id,
+            "name": "Updated Book Club Name",
+            "description": "Updated Description",
+            "currentBook": "New Book",
+            "meetingDay": "monday",
+            "meetingStartTime": datetime.time(18, 0),
+            "meetingEndTime": datetime.time(18, 0),
+            "meetingOccurence": "one",
+            "libraryId": self.library,
+        }
+
+        request = HttpRequest()
+        request.method = "POST"
+        request.POST = form_data
+
+        response = edit_book_club(request, self.book_club_id)
+
+        updated_book_club = BookClub.objects.get(id=self.book_club_id)
+
+        self.assertEqual(updated_book_club.admin, self.non_member_user)
+        self.assertIn(self.non_member_user, updated_book_club.members.all())
+        self.assertEqual(response.status_code, 302)
+
+    def test_edit_book_club_form_save(self):
+        form_data = {
+            "admin": self.non_member_user.id,
+            "name": "Updated Book Club Name",
+            "description": "Updated Description",
+            "currentBook": "New Book",
+            "meetingDay": "monday",
+            "meetingStartTime": datetime.time(18, 0),
+            "meetingEndTime": datetime.time(18, 0),
+            "meetingOccurence": "one",
+            "libraryId": self.library,
+        }
+
+        request = HttpRequest()
+        request.method = "POST"
+        request.POST = form_data
+
+        response = edit_book_club(request, self.book_club_id)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            BookClub.objects.get(id=self.book_club_id).name, "Updated Book Club Name"
+        )
+        self.assertEqual(
+            BookClub.objects.get(id=self.book_club_id).description,
+            "Updated Description",
+        )
+        self.assertEqual(
+            BookClub.objects.get(id=self.book_club_id).currentBook, "New Book"
+        )
