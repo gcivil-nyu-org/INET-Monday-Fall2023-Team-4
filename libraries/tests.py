@@ -18,8 +18,6 @@ from libraries.views import (
 
 import datetime
 
-c = Client()
-
 
 class IndexViewTest(TestCase):
     def test_index_view(self):
