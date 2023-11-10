@@ -1,11 +1,15 @@
 from django.test import TestCase, RequestFactory
 from user.forms import UserRegisterForm, UpdateUserForm, ValidateForm
 from django.urls import reverse
+from BookClub.models import BookClub
 from user.models import CustomUser
+from libraries.models import Library
 from user.views import user_profile
 from django.contrib.messages.storage.fallback import FallbackStorage
 from unittest.mock import patch
 from smtplib import SMTPException
+from django.test import Client
+import datetime
 
 
 class LoginViewTest(TestCase):
@@ -203,3 +207,64 @@ class UserFormsTestCase(TestCase):
         form = ValidateForm(data)
         self.assertFalse(form.is_valid())
         self.assertIn("Only alphanumeric characters are allowed.", form.errors["code"])
+
+
+class UnsubscribeTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = CustomUser.objects.create(
+            username="Tester",
+            email="testers@nyu.edu",
+            first_name="Testing",
+            last_name="Testing",
+        )
+        self.library = Library.objects.create(
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.book_club = BookClub.objects.create(
+            name="Test Book Club",
+            description="This is a test book club",
+            currentBook="Sample Book",
+            meetingDay="monday",
+            meetingStartTime=datetime.time(18, 0),
+            meetingEndTime=datetime.time(18, 0),
+            meetingOccurence="one",
+            libraryId=self.library,
+            admin=self.user,
+        )
+
+    # def test_unsubscribe_post(self):
+    #     self.client.login(username='Tester', password='testpassword')
+        
+    #     response = self.client.post('/unsubscribe/1/', {})
+        
+    #     updated_book_club = BookClub.objects.get(id=1)
+    #     self.assertFalse(updated_book_club.members.filter(id=self.user.id).exists())
+
+    #     self.assertContains(response, "Unsubscribe action complete")
+
+    # def test_unsubscribe_post_owner(self):
+    #     self.client.login(username='Tester', password='testpassword')
+
+    #     response = self.client.post('/unsubscribe/1/', {})
+        
+    #     updated_book_club = BookClub.objects.get(id=1)
+    #     self.assertTrue(updated_book_club.members.filter(id=self.user.id).exists())
+
+    #     self.assertContains(response, "Owner can not unsubscribe")
