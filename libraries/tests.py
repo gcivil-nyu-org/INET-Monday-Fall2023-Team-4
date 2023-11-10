@@ -1,6 +1,7 @@
 from django.test import TestCase, RequestFactory
 from django.template.loader import get_template
-from django.contrib.auth.models import AnonymousUser
+
+# from django.contrib.auth.models import AnonymousUser
 from django.test import Client
 from django.urls import reverse
 from django.http import HttpRequest

@@ -251,9 +251,9 @@ class UnsubscribeTestCase(TestCase):
 
     # def test_unsubscribe_post(self):
     #     self.client.login(username='Tester', password='testpassword')
-        
+
     #     response = self.client.post('/unsubscribe/1/', {})
-        
+
     #     updated_book_club = BookClub.objects.get(id=1)
     #     self.assertFalse(updated_book_club.members.filter(id=self.user.id).exists())
 
@@ -263,7 +263,7 @@ class UnsubscribeTestCase(TestCase):
     #     self.client.login(username='Tester', password='testpassword')
 
     #     response = self.client.post('/unsubscribe/1/', {})
-        
+
     #     updated_book_club = BookClub.objects.get(id=1)
     #     self.assertTrue(updated_book_club.members.filter(id=self.user.id).exists())
 
