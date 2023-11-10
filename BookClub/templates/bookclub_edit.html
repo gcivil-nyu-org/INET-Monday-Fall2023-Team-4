@@ -8,6 +8,24 @@
     <title>Edit Book Club</title>
 </head>
 {% block content %}
+{% if request.user != book_club.admin %}
+<div class="container-fluid p-0">
+    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+      <p>Only the administrator of the book club is allowed to make changes.</p>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+{% endif %}
+{% if messages %}
+    {% for message in messages %}
+    <div class="container-fluid p-0">
+      <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    </div>
+    {% endfor %}
+{% endif %}
 <body>
     <h1>Edit Book Club: {{ book_club.name }}</h1>
     <form method="POST">
@@ -23,7 +41,7 @@
             </div>
         {% endfor %}
 
-        <button type="submit">Save Changes</button>
+        <button type="submit" {% if request.user != book_club.admin %}disabled{% endif %}>Save Changes</button>
     </form>
 </body>
 {% endblock %}
