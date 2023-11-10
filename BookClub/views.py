@@ -4,6 +4,7 @@ from .models import BookClub
 from .models import Library
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import HttpResponseForbidden
 
 
 @login_required
@@ -19,14 +20,15 @@ def create_book_club(request):
                 book_club.libraryId = library
                 book_club.save()
                 book_club.members.add(request.user)
-                library2 = get_object_or_404(Library, pk=library_id)
-                return render(
-                    request, "libraries/library_detail.html", {"library": library2}
-                )
+                context = {
+                    "book_club": book_club,
+                }
+                return render(request, "bookclub_detail.html", context)
         elif request.user.status != "nyu" and library.NYU == "1":
-            messages.error(
-                request, "You are not allowed to create a book club for NYU libraries."
+            error_message = (
+                "You are not allowed to create a book club for NYU libraries."
             )
+            return HttpResponseForbidden(error_message)
 
         else:
             if form.is_valid():

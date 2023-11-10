@@ -5,6 +5,7 @@ from .forms import BookClubEditForm, BookClubForm
 from .models import BookClub
 from user.models import CustomUser
 from libraries.models import Library
+from user.models import CustomUser
 
 
 class BookClubModelTest(TestCase):
@@ -151,3 +152,50 @@ class BookClubViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "bookclub_detail.html")
         self.assertEqual(response.context["book_club"], self.book_club)
+
+
+class BookClubModelTest(TestCase):
+    def setUp(self):
+        self.library = Library.objects.create(
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.admin_user = CustomUser.objects.create(
+            username="admin",
+            email="admin@email.com",
+            first_name="test1first",
+            last_name="test1last",
+        )
+        self.member_user = CustomUser.objects.create(
+            username="member",
+            email="member@nyu.edu",
+            first_name="test2first",
+            last_name="test2last",
+        )
+        self.book_club = BookClub.objects.create(
+            name="Test Book Club",
+            description="This is a test book club",
+            currentBook="Sample Book",
+            meetingDay="monday",
+            meetingStartTime=timezone.now(),
+            meetingEndTime=timezone.now(),
+            meetingOccurence="one",
+            libraryId=self.library,
+            admin=self.admin_user,
+        )
+        self.book_club.members.add(self.admin_user, self.member_user)
