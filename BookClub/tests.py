@@ -120,7 +120,8 @@ class BookClubViewsTest(TestCase):
         self.book_club_id = self.book_club.id
 
     def test_create_book_club_view(self):
-        response = self.client.get(reverse("create-book-club"))
+        self.client.force_login(self.admin_user)
+        response = self.client.get(reverse("create-book_club") + '?libraryId=' + str(self.library.id))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "bookclub.html")
         self.assertIsInstance(response.context["form"], BookClubForm)
