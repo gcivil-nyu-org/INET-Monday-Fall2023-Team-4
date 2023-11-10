@@ -4,7 +4,7 @@ from django.urls import reverse
 from BookClub.models import BookClub
 from user.models import CustomUser
 from libraries.models import Library
-from user.views import user_profile
+from user.views import user_profile, unsubscribe
 from django.contrib.messages.storage.fallback import FallbackStorage
 from unittest.mock import patch
 from smtplib import SMTPException
@@ -248,23 +248,34 @@ class UnsubscribeTestCase(TestCase):
             libraryId=self.library,
             admin=self.user,
         )
+        self.factory = RequestFactory()
 
-    # def test_unsubscribe_post(self):
-    #     self.client.login(username='Tester', password='testpassword')
+    def test_unsubscribe_view(self):
+        request = self.factory.post(
+            reverse("users:unsubscribe", kwargs={"slug": self.book_club.id})
+        )
+        request.user = self.user
+        setattr(request, "session", "session")
+        messages = FallbackStorage(request)
+        setattr(request, "_messages", messages)
+        response = unsubscribe(request, slug=self.book_club.id)
+        self.assertEqual(response.status_code, 302)
 
-    #     response = self.client.post('/unsubscribe/1/', {})
+    def test_unsubscribe_view_owner_attempt(self):
+        request = self.factory.post(
+            reverse("users:unsubscribe", kwargs={"slug": self.book_club.id})
+        )
+        request.user = self.user
+        self.book_club.admin = self.user
+        self.book_club.save()
+        setattr(request, "session", "session")
+        messages = FallbackStorage(request)
+        setattr(request, "_messages", messages)
+        response = unsubscribe(request, slug=self.book_club.id)
+        self.assertEqual(response.status_code, 302)
 
-    #     updated_book_club = BookClub.objects.get(id=1)
-    #     self.assertFalse(updated_book_club.members.filter(id=self.user.id).exists())
-
-    #     self.assertContains(response, "Unsubscribe action complete")
-
-    # def test_unsubscribe_post_owner(self):
-    #     self.client.login(username='Tester', password='testpassword')
-
-    #     response = self.client.post('/unsubscribe/1/', {})
-
-    #     updated_book_club = BookClub.objects.get(id=1)
-    #     self.assertTrue(updated_book_club.members.filter(id=self.user.id).exists())
-
-    #     self.assertContains(response, "Owner can not unsubscribe")
+    def test_unsubscribe_view_invalid_bookclub(self):
+        request = self.factory.post(reverse("users:unsubscribe", kwargs={"slug": 999}))
+        request.user = self.user
+        response = unsubscribe(request, slug=999)
+        self.assertEqual(response.status_code, 302)
