@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from .forms import BookClubForm
+from .forms import BookClubEditForm, BookClubForm
 from .models import BookClub
 from .models import Library
 from django.contrib.auth.decorators import login_required
