@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
 from .models import BookClub
 from user.models import CustomUser
 from .forms import BookClubForm, BookClubEditForm
@@ -51,6 +52,11 @@ def get_email_content(fields_changed, bc_name):
 def edit_book_club(request, book_club_id):
     book_club = get_object_or_404(BookClub, id=book_club_id)
     original_bc_name = book_club.name
+
+    if request.user != book_club.admin:
+        return HttpResponseForbidden(
+            "You don't have permission to edit this Book Club."
+        )
 
     if request.method == "POST":
         form = BookClubEditForm(request.POST, instance=book_club)
