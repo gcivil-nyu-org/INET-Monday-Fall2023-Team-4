@@ -3,7 +3,6 @@ from .forms import BookClubEditForm, BookClubForm
 from .models import BookClub
 from .models import Library
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.http import HttpResponseForbidden
 
 
