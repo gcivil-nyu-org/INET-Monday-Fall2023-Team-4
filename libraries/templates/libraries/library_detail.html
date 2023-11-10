@@ -65,6 +65,9 @@
         {% endfor %}
         </div>
     </div>
+    <div class="text-center mt-3 mb-3">
+      <a href="{% url 'create-book-club' %}?libraryId={{ library.id }}" class="btn btn-primary">Create Book Club</a>
+    </div>
   </body>
   {% endblock %}
 </html>
