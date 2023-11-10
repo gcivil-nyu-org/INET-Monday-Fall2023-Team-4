@@ -3,9 +3,10 @@ from .models import BookClub
 from user.models import CustomUser
 from .forms import BookClubForm, BookClubEditForm
 from django.conf import settings
-from django.core.mail import send_mass_mail, send_mail
+from django.core.mail import send_mail
 from smtplib import SMTPException
 from django.contrib import messages
+
 
 def create_book_club(request):
     form = BookClubForm
@@ -13,7 +14,8 @@ def create_book_club(request):
 
 
 def get_email_content(fields_changed, bc_name):
-    # input is dict of fields and data changed by form, if name is changed, take old name as bc_name
+    # input is dict of fields and data changed by form
+    # if name is changed, take old name as bc_name
     content = "Here are the latest updates from " + bc_name + "\n\r"
     index = 0
     list_bullet = "{index}.\t{bc_name}"
@@ -69,14 +71,16 @@ def edit_book_club(request, book_club_id):
                 bc_members = book_club.members.all()
                 email_list = [mem.email for mem in bc_members]
                 content = get_email_content(changed_fields_and_data, original_bc_name)
-                subject, content, from_email = ("Check new updates from your book club!", 
-                                get_email_content(changed_fields_and_data, original_bc_name), 
-                                settings.EMAIL_HOST_USER,)
+                subject, content, from_email = (
+                    "Check new updates from your book club!",
+                    get_email_content(changed_fields_and_data, original_bc_name),
+                    settings.EMAIL_HOST_USER,
+                )
                 send_mail(subject, content, from_email, email_list, fail_silently=False)
             except SMTPException as e:
                 print(e)
                 messages.error(request, "Failed to notify members of your updates")
-            
+
             return redirect("book_club_detail", book_club_id=book_club.id)
     else:
         form = BookClubEditForm(instance=book_club)
