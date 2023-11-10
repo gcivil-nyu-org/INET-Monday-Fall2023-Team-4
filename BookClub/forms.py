@@ -14,3 +14,19 @@ class BookClubForm(ModelForm):
             "meetingEndTime",
             "meetingOccurence",
         )
+
+
+class BookClubEditForm(ModelForm):
+    class Meta:
+        model = BookClub
+        fields = (
+            "name",
+            "description",
+            "currentBook",
+            "meetingDay",
+            "meetingStartTime",
+            "meetingEndTime",
+            "meetingOccurence",
+            "libraryId",
+            "admin",
+        )
