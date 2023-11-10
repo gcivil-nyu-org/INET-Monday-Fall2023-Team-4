@@ -1,7 +1,6 @@
 from django.test import TestCase, RequestFactory
 from django.template.loader import get_template
-
-# from django.contrib.auth.models import AnonymousUser
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.test import Client
 from django.urls import reverse
 from django.http import HttpRequest
@@ -291,15 +290,6 @@ class JoinClubFormViewTestCase(TestCase):
         self.join_club_form_view = JoinClubFormView()
         self.join_club_form_view.object = self.library
 
-    # def test_post_unauthenticated_user(self):
-    #     request = self.factory.post("/libraries/")
-    #     request.user = AnonymousUser()
-
-    #     self.join_club_form_view.request = request
-    #     response = self.join_club_form_view.post(request)
-
-    #     self.assertEqual(response.status_code, 403)
-
     def test_get_success_url(self):
         request = self.factory.get("/libraries/")
         request.user = self.user
@@ -345,16 +335,37 @@ class LibraryViewTestCase(TestCase):
         )
         self.client = Client()
         self.library_view = LibraryView()
+        self.factory = RequestFactory()
 
     def test_get_method(self):
-        response = self.client.get("/libraries/1")
+        # Test the GET method of LibraryView
+        request = self.factory.get(
+            reverse("libraries:library-detail", kwargs={"pk": self.library.pk})
+        )
+        request.user = self.user
+        response = LibraryView.as_view()(request, pk=self.library.pk)
         self.assertEqual(response.status_code, 200)
 
-    # def test_post_method_unauthenticated(self):
-    #     request = HttpRequest()
-    #     request.method = "POST"
-    #     request.user = AnonymousUser()
+    def test_post_method_invalid_user_id(self):
+        request = self.factory.post(
+            reverse("libraries:library-detail", kwargs={"pk": self.library.pk}),
+            data={"user_id": -1, "bookclub_id": [1]},
+        )
+        request.user = self.user
+        setattr(request, "session", "session")
+        messages = FallbackStorage(request)
+        setattr(request, "_messages", messages)
+        response = LibraryView.as_view()(request, pk=self.library.pk)
+        self.assertEqual(response.status_code, 302)
 
-    #     response = self.library_view.post(request)
-
-    #     self.assertEqual(response.status_code, 403)
+    def test_post_method_unjoin_owner(self):
+        request = self.factory.post(
+            reverse("libraries:library-detail", kwargs={"pk": self.library.pk}),
+            data={"user_id": self.user.id, "bookclub_id": [1], "unjoin": "true"},
+        )
+        request.user = self.user
+        setattr(request, "session", "session")
+        messages = FallbackStorage(request)
+        setattr(request, "_messages", messages)
+        response = LibraryView.as_view()(request, pk=self.library.pk)
+        self.assertEqual(response.status_code, 302)
