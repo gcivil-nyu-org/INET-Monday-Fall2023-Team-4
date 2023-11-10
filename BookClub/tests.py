@@ -7,7 +7,6 @@ from user.models import CustomUser
 from libraries.models import Library
 
 
-
 class BookClubModelTest(TestCase):
     def setUp(self):
         self.library = Library.objects.create(
@@ -152,5 +151,3 @@ class BookClubViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "bookclub_detail.html")
         self.assertEqual(response.context["book_club"], self.book_club)
-
-
