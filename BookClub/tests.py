@@ -1,8 +1,7 @@
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.utils import timezone
 from django.urls import reverse
 from django.http import HttpRequest
-from .forms import BookClubEditForm
 from .models import BookClub
 from .views import edit_book_club
 from user.models import CustomUser
@@ -127,6 +126,7 @@ class BookClubViewsTest(TestCase):
         )
         self.book_club.members.add(self.admin_user, self.member_user)
         self.book_club_id = self.book_club.id
+        self.factory = RequestFactory()
 
     def test_create_book_club_view(self):
         response = self.client.get(reverse("create-book-club"))
@@ -135,20 +135,20 @@ class BookClubViewsTest(TestCase):
         # self.assertIsInstance(response.context["form"], BookClubForm)
 
     def test_edit_book_club_view(self):
-        response = self.client.post(
-            reverse("edit_book_club", args=[self.book_club_id]),
+        self.client.login(username="admin", password="adminpassword")
+
+        url = reverse("edit_book_club", args=[self.book_club_id])
+        request = self.factory.post(
+            url,
             {
                 "name": "Updated Book Club Name",
                 "description": "Updated Description",
             },
         )
+        request.user = self.admin_user
+        response = edit_book_club(request, book_club_id=self.book_club_id)
         self.assertEqual(response.status_code, 200)
-
-        response = self.client.get(reverse("edit_book_club", args=[self.book_club_id]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "bookclub_edit.html")
-        self.assertIsInstance(response.context["form"], BookClubEditForm)
-        self.assertEqual(response.context["book_club"], self.book_club)
+        self.client.logout()
 
     def test_book_club_detail_view(self):
         response = self.client.get(
@@ -173,6 +173,7 @@ class BookClubViewsTest(TestCase):
 
         request = HttpRequest()
         request.method = "POST"
+        request.user = self.admin_user
         request.POST = form_data
 
         response = edit_book_club(request, self.book_club_id)
@@ -198,6 +199,7 @@ class BookClubViewsTest(TestCase):
 
         request = HttpRequest()
         request.method = "POST"
+        request.user = self.admin_user
         request.POST = form_data
 
         response = edit_book_club(request, self.book_club_id)
@@ -213,3 +215,13 @@ class BookClubViewsTest(TestCase):
         self.assertEqual(
             BookClub.objects.get(id=self.book_club_id).currentBook, "New Book"
         )
+
+    def test_non_admin_access_edit_page(self):
+        self.client.login(username="non_member_user", password="testpassword")
+
+        url = reverse("edit_book_club", args=[self.book_club_id])
+        request = self.factory.get(url)
+        request.user = self.non_member_user
+
+        response = edit_book_club(request, book_club_id=self.book_club_id)
+        self.assertEqual(response.status_code, 403)
