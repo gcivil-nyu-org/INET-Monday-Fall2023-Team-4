@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from .forms import BookClubEditForm
+from .forms import BookClubEditForm, BookClubForm
 from .models import BookClub
 from user.models import CustomUser
 from libraries.models import Library
@@ -123,7 +123,7 @@ class BookClubViewsTest(TestCase):
         response = self.client.get(reverse("create-book-club"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "bookclub.html")
-        # self.assertIsInstance(response.context["form"], BookClubForm)
+        self.assertIsInstance(response.context["form"], BookClubForm)
 
     def test_edit_book_club_view(self):
         response = self.client.post(
