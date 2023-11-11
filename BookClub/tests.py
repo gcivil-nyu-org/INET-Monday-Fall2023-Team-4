@@ -3,7 +3,6 @@ from django.utils import timezone
 from django.urls import reverse
 from django.http import HttpRequest
 from .models import BookClub
-from .forms import BookClubEditForm
 from .views import edit_book_club
 from user.models import CustomUser
 from libraries.models import Library
