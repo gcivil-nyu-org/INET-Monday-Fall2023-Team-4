@@ -36,6 +36,7 @@ class LibraryDetailView(DetailView):
         bc_pk_list = [bc.bookclub_id for bc in bookclubs_ids]
         context["user_clubs"] = BookClub.objects.filter(pk__in=bc_pk_list)
         context["form"] = JoinClubForm()
+        context["key"] = conf_settings.GOOGLE_API_KEY
 
         return context
 
