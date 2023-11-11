@@ -1,8 +1,16 @@
-# 默认忽略的文件
-/shelf/
-/workspace.xml
-# 数据源本地存储已忽略文件
-/dataSources/
-/dataSources.local.xml
-# 基于编辑器的 HTTP 客户端请求
-/httpRequests/
+*.pyc
+*.cpython-311.pyc
+__pycache__/
+db.sqlite3
+.DS_Store
+.vscode
+
+.env
+
+_migrations/*
+!_migrations/__init__.py
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
