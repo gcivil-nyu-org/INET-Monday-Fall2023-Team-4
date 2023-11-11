@@ -12,7 +12,6 @@ from django.db.models import Q
 from libraries.models import Library
 from BookClub.models import BookClub
 
-from django.conf import settings as conf_settings
 from django.core.exceptions import ObjectDoesNotExist
 
 from .forms import JoinClubForm
