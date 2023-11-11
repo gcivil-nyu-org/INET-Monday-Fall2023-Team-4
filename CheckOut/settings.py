@@ -53,8 +53,8 @@ INSTALLED_APPS = [
     "bootstrap5",
     "django_bootstrap_icons",
     "BookClub.apps.BookClubConfig",
-    'channels',
-    'chat',
+    "channels",
+    "chat",
 ]
 
 AUTH_USER_MODEL = "user.CustomUser"
@@ -122,7 +122,8 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth."
+                "password_validation.UserAttributeSimilarityValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -162,9 +163,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 CHANNEL_LAYERS = {  # self
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
+    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
