@@ -1,6 +1,7 @@
 from django.test import TestCase, RequestFactory
 from django.utils import timezone
 from django.urls import reverse
+from .forms import BookClubForm
 from django.http import HttpRequest
 from .models import BookClub
 from .views import edit_book_club
@@ -129,10 +130,13 @@ class BookClubViewsTest(TestCase):
         self.factory = RequestFactory()
 
     def test_create_book_club_view(self):
-        response = self.client.get(reverse("create-book-club"))
+        self.client.force_login(self.admin_user)
+        response = self.client.get(
+            reverse("create-book-club") + "?libraryId=" + str(self.library.id)
+        )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "bookclub.html")
-        # self.assertIsInstance(response.context["form"], BookClubForm)
+        self.assertIsInstance(response.context["form"], BookClubForm)
 
     def test_edit_book_club_view(self):
         self.client.login(username="admin", password="adminpassword")

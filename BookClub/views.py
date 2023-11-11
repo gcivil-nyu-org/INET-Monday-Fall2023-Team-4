@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import BookClubForm, BookClubEditForm
+from libraries.models import Library
 from .models import BookClub
 from django.contrib import messages
 from django.http import HttpResponseForbidden
 from user.models import CustomUser
+from .forms import BookClubForm, BookClubEditForm
 from django.conf import settings
 from django.core.mail import send_mail
 from smtplib import SMTPException
+from django.contrib.auth.decorators import login_required
 
 
 def book_club_details(request, slug):
@@ -35,8 +37,44 @@ def book_club_details(request, slug):
     return render(request, "details.html", context)
 
 
+@login_required
 def create_book_club(request):
-    form = BookClubForm
+    library_id = request.GET.get("libraryId") or request.POST.get("libraryId")
+    library = Library.objects.get(id=int(library_id))
+    form = BookClubForm(request.POST or None)
+    if request.method == "POST":
+        if request.user.status == "nyu" and library.NYU == "1":
+            if form.is_valid():
+                book_club = form.save(commit=False)
+                book_club.admin = request.user
+                book_club.libraryId = library
+                book_club.save()
+                book_club.members.add(request.user)
+                context = {
+                    "book_club": book_club,
+                }
+                return render(request, "bookclub_detail.html", context)
+        elif request.user.status != "nyu" and library.NYU == "1":
+            error_message = (
+                "You are not allowed to create a book club for NYU libraries."
+            )
+            return HttpResponseForbidden(error_message)
+
+        else:
+            if form.is_valid():
+                library = Library.objects.get(id=int(library_id))
+                book_club = form.save(commit=False)
+                book_club.admin = request.user
+                book_club.libraryId = library
+                book_club.save()
+                book_club.members.add(request.user)
+
+                context = {
+                    "book_club": book_club,
+                }
+                return render(request, "bookclub_detail.html", context)
+    else:
+        form = BookClubForm()
     return render(request, "bookclub.html", {"form": form})
 
 
