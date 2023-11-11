@@ -247,10 +247,10 @@ make sure you entered in the right code.",
                     return render(request, "user/profile.html", context)
             else:
                 context = {
-                        "title": "validate code",
-                        "verify_code": True,
-                        "validate_failed": True,
-                        "error_text": "Please enter a valid code!",
+                    "title": "validate code",
+                    "verify_code": True,
+                    "validate_failed": True,
+                    "error_text": "Please enter a valid code!",
                 }
                 print("Failed validation")
                 return render(request, "user/profile.html", context)
