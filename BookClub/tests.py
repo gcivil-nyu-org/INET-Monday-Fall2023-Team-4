@@ -155,9 +155,7 @@ class BookClubViewsTest(TestCase):
         self.client.logout()
 
     def test_book_club_detail_view(self):
-        response = self.client.get(
-            reverse("details", args=[self.book_club_id])
-        )
+        response = self.client.get(reverse("details", args=[self.book_club_id]))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "details.html")
 
