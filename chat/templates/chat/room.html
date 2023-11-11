@@ -14,12 +14,26 @@
     }
 </style>
 <body>
+    <div style="text-align: center; margin-top: 20px;">
+        <h2 style="font-family: 'Arial', sans-serif; color: #333;">Room: {{ room_name }}</h2>
+    </div>
+
+    <div style="display: flex; justify-content: center; margin-top: 10px;">
+        <textarea disabled id="chat-log" style="width: 70%; height: 500px; border: 1px solid #ccc; border-radius: 4px; padding: 10px; overflow-y: auto; resize: none;" cols="130" rows="35"></textarea>
+    </div>
+
+    <div style="display: flex; justify-content: center; margin-top: 10px;">
+        <input id="chat-message-input" type="text" style="width: 60%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-right: 10px;">
+        <input id="chat-message-submit" type="button" style="padding: 10px 20px; border: none; background-color: #4CAF50; color: white; border-radius: 4px; cursor: pointer;" value="Send">
+    </div>
+
     <center><h2>Room: {{room_name}}</h2></center>
 
     <textarea disabled id="chat-log" cols="130" rows="35"></textarea>
     <br>
     <input id="chat-message-input" type="text" size="40"></input>
     <input id="chat-message-submit" type="button" value="Send">
+
     {{ room_name|json_script:"room-name" }}
 
     <script>
