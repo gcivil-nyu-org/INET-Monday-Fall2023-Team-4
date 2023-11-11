@@ -50,10 +50,8 @@ def create_book_club(request):
                 book_club.libraryId = library
                 book_club.save()
                 book_club.members.add(request.user)
-                context = {
-                    "book_club": book_club,
-                }
-                return render(request, "details.html", context)
+
+                return redirect("details", slug=book_club.id)
         elif request.user.status != "nyu" and library.NYU == "1":
             error_message = (
                 "You are not allowed to create a book club for NYU libraries."
@@ -69,10 +67,7 @@ def create_book_club(request):
                 book_club.save()
                 book_club.members.add(request.user)
 
-                context = {
-                    "book_club": book_club,
-                }
-                return render(request, "details.html", context)
+                return redirect("details", slug=book_club.id)
     else:
         form = BookClubForm()
     return render(request, "bookclub.html", {"form": form})
