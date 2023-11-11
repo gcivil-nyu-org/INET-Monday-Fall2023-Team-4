@@ -93,8 +93,8 @@
                     <input type="hidden" value={% if user.is_authenticated %} {{ user.id }} {% else %} -1 {% endif %} name="user_id">
                     <input type="hidden" value={{ bc.id }} name="bookclub_id">
                     {% comment %} <input type="hidden" value={{ user.is_authenticated }} name="is_authenticated"> {% endcomment %}
-					          <div class="row">
-                    <a href="{% url 'details' bc.id %}" class="btn btn-primary">Details</a>
+					          <div class="col-lg-2 d-flex align-items-left">
+                    <a href="{% url 'details' bc.id %}" class="btn btn-primary mx-3">Details</a>
                     {% if bc in user_clubs %}
                         {% comment %} <input type="hidden" value=true name="join"> {% endcomment %}
                         <button type="submit" name="unjoin" class="btn btn-primary">Unsubscribe</button>
@@ -102,7 +102,7 @@
                         {% comment %} <input type="hidden" value=false name="join"> {% endcomment %}
                         <button type="submit" name="join" class="btn btn-primary">Subscribe</button>
                     {% endif %}
-                    </div>
+                  </div>
                 </form>
             </div>
         </div>
