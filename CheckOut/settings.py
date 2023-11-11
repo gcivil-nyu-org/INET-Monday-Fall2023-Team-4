@@ -180,6 +180,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
+
 GOOGLE_API_KEY = env("GOOGLE_API_KEY")
 
 CHANNEL_LAYERS = {  # self
