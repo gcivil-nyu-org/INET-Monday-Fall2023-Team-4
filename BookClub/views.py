@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from libraries.models import Library
 from .forms import BookClubForm, BookClubEditForm
 from .models import BookClub
 from django.contrib import messages
@@ -8,6 +9,7 @@ from .forms import BookClubForm, BookClubEditForm
 from django.conf import settings
 from django.core.mail import send_mail
 from smtplib import SMTPException
+from django.contrib.auth.decorators import login_required
 
 
 def book_club_details(request, slug):
