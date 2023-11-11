@@ -12,11 +12,15 @@ from django.urls import reverse
 class ChatConsumerTest:
     async def test_websocket_connection(self):
         # Setup the application to be tested
-        application = ProtocolTypeRouter({
-            "websocket": URLRouter([
-                path("ws/chat/<str:room_name>/", ChatConsumer.as_asgi()),
-            ])
-        })
+        application = ProtocolTypeRouter(
+            {
+                "websocket": URLRouter(
+                    [
+                        path("ws/chat/<str:room_name>/", ChatConsumer.as_asgi()),
+                    ]
+                )
+            }
+        )
 
         # Create a WebsocketCommunicator instance for the test
         communicator = WebsocketCommunicator(application, "ws/chat/testroom/")
@@ -29,11 +33,15 @@ class ChatConsumerTest:
         await communicator.disconnect()
 
     async def test_send_receive_message(self):
-        application = ProtocolTypeRouter({
-            "websocket": URLRouter([
-                path("ws/chat/<str:room_name>/", ChatConsumer.as_asgi()),
-            ])
-        })
+        application = ProtocolTypeRouter(
+            {
+                "websocket": URLRouter(
+                    [
+                        path("ws/chat/<str:room_name>/", ChatConsumer.as_asgi()),
+                    ]
+                )
+            }
+        )
 
         communicator = WebsocketCommunicator(application, "ws/chat/testroom/")
         await communicator.connect()
@@ -48,11 +56,15 @@ class ChatConsumerTest:
         await communicator.disconnect()
 
     async def test_disconnect(self):
-        application = ProtocolTypeRouter({
-            "websocket": URLRouter([
-                path("ws/chat/<str:room_name>/", ChatConsumer.as_asgi()),
-            ])
-        })
+        application = ProtocolTypeRouter(
+            {
+                "websocket": URLRouter(
+                    [
+                        path("ws/chat/<str:room_name>/", ChatConsumer.as_asgi()),
+                    ]
+                )
+            }
+        )
 
         communicator = WebsocketCommunicator(application, "ws/chat/testroom/")
         await communicator.connect()
@@ -69,15 +81,14 @@ class ChatViewsTest(TestCase):
 
     def test_index_view(self):
         # Test the index view
-        response = self.client.get(reverse('index'))
+        response = self.client.get(reverse("index"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'chat/index.html')
+        self.assertTemplateUsed(response, "chat/index.html")
 
     def test_room_view(self):
         # Test the room view with a sample room name
-        room_name = 'testroom'
-        response = self.client.\
-            get(reverse('room', kwargs={'room_name': room_name}))
+        room_name = "testroom"
+        response = self.client.get(reverse("room", kwargs={"room_name": room_name}))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'chat/room.html')
-        self.assertEqual(response.context['room_name'], room_name)
+        self.assertTemplateUsed(response, "chat/room.html")
+        self.assertEqual(response.context["room_name"], room_name)
