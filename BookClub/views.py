@@ -34,6 +34,7 @@ def book_club_details(request, slug):
             return redirect("bookclub:details", slug=slug)
     return render(request, "details.html", context)
 
+
 def create_book_club(request):
     form = BookClubForm
     return render(request, "bookclub.html", {"form": form})
