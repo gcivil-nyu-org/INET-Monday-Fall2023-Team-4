@@ -80,6 +80,7 @@
         <h2 class="font-weight-light">Check out our book clubs!</h2>
         <div class="d-flex overflow-auto flex-row flex-nowrap justify-content-center" style="height: 350px">
         {% for bc in book_clubs %}
+        <div class="col-3">
         <div class="card p-3 m-3">
             <div class="card-body">
                 <h5 class="card-title">{{ bc.name }}</h5>
@@ -92,7 +93,8 @@
                     <input type="hidden" value={% if user.is_authenticated %} {{ user.id }} {% else %} -1 {% endif %} name="user_id">
                     <input type="hidden" value={{ bc.id }} name="bookclub_id">
                     {% comment %} <input type="hidden" value={{ user.is_authenticated }} name="is_authenticated"> {% endcomment %}
-					<a href="{% url 'bookclub:details' bc.id %}" class="btn btn-primary">Details</a>
+					          <div class="row">
+                    <a href="{% url 'details' bc.id %}" class="btn btn-primary">Details</a>
                     {% if bc in user_clubs %}
                         {% comment %} <input type="hidden" value=true name="join"> {% endcomment %}
                         <button type="submit" name="unjoin" class="btn btn-primary">Unsubscribe</button>
@@ -100,9 +102,11 @@
                         {% comment %} <input type="hidden" value=false name="join"> {% endcomment %}
                         <button type="submit" name="join" class="btn btn-primary">Subscribe</button>
                     {% endif %}
+                    </div>
                 </form>
             </div>
         </div>
+      </div>
         {% endfor %}
         </div>
     </div>
