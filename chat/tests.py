@@ -1,64 +1,83 @@
 from channels.testing import WebsocketCommunicator
-from django.test import TestCase
-from channels.routing import URLRouter
+import pytest
+from channels.routing import ProtocolTypeRouter, URLRouter
 from django.urls import path
 from .consumers import ChatConsumer  # Import your ChatConsumer here
+from django.test import TestCase, Client
+from django.urls import reverse
 
-class ChatConsumerTest(TestCase):
-    def setUp(self):
-        # Define an in-memory channel layer for testing
-        self.channel_layer = get_channel_layer()
-        self.application = URLRouter([
-            path("ws/chat/<str:room_name>/", ChatConsumer.as_asgi()),
-        ])
 
+# Use pytest's asynchronous capabilities
+@pytest.mark.asyncio
+class ChatConsumerTest:
     async def test_websocket_connection(self):
-        # Establish a connection to the WebSocket
-        communicator = WebsocketCommunicator(self.application, "/ws/chat/testroom/")
+        # Setup the application to be tested
+        application = ProtocolTypeRouter({
+            "websocket": URLRouter([
+                path("ws/chat/<str:room_name>/", ChatConsumer.as_asgi()),
+            ])
+        })
+
+        # Create a WebsocketCommunicator instance for the test
+        communicator = WebsocketCommunicator(application, "ws/chat/testroom/")
+
+        # Connect to the WebSocket
         connected, _ = await communicator.connect()
-        self.assertTrue(connected)
-        # Disconnect
+        assert connected
+
+        # Disconnect from the WebSocket
         await communicator.disconnect()
 
     async def test_send_receive_message(self):
-        # Establish a connection to the WebSocket
-        communicator = WebsocketCommunicator(self.application, "/ws/chat/testroom/")
+        application = ProtocolTypeRouter({
+            "websocket": URLRouter([
+                path("ws/chat/<str:room_name>/", ChatConsumer.as_asgi()),
+            ])
+        })
+
+        communicator = WebsocketCommunicator(application, "ws/chat/testroom/")
         await communicator.connect()
 
-        # Send a message to the WebSocket
+        # Send a message
         await communicator.send_json_to({"message": "Hello", "username": "testuser"})
 
-        # Receive the response from the WebSocket
+        # Receive and assert the response
         response = await communicator.receive_json_from()
-        self.assertEqual(response, {"message": "Hello", "username": "testuser"})
+        assert response == {"message": "Hello", "username": "testuser"}
 
-        # Disconnect
         await communicator.disconnect()
 
     async def test_disconnect(self):
-        # Establish a connection to the WebSocket
-        communicator = WebsocketCommunicator(self.application, "/ws/chat/testroom/")
-        await communicator.connect()
+        application = ProtocolTypeRouter({
+            "websocket": URLRouter([
+                path("ws/chat/<str:room_name>/", ChatConsumer.as_asgi()),
+            ])
+        })
 
-        # Disconnect
+        communicator = WebsocketCommunicator(application, "ws/chat/testroom/")
+        await communicator.connect()
         await communicator.disconnect()
 
-        # Test if the WebSocket is closed
-        self.assertFalse(communicator.connected)
+        # Check if the WebSocket is closed
+        assert not communicator.connected
 
 
 class ChatViewsTest(TestCase):
     def setUp(self):
+        # Django test client
         self.client = Client()
 
     def test_index_view(self):
-        response = self.client.get('/chat/')
+        # Test the index view
+        response = self.client.get(reverse('index'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'chat/index.html')
 
     def test_room_view(self):
+        # Test the room view with a sample room name
         room_name = 'testroom'
-        response = self.client.get(f'/chat/{room_name}/')
+        response = self.client.\
+            get(reverse('room', kwargs={'room_name': room_name}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'chat/room.html')
         self.assertEqual(response.context['room_name'], room_name)
