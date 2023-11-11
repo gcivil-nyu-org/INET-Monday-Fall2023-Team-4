@@ -1,13 +1,22 @@
 from django.test import TestCase, RequestFactory
 from django.template.loader import get_template
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.test import Client
 from django.urls import reverse
 from django.http import HttpRequest
 
+from BookClub.models import BookClub
+from user.models import CustomUser
 from libraries.models import Library
-from libraries.views import index, LibraryListView
+from libraries.views import (
+    index,
+    LibraryListView,
+    LibraryView,
+    JoinClubFormView,
+    LibraryDetailView,
+)
 
-c = Client()
+import datetime
 
 
 class IndexViewTest(TestCase):
@@ -121,7 +130,6 @@ class TestLibraryListView(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
-        # Create sample data for testing
         self.library1 = Library.objects.create(
             id=1,
             branch="Test Case Branch",
@@ -188,3 +196,176 @@ class TestLibraryListView(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context_data["search_value"], "Branch")
+
+
+class LibraryDetailViewTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(
+            username="member",
+            email="member@nyu.edu",
+            first_name="test2first",
+            last_name="test2last",
+        )
+        self.library = Library.objects.create(
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.bookclub = BookClub.objects.create(
+            name="Test Book Club",
+            description="This is a test book club",
+            currentBook="Sample Book",
+            meetingDay="monday",
+            meetingStartTime=datetime.time(18, 0),
+            meetingEndTime=datetime.time(18, 0),
+            meetingOccurence="one",
+            libraryId=self.library,
+            admin=self.user,
+        )
+        self.library_detail_view = LibraryDetailView()
+        self.library_detail_view.object = self.bookclub
+
+    def test_get_context_data(self):
+        user_id = 1
+        request = type("Request", (), {"user": type("User", (), {"id": user_id})})()
+
+        self.library_detail_view.request = request
+
+        context = self.library_detail_view.get_context_data()
+
+        book_clubs = list(
+            BookClub.objects.filter(libraryId=self.library_detail_view.object.id)
+        )
+        bookclubs_ids = BookClub.members.through.objects.filter(customuser_id=user_id)
+        bc_pk_list = [bc.bookclub_id for bc in bookclubs_ids]
+        user_clubs = list(BookClub.objects.filter(pk__in=bc_pk_list))
+
+        self.assertEqual(list(context["book_clubs"]), book_clubs)
+        self.assertEqual(list(context["user_clubs"]), user_clubs)
+        self.assertIsNotNone(context["form"])
+
+
+class JoinClubFormViewTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(
+            username="member",
+            email="member@nyu.edu",
+            first_name="test2first",
+            last_name="test2last",
+        )
+        self.library = Library.objects.create(
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.factory = RequestFactory()
+        self.join_club_form_view = JoinClubFormView()
+        self.join_club_form_view.object = self.library
+
+    def test_get_success_url(self):
+        request = self.factory.get("/libraries/")
+        request.user = self.user
+
+        self.join_club_form_view.request = request
+        self.join_club_form_view.object = self.library
+
+        url = self.join_club_form_view.get_success_url()
+
+        expected_url = reverse(
+            "libraries:library-detail", kwargs={"pk": self.library.pk}
+        )
+
+        self.assertEqual(url, expected_url)
+
+
+class LibraryViewTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(
+            username="Tester",
+            email="testers@nyu.edu",
+            first_name="Testing",
+            last_name="Testing",
+        )
+        self.library = Library.objects.create(
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.client = Client()
+        self.library_view = LibraryView()
+        self.factory = RequestFactory()
+
+    def test_get_method(self):
+        # Test the GET method of LibraryView
+        request = self.factory.get(
+            reverse("libraries:library-detail", kwargs={"pk": self.library.pk})
+        )
+        request.user = self.user
+        response = LibraryView.as_view()(request, pk=self.library.pk)
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_method_invalid_user_id(self):
+        request = self.factory.post(
+            reverse("libraries:library-detail", kwargs={"pk": self.library.pk}),
+            data={"user_id": -1, "bookclub_id": [1]},
+        )
+        request.user = self.user
+        setattr(request, "session", "session")
+        messages = FallbackStorage(request)
+        setattr(request, "_messages", messages)
+        response = LibraryView.as_view()(request, pk=self.library.pk)
+        self.assertEqual(response.status_code, 302)
+
+    def test_post_method_unjoin_owner(self):
+        request = self.factory.post(
+            reverse("libraries:library-detail", kwargs={"pk": self.library.pk}),
+            data={"user_id": self.user.id, "bookclub_id": [1], "unjoin": "true"},
+        )
+        request.user = self.user
+        setattr(request, "session", "session")
+        messages = FallbackStorage(request)
+        setattr(request, "_messages", messages)
+        response = LibraryView.as_view()(request, pk=self.library.pk)
+        self.assertEqual(response.status_code, 302)

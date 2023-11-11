@@ -3,6 +3,7 @@
 
 <head>
     {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %} {% load bootstrap_icons %}
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <title>{% block title %}{% endblock %}</title>
 </head>
 <style>
@@ -29,20 +30,20 @@
             <div class="collapse navbar-collapse" id="mainNavBar">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                    <a class="nav-link active" href="{% url "users:index" %}">Home</a>
+                    <a class="nav-link active" href="{% url "users:index" %}">{% bs_icon 'house-door' %}Home</a>
                     </li>
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link active" href="{% url "logout" %}">Logout</a></li>
                         <li>
-                            <a class="nav-link active" href="{% url "users:user_profile" %}">User Profile</a>
+                            <a class="nav-link active" href="{% url "users:user_profile" %}">{% bs_icon 'person-gear' %}User Profile</a>
                         </li class="nav-item">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url "logout" %}">{% bs_icon 'box-arrow-left' %}Logout</a></li>
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link active" href="{% url "users:register" %}">{% bs_icon 'person' %}Sign up</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="{% url "users:login" %}">{% bs_icon 'box-arrow-in-right' %}Log in</a>
+                            <a class="nav-link active" href="{% url "users:login" %}">{% bs_icon 'box-arrow-right' %}Log in</a>
                         </li>
                     {% endif %}
                 </ul>

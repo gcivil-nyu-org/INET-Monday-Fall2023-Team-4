@@ -1,6 +1,7 @@
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse
 from django.template import loader
 from django.urls import reverse
+from django.contrib import messages
 
 from django.views import View
 from django.views.generic.detail import DetailView
@@ -10,6 +11,8 @@ from django.views.generic.list import ListView
 from django.db.models import Q
 from libraries.models import Library
 from BookClub.models import BookClub
+from django.conf import settings as conf_settings
+from django.core.exceptions import ObjectDoesNotExist
 
 from .forms import JoinClubForm
 
@@ -33,6 +36,7 @@ class LibraryDetailView(DetailView):
         bc_pk_list = [bc.bookclub_id for bc in bookclubs_ids]
         context["user_clubs"] = BookClub.objects.filter(pk__in=bc_pk_list)
         context["form"] = JoinClubForm()
+        context["key"] = conf_settings.GOOGLE_API_KEY
 
         return context
 
@@ -44,8 +48,6 @@ class JoinClubFormView(SingleObjectMixin, FormView):
     success_url = "#"
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseForbidden()
         self.object = self.get_object()
         return super().post(request, *args, **kwargs)
 
@@ -64,11 +66,29 @@ class LibraryView(View):
         view = JoinClubFormView.as_view()
         form = JoinClubForm(request.POST)
         if form.is_valid():
-            bc = BookClub.objects.get(id=request.POST["bookclub_id"][0])
-            if "unjoin" in request.POST:
-                bc.members.remove(request.user)
+            if int(request.POST["user_id"]) == -1:
+                messages.error(
+                    request,
+                    "Please login/ sign up to subscribe to a bookclub!",
+                )
             else:
-                bc.members.add(request.user)
+                try:
+                    bc = BookClub.objects.get(id=request.POST["bookclub_id"][0])
+                    if "unjoin" in request.POST:
+                        if bc.admin == request.user:
+                            messages.error(
+                                request,
+                                "Owner cannot unsubscribe, please reassign ownership first",
+                            )
+                        else:
+                            bc.members.remove(request.user)
+                    else:
+                        bc.members.add(request.user)
+                except ObjectDoesNotExist:
+                    messages.error(
+                        request,
+                        "Something went wrong, please try again.",
+                    )
         return view(request, *args, **kwargs)
 
 

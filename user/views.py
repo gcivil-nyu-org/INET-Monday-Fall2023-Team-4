@@ -246,7 +246,14 @@ make sure you entered in the right code.",
                     }
                     return render(request, "user/profile.html", context)
             else:
+                context = {
+                    "title": "validate code",
+                    "verify_code": True,
+                    "validate_failed": True,
+                    "error_text": "Please enter a valid code!",
+                }
                 print("Failed validation")
+                return render(request, "user/profile.html", context)
     else:
         user_form = UpdateUserForm(instance=request.user)
     return render(
