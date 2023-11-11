@@ -11,59 +11,107 @@
     bootstrap_javascript %} {% load bootstrap_icons %}
   </head>
   {% block content %}
-  <body>
-    <div class="card d-flex align-items-center justify-content-center">
-        <h3 class="p-3">{{ library.branch }}</h3>
-        <p>
-          <address class="fs-4 px-3"> 
-          {{ library.address }}, {{ library.city }}, {{ library.postcode }}
-          </address> 
-          <p class="fs-5 px-3">
-          {% bs_icon 'telephone-fill' %} Phone: {{ library.phone }} <br />
-          {% bs_icon 'alarm-fill' %} Today's Hours: {{ library.get_today_hours }} <br />
-          </p>
-          <p class="fs-5 px-3" href="#opening_hours_{{library.id}}" data-bs-toggle="collapse">{% bs_icon 'calendar-event-fill' %}View all opening hours {% bs_icon 'chevron-down' %}</p>
-          <p id="opening_hours_{{library.id}}" class="collapse px-3">
-              Monday: {% if library.monday == null %} Closed {% else %} {{ library.monday }} {% endif %} <br />
-              Tuesday: {% if library.tuesday == null %} Closed {% else %} {{library.tuesday}} {% endif %} <br />
-              Wednesday: {% if library.wednesday == null %} Closed {% else %} {{library.wednesday}} {% endif %} <br />
-              Thursday: {% if library.thursday == null %} Closed {% else %} {{library.thursday}} {% endif %}<br />
-              Friday: {% if library.friday == null %} Closed {% else %} {{ library.friday }} {% endif %} <br />
-              Saturday: {% if library.saturday == null %} Closed {% else %} {{ library.saturday }} {% endif %} <br />
-              Sunday: {% if library.sunday == null %} Closed {% else %} {{ library.sunday }} {% endif %} <br />
-          </p>
-          <p class="fs-5 px-3"><a href="{{ library.link }}" style="text-decoration:none; color: unset">{% bs_icon 'info-square-fill' %}Vist library's official page for more details</a></p>
-        </p>
+  {% if messages %}
+    {% for message in messages %}
+    <div class="container-fluid p-0">
+      <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
     </div>
+    {% endfor %}
+  {% endif %}
+  <body>
+	<div class="container">
+		<div class="row">
+			<div class="col-6">
+        <div class="card d-flex align-items-center justify-content-center">
+          <h3 class="p-3">{{ library.branch }}</h3>
+          <p class="align-items-left justify-content-left">
+            <address class="fs-4 px-3"> 
+            {{ library.address }}, {{ library.city }}, {{ library.postcode }}
+            </address> 
+            <p class="fs-5 px-3">
+            {% bs_icon 'telephone-fill' %} Phone: {{ library.phone }} <br />
+            {% bs_icon 'alarm-fill' %} Today's Hours: {{ library.get_today_hours }} <br />
+            </p>
+            <p class="fs-5 px-3" href="#opening_hours_{{library.id}}" data-bs-toggle="collapse">{% bs_icon 'calendar-event-fill' %}View all opening hours {% bs_icon 'chevron-down' %}</p>
+            <p id="opening_hours_{{library.id}}" class="collapse px-3">
+                Monday: {% if library.monday == null %} Closed {% else %} {{ library.monday }} {% endif %} <br />
+                Tuesday: {% if library.tuesday == null %} Closed {% else %} {{library.tuesday}} {% endif %} <br />
+                Wednesday: {% if library.wednesday == null %} Closed {% else %} {{library.wednesday}} {% endif %} <br />
+                Thursday: {% if library.thursday == null %} Closed {% else %} {{library.thursday}} {% endif %}<br />
+                Friday: {% if library.friday == null %} Closed {% else %} {{ library.friday }} {% endif %} <br />
+                Saturday: {% if library.saturday == null %} Closed {% else %} {{ library.saturday }} {% endif %} <br />
+                Sunday: {% if library.sunday == null %} Closed {% else %} {{ library.sunday }} {% endif %} <br />
+            </p>
+            <p class="fs-5 px-3"><a href="{{ library.link }}" style="text-decoration:none; color: unset">{% bs_icon 'info-square-fill' %}Vist library's official page for more details</a></p>
+          </p>
+        </div>
+			</div>
+			<div class="col-6">
+				<div class="card d-flex align-items-center justify-content-center" style="height:100%">
+					<div id="map" style='height:100%;width:100%;'>Looks like we have no location data for this location!</div>
+					<script
+					   src="https://maps.googleapis.com/maps/api/js?key={{key}}&callback=initMap&v=weekly"
+					   defer
+					></script>
+					<script> 
+						let map;
+						function initMap() {
+							let location = { 'lat':{{library.latitude}}, 'lng':{{library.longitude}} };
+							map = new google.maps.Map(document.getElementById("map"), {
+								center: location,
+								zoom: 18,
+							});
+							new google.maps.Marker({
+								position: location,
+								map,
+								title: "{{library.branch}}",
+							});
+						}
+						window.initMap = initMap;
+					</script>
+				</div>
+			</div>
+		</div>
+	</div>
     <div class="container-fluid p-3">
         <h2 class="font-weight-light">Check out our book clubs!</h2>
-        <div class="d-flex overflow-auto" style="height: 450px">
+        <div class="d-flex overflow-auto flex-row flex-nowrap" style="height: 350px">
         {% for bc in book_clubs %}
-        <div class="card p-3">
+        <div class="col-3">
+        <div class="card p-3 m-3">
             <div class="card-body">
                 <h5 class="card-title">{{ bc.name }}</h5>
                 <p class="card-text">{{ bc.description }}</p>
                 <p class="card-text">Currently reading: {{ bc.currentBook }}</p>
                 <p class="card-text">Meeting day: {{ bc.meetingDay }}</p>
                 <p class="card-text">Meeting time: {{ bc.meetingStartTime }} - {{ bc.meetingEndTime }}</p>
-                {% if user.is_authenticated %}
                 <form method="POST" id="joinForm" class="form-inline my-2 my-lg-0">
                     {% csrf_token%}
-                    <input type="hidden" value="{{ user.id }}" name="user_id">
-                    <input type="hidden" value="{{ bc.id }}" name="bookclub_id">
+                    <input type="hidden" value={% if user.is_authenticated %} {{ user.id }} {% else %} -1 {% endif %} name="user_id">
+                    <input type="hidden" value={{ bc.id }} name="bookclub_id">
+                    {% comment %} <input type="hidden" value={{ user.is_authenticated }} name="is_authenticated"> {% endcomment %}
+					          <div class="col-lg-2 d-flex align-items-left">
+                    <a href="{% url 'details' bc.id %}" class="btn btn-primary mx-3">Details</a>
                     {% if bc in user_clubs %}
                         {% comment %} <input type="hidden" value=true name="join"> {% endcomment %}
-                        <button type="submit" name="unjoin" class="btn btn-primary">Joined</button>
+                        <button type="submit" name="unjoin" class="btn btn-primary">Unsubscribe</button>
                     {% else %}
                         {% comment %} <input type="hidden" value=false name="join"> {% endcomment %}
-                        <button type="submit" name="join" class="btn btn-primary">Join</button>
+                        <button type="submit" name="join" class="btn btn-primary">Subscribe</button>
                     {% endif %}
+                  </div>
                 </form>
-                {% endif %}
             </div>
         </div>
+      </div>
         {% endfor %}
         </div>
+    </div>
+    <div class="text-center mt-3 mb-3">
+      <a href="{% url 'create-book-club' %}?libraryId={{ library.id }}" class="btn btn-primary">Create Book Club</a>
     </div>
   </body>
   {% endblock %}

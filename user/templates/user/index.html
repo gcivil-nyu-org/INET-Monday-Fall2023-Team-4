@@ -72,23 +72,30 @@
 						<center>Looks like your not subscribed to any book clubs.</center>
 					{% endif %}
 					{% for club in subscriptions %}
-						<div class="panel panel-default">
-							<div class="row">
-								<div class="panel-heading">
-									<div class="col-sm-8">
-										{% if club.admin == request.user %}
-											<p class="text-primary">OWNER</p>
-										{% else %}
-											<p class="text-primary">MEMBER</p>
-										{% endif %}
-										 Club Name: {{club.name}} - Meeting Day: {{club.meetingDay}} - Current Boook: {{club.currentBook}}
-									</div>
-									<div class="col-sm-4">
-										<div style="float: right;">
-											<form method="POST" action="{% url 'users:unsubscribe' club.id %}">
-												{% csrf_token %}
-												<button type="submit" class="btn btn-warning">Unsubscribe</button>
-											</form>
+						<div class='card' style="width: 100%;margin-bottom:10px;">
+							<div class="card-body">
+								<div class="card-title">
+									<div class='row'>
+										<div class='col-8'>
+											{% if club.admin == request.user %}
+												<p><span class="text-primary">OWNER</span> | <b>{{club.libraryId.branch}}</b></p>
+											{% else %}
+												<p><span class="text-primary">MEMBER</span> | <b>{{club.libraryId.branch}}</b></p>
+											{% endif %}
+											
+										</div>
+										<div class='col-4' style='float: right;'>
+											<div style='float:right'>
+												{% if club.admin == request.user %}
+													<a href="{% url 'edit_book_club' club.id %}" class="btn btn-primary">Edit Book Club</a>
+												{% endif %}
+												<form method="POST" action="{% url 'users:unsubscribe' club.id %}">
+													{% csrf_token %}
+													<button type="submit" class="btn btn-warning">Unsubscribe</button>
+												</form>
+
+											</div>
+											
 										</div>
 									</div>
 								</div>
@@ -104,15 +111,7 @@
 	{% endblock %}
 	{% endif %}
 	{% if not user.is_authenticated and isfrontpage %}
-		<div class="container">
-			<div class=".col-md-3">
-				<div class="panel panel-info">
-					<div class="panel-heading">
-							Login for to view subscriptions
-					</div>
-				</div>
-			</div>
-		</div>
+		<center>Login for to view subscriptions</center>
 	{% endif %}
 </div>
 </body>
