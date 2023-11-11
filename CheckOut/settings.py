@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 import environ
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +28,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = "django-insecure-ha2r#15cuib7b$eh#!*%8dc#0t)s*v3n(g$yi&ep($kkgy&%j8"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "checkout-env.eba-a2fjneg3.us-west-2.elasticbeanstalk.com",
@@ -35,6 +36,20 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "172.31.40.50",
 ]
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+}
 
 
 # Application definition
@@ -88,19 +103,22 @@ TEMPLATES = [
     },
 ]
 
+
+MESSAGE_TAGS = {
+    messages.DEBUG: "alert-secondary",
+    messages.INFO: "alert-info",
+    messages.SUCCESS: "alert-success",
+    messages.WARNING: "alert-warning",
+    messages.ERROR: "alert-danger",
+}
+
+
 WSGI_APPLICATION = "CheckOut.wsgi.application"
 ASGI_APPLICATION = "CheckOut.asgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 
 DATABASES = {
     "default": {
@@ -161,6 +179,8 @@ STATIC_ROOT = "static"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+GOOGLE_API_KEY = env("GOOGLE_API_KEY")
 
 CHANNEL_LAYERS = {  # self
     "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}

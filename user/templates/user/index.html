@@ -1,3 +1,4 @@
+{% extends "user/base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
 <!DOCTYPE html>
@@ -11,9 +12,8 @@
 <meta name="language" content="English">
 
 <title>{{title}}</title>
-
 <!-- bootstrap file -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <!-- bootstrap file-->
@@ -36,62 +36,95 @@
 <script>
 	alert("{{ message }}");
 </script>
+{{message}}
 
 {% endfor %}
 {% endif %}
 
 
 </head>
-
+{% block content %}
 <body class="container-fluid">
 
-
-<header class="row">
-
-	<!-- navbar-->
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-	<div class="container-fluid">
-		<div class="navbar-header">
-		<button class="navbar-toggle" data-toggle="collapse" data-target="#mainNavBar">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-		</button>
-		<a class="navbar-brand" class="styleheader" href="{% url "users:index" %}">Check Out</a>
-		</div>
-		<div class="collapse navbar-collapse" id="mainNavBar">
-		<ul class="nav navbar-nav navbar-right">
-			<li><a href="{% url "users:index" %}">Home</a></li>
-
-			{% if user.is_authenticated %}
-			<li><a href="{% url "logout" %}"><span class="glyphicon glyphicon-log-out"></span>  Logout</a></li>
-			<li><a href="{% url "users:user_profile" %}"><span class="glyphicon glyphicon-log-out"></span>  User Profile</a></li>
-			{% else %}
-			<li><a href="{% url "users:register" %}"><span class="glyphicon glyphicon-user"></span>  Sign up</a></li>
-			<li><a href="{% url "users:login" %}"><span class="glyphicon glyphicon-log-in"></span>  Log in</a></li>
-			{% endif %}
-
-		</ul>
-		</div>
-	</div>
-	</nav>
-</header>
-<br/>
-<br>
-<br>
+{% include "user/base.html" %}
 <div class="row">
 	{% block start %}
 	{% if user.is_authenticated %}
-	<center><h1>Welcome back {{user.first_name}}!</h1></center>
-	{% else %}
-	<center><h1>Check Out</h1></center>
-	{% endif %}
-	<div>
-		<center><button type="button" class="btn btn-info"><a href="{% url "libraries:library-list"%}">View Libraries</a></button></center>
+	<div class="container">
+		<center><h1>Welcome back {{user.first_name}}!</h1></center>
+		{% else %}
+		<center><h1>Check Out</h1></center>
+		{% endif %}
+		<div>
+			<center><button type="button" class="btn btn-info"><a href="{% url 'libraries:library-list'%}">View Libraries</a></button></center>
+		</div>
+		</br>
 	</div>
 	{% endblock %}
+	{% if user.is_authenticated and isfrontpage %}
+	{% block subscriptions %}
+		<div class="container">
+			<div class="row">
+				<div class='col-2'></div>
+				<div class="col-8">
+					{% if messages %}
+					{% for message in messages %}
+						<div class="alert alert-info" role="alert">
+						  {{message}}
+						</div>
+					{% endfor %}
+					{% endif %}
+					{% if subscriptions %}
+						<center><h2>Your Subscriptions</h2></center>
+					{% else %}
+						<center>Looks like your not subscribed to any book clubs.</center>
+					{% endif %}
+					{% for club in subscriptions %}
+						<div class='card' style="width: 100%;margin-bottom:10px;">
+							<div class="card-body">
+								<div class="card-title">
+									<div class='row'>
+										<div class='col-8'>
+											{% if club.admin == request.user %}
+												<p><span class="text-primary">OWNER</span> | <b>{{club.libraryId.branch}}</b></p>
+											{% else %}
+												<p><span class="text-primary">MEMBER</span> | <b>{{club.libraryId.branch}}</b></p>
+											{% endif %}
+											
+										</div>
+										<div class='col-4' style='float: right;'>
+											<div style='float:right'>
+												{% if club.admin == request.user %}
+													<a href="{% url 'edit_book_club' club.id %}" class="btn btn-primary">Edit Book Club</a>
+												{% endif %}
+												<form method="POST" action="{% url 'users:unsubscribe' club.id %}">
+													{% csrf_token %}
+													<button type="submit" class="btn btn-warning">Unsubscribe</button>
+												</form>
+
+											</div>
+											
+										</div>
+									</div>
+								</div>
+								<div class="card-text">
+									<b>Club Name: {{club.name}} - Meeting Day: {{club.meetingDay}} - Current Book: {{club.currentBook}}</b>
+									</br>
+									{{club.description}}
+								</div>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+				<div class='col-2'></div>
+			</div>
+		</div>
+	{% endblock %}
+	{% endif %}
+	{% if not user.is_authenticated and isfrontpage %}
+		<center>Login for to view subscriptions</center>
+	{% endif %}
 </div>
 </body>
-
+{% endblock %}
 </html>
