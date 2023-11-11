@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     "bootstrap5",
     "django_bootstrap_icons",
     "BookClub.apps.BookClubConfig",
+    'channels',
+    'chat',
 ]
 
 AUTH_USER_MODEL = "user.CustomUser"
@@ -96,7 +98,9 @@ MESSAGE_TAGS = {
     messages.ERROR: "alert-danger",
 }
 
+
 WSGI_APPLICATION = "CheckOut.wsgi.application"
+ASGI_APPLICATION = "CheckOut.asgi.application"
 
 
 # Database
@@ -162,6 +166,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 GOOGLE_API_KEY = env("GOOGLE_API_KEY")
+
+CHANNEL_LAYERS = {  # self
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
