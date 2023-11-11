@@ -95,7 +95,7 @@
 										<div class='col-4' style='float: right;'>
 											<div style='float:right'>
 												{% if club.admin == request.user %}
-													<a href="{% url 'bookclub:edit_book_club' club.id %}" class="btn btn-primary">Edit Book Club</a>
+													<a href="{% url 'edit_book_club' club.id %}" class="btn btn-primary">Edit Book Club</a>
 												{% endif %}
 												<form method="POST" action="{% url 'users:unsubscribe' club.id %}">
 													{% csrf_token %}

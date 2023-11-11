@@ -28,10 +28,10 @@ def book_club_details(request, slug):
                 messages.error(
                     request, "You must be a NYU student to subscribe to this book club"
                 )
-            return redirect("bookclub:details", slug=slug)
+            return redirect("details", slug=slug)
         elif "unsubscribe" in request.POST:
             bc.members.remove(request.user)
-            return redirect("bookclub:details", slug=slug)
+            return redirect("details", slug=slug)
     return render(request, "details.html", context)
 
 
