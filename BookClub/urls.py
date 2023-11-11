@@ -1,4 +1,5 @@
 from django.urls import path
+
 from .views import create_book_club, edit_book_club, book_club_detail, book_club_details
 
 urlpatterns = [
