@@ -1,7 +1,7 @@
 from django.test import TestCase, RequestFactory
 from django.utils import timezone
 from django.urls import reverse
-from .forms import BookClubEditForm, BookClubForm
+from .forms import BookClubForm
 from django.http import HttpRequest
 from .models import BookClub
 from .views import edit_book_club

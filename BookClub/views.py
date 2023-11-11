@@ -5,7 +5,6 @@ from .models import BookClub
 from user.models import CustomUser
 from .models import Library
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
 from django.conf import settings
 from django.core.mail import send_mail
 from smtplib import SMTPException
