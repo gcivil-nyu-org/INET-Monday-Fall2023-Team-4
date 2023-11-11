@@ -29,4 +29,5 @@ urlpatterns = [
     ),
     path("libraries/", include("libraries.urls")),
     path("bookclub/", include("BookClub.urls")),
+    path("chat/", include("chat.urls")),
 ]

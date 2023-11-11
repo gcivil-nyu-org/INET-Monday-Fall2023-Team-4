@@ -1,14 +1,39 @@
-from django.shortcuts import get_object_or_404, render, redirect
-from .forms import BookClubEditForm, BookClubForm
-from django.http import HttpResponseForbidden
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import BookClubForm, BookClubEditForm
 from .models import BookClub
+from django.contrib import messages
+from django.http import HttpResponseForbidden
 from user.models import CustomUser
-from .models import Library
-from django.contrib.auth.decorators import login_required
+from .forms import BookClubForm, BookClubEditForm
 from django.conf import settings
 from django.core.mail import send_mail
 from smtplib import SMTPException
-from django.contrib import messages
+
+
+def book_club_details(request, slug):
+    bc = BookClub.objects.get(id=slug)
+    context = {
+        "bookclub": bc,
+        "member_count": bc.members.all().count(),
+        "subscribed": bc.members.contains(request.user)
+        if request.user.is_authenticated
+        else False,
+    }
+    if request.method == "POST":
+        if "subscribe" in request.POST:
+            if (bc.libraryId.NYU == "0") or (
+                bc.libraryId.NYU == "1" and request.user.status == "nyu"
+            ):
+                bc.members.add(request.user)
+            else:
+                messages.error(
+                    request, "You must be a NYU student to subscribe to this book club"
+                )
+            return redirect("details", slug=slug)
+        elif "unsubscribe" in request.POST:
+            bc.members.remove(request.user)
+            return redirect("details", slug=slug)
+    return render(request, "details.html", context)
 
 
 @login_required
