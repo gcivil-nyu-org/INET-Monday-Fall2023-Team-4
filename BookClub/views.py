@@ -53,7 +53,7 @@ def create_book_club(request):
                 context = {
                     "book_club": book_club,
                 }
-                return render(request, "bookclub_detail.html", context)
+                return render(request, "detail.html", context)
         elif request.user.status != "nyu" and library.NYU == "1":
             error_message = (
                 "You are not allowed to create a book club for NYU libraries."
@@ -72,7 +72,7 @@ def create_book_club(request):
                 context = {
                     "book_club": book_club,
                 }
-                return render(request, "bookclub_detail.html", context)
+                return render(request, "detail.html", context)
     else:
         form = BookClubForm()
     return render(request, "bookclub.html", {"form": form})
@@ -151,18 +151,8 @@ def edit_book_club(request, book_club_id):
                 print(e)
                 messages.error(request, "Failed to notify members of your updates")
 
-            return redirect("book_club_detail", book_club_id=book_club.id)
+            return redirect("details", slug=book_club.id)
     else:
         form = BookClubEditForm(instance=book_club)
 
     return render(request, "bookclub_edit.html", {"form": form, "book_club": book_club})
-
-
-def book_club_detail(request, book_club_id):
-    book_club = get_object_or_404(BookClub, id=book_club_id)
-
-    context = {
-        "book_club": book_club,
-    }
-
-    return render(request, "bookclub_detail.html", context)

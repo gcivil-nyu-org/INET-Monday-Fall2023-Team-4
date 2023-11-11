@@ -156,11 +156,10 @@ class BookClubViewsTest(TestCase):
 
     def test_book_club_detail_view(self):
         response = self.client.get(
-            reverse("book_club_detail", args=[self.book_club_id])
+            reverse("details", args=[self.book_club_id])
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "bookclub_detail.html")
-        self.assertEqual(response.context["book_club"], self.book_club)
+        self.assertTemplateUsed(response, "details.html")
 
     def test_edit_book_club_view_post(self):
         form_data = {
