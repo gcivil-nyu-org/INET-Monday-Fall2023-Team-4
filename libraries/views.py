@@ -73,7 +73,7 @@ class LibraryView(View):
                 )
             else:
                 try:
-                    bc = BookClub.objects.get(id=request.POST["bookclub_id"][0])
+                    bc = BookClub.objects.get(id=request.POST["bookclub_id"])
                     if "unjoin" in request.POST:
                         if bc.admin == request.user:
                             messages.error(
