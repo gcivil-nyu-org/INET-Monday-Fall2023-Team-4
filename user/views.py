@@ -31,7 +31,7 @@ def index(request):
 
 
 def unsubscribe(request, slug):
-    print("unsubscribing")
+    # print("unsubscribing")
     if request.method == "POST":
         try:
             bc = BookClub.objects.get(id=slug)
@@ -56,7 +56,7 @@ def register(request):
             if form.is_valid():
                 vcode = "".join(random.choices(string.ascii_letters, k=5))
                 email = form.cleaned_data.get("email")
-                print(f"vcode: {vcode}")
+                # print(f"vcode: {vcode}")
                 request.session["verification_code"] = {
                     "code": vcode,
                     "ttl": (time.time() + 300),
@@ -90,9 +90,9 @@ def register(request):
                     }
                     return render(request, "user/register.html", context)
         elif "verify" in request.POST:
-            print("Verify stuff")
+            # print("Verify stuff")
             validate_form = ValidateForm(request.POST)
-            print(request.POST)
+            # print(request.POST)
             if validate_form.is_valid():
                 code = validate_form.cleaned_data.get("code")
                 validation_token = request.session.get("verification_code")
@@ -162,11 +162,11 @@ def user_login(request):
 def user_profile(request):
     if request.method == "POST":
         user_form = UpdateUserForm(request.POST, instance=request.user)
-        print("this one", request.POST)
+        # print("this one", request.POST)
         # if "change_password" in re
         if "update" in request.POST:
             if request.POST["email"] == request.user.email:
-                print("no email update")
+                # print("no email update")
                 if user_form.is_valid():
                     user_form.save()
                     messages.success(request, "Your profile is updated successfully")
@@ -175,11 +175,11 @@ def user_profile(request):
             # email changed
             request.session["profile_form"] = request.POST
             if request.POST["email"] != request.user.email:
-                print("email changed")
+                # print("email changed")
                 if user_form.is_valid():
                     vcode = "".join(random.choices(string.ascii_letters, k=5))
                     email = user_form.cleaned_data.get("email")
-                    print(f"vcode: {vcode}")
+                    # print(f"vcode: {vcode}")
                     request.session["verification_code"] = {
                         "code": vcode,
                         "ttl": (time.time() + 300),
