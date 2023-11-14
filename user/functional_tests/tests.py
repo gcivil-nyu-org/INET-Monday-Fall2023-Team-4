@@ -271,9 +271,7 @@ class UnsubscribeTestCase(TestCase):
         self.assertNotIn(user, self.book_club.members.all())
         messages = list(messages)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            str(messages[0]), "Unsubscribe action complete"
-        )
+        self.assertEqual(str(messages[0]), "Unsubscribe action complete")
 
     def test_unsubscribe_view_owner_attempt(self):
         request = self.factory.post(

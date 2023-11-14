@@ -305,7 +305,8 @@ class NYUStatusLogicTests(TestCase):
         request.user = self.user_nyu
         request.POST = form_data
 
-        book_club_details(request, self.nyu_book_club.id)
+        response = book_club_details(request, self.nyu_book_club.id)
+        self.assertEqual(response.status_code, 302)
 
         self.assertIn(self.user_nyu, self.nyu_book_club.members.all())
 
@@ -320,7 +321,8 @@ class NYUStatusLogicTests(TestCase):
         request.user = self.user_nyu
         request.POST = form_data
 
-        book_club_details(request, self.non_nyu_book_club.id)
+        response = book_club_details(request, self.non_nyu_book_club.id)
+        self.assertEqual(response.status_code, 302)
 
         self.assertIn(self.user_nyu, self.non_nyu_book_club.members.all())
 
@@ -339,7 +341,8 @@ class NYUStatusLogicTests(TestCase):
         messages = FallbackStorage(request)
         setattr(request, "_messages", messages)
 
-        book_club_details(request, self.nyu_book_club.id)
+        response = book_club_details(request, self.nyu_book_club.id)
+        self.assertEqual(response.status_code, 302)
 
         self.assertNotIn(self.user_non_nyu, self.nyu_book_club.members.all())
 
@@ -354,7 +357,8 @@ class NYUStatusLogicTests(TestCase):
         request.user = self.user_non_nyu
         request.POST = form_data
 
-        book_club_details(request, self.non_nyu_book_club.id)
+        response = book_club_details(request, self.non_nyu_book_club.id)
+        self.assertEqual(response.status_code, 302)
 
         self.assertIn(self.user_non_nyu, self.non_nyu_book_club.members.all())
 
@@ -367,7 +371,8 @@ class NYUStatusLogicTests(TestCase):
         request.user = self.user_nyu
         request.POST = form_data
 
-        book_club_details(request, self.non_nyu_book_club.id)
+        response = book_club_details(request, self.non_nyu_book_club.id)
+        self.assertEqual(response.status_code, 302)
 
         self.assertNotIn(self.user_nyu, self.non_nyu_book_club.members.all())
 
