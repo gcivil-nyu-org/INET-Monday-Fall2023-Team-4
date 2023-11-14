@@ -11,6 +11,7 @@ from django.views.generic.list import ListView
 from django.db.models import Q
 from libraries.models import Library
 from BookClub.models import BookClub
+from BookClub.views import checkIfAllowedToSubscribe
 from django.conf import settings as conf_settings
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -83,7 +84,7 @@ class LibraryView(View):
                         else:
                             bc.members.remove(request.user)
                     else:
-                        bc.members.add(request.user)
+                        checkIfAllowedToSubscribe(bc, request)
                 except ObjectDoesNotExist:
                     messages.error(
                         request,
