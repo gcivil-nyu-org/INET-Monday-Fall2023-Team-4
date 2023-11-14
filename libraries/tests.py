@@ -395,6 +395,31 @@ class LibraryViewTestCase(TestCase):
         self.book_club.refresh_from_db()
         self.assertNotIn(self.user, self.book_club.members.all())
 
+    def test_join_member(self):
+        user = CustomUser.objects.create(
+            id=5,
+            username="Tester5",
+            email="testers5@nyu.edu",
+            first_name="Testing5",
+            last_name="Testing5",
+        )
+        request = self.factory.post(
+            reverse("libraries:library-detail", kwargs={"pk": self.library.pk}),
+            data={
+                "user_id": user.id,
+                "bookclub_id": [self.book_club.id],
+                "join": "true",
+            },
+        )
+        request.user = user
+        request.session = {}
+        messages = FallbackStorage(request)
+        request._messages = messages
+        response = LibraryView.as_view()(request, pk=self.library.pk)
+        self.assertEqual(response.status_code, 302)
+        self.book_club.refresh_from_db()
+        self.assertIn(user, self.book_club.members.all())
+
     def test_unjoin_admin(self):
         request = self.factory.post(
             reverse("libraries:library-detail", kwargs={"pk": self.library.pk}),

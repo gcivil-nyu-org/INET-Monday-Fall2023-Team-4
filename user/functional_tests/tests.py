@@ -251,15 +251,29 @@ class UnsubscribeTestCase(TestCase):
         self.factory = RequestFactory()
 
     def test_unsubscribe_view(self):
+        user = CustomUser.objects.create(
+            id=3,
+            username="Tester3",
+            email="testers3@nyu.edu",
+            first_name="Testing3",
+            last_name="Testing3",
+        )
+        self.book_club.members.add(user.id)
         request = self.factory.post(
             reverse("users:unsubscribe", kwargs={"slug": self.book_club.id})
         )
-        request.user = self.user
-        setattr(request, "session", "session")
+        request.user = user
+        request.session = {}
         messages = FallbackStorage(request)
-        setattr(request, "_messages", messages)
+        request._messages = messages
         response = unsubscribe(request, slug=self.book_club.id)
         self.assertEqual(response.status_code, 302)
+        self.assertNotIn(user, self.book_club.members.all())
+        messages = list(messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            str(messages[0]), "Unsubscribe action complete"
+        )
 
     def test_unsubscribe_view_owner_attempt(self):
         request = self.factory.post(
