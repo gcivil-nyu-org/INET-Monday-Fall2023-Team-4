@@ -1,10 +1,11 @@
 from django.test import TestCase, RequestFactory
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.utils import timezone
 from django.urls import reverse
 from .forms import BookClubForm
 from django.http import HttpRequest
 from .models import BookClub
-from .views import edit_book_club
+from .views import edit_book_club, book_club_details, create_book_club
 from user.models import CustomUser
 from libraries.models import Library
 import datetime
@@ -226,3 +227,170 @@ class BookClubViewsTest(TestCase):
 
         response = edit_book_club(request, book_club_id=self.book_club_id)
         self.assertEqual(response.status_code, 403)
+
+
+class NYUStatusLogicTests(TestCase):
+    def setUp(self):
+        self.user_nyu = CustomUser.objects.create(
+            username="nyu_user",
+            email="nyu_user@nyu.edu",
+            first_name="NYU",
+            last_name="Tester",
+            status="nyu",
+        )
+        self.user_non_nyu = CustomUser.objects.create(
+            username="non_nyu_user",
+            email="non_nyu_user@gmail.com",
+            first_name="Non-NYU",
+            last_name="Tester",
+            status="reader",
+        )
+        self.library_nyu = Library.objects.create(
+            id=1,
+            branch="NYU Library",
+            address="123 Test Unit Drive",
+            city="NYC",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU="1",
+        )
+        self.library_non_nyu = Library.objects.create(
+            id=2,
+            branch="Non-NYU Library",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU="0",
+        )
+        self.nyu_book_club = BookClub.objects.create(
+            id=1, name="NYU Book Club", admin=self.user_nyu, libraryId=self.library_nyu
+        )
+        self.non_nyu_book_club = BookClub.objects.create(
+            id=2,
+            name="Test Book Club",
+            admin=self.user_non_nyu,
+            libraryId=self.library_non_nyu,
+        )
+        self.factory = RequestFactory()
+
+    def test_nyu_user_can_subscribe_to_nyu_club(self):
+        self.assertTrue(self.user_nyu.status == "nyu")
+        self.assertTrue(self.library_nyu.NYU == "1")
+
+        form_data = {"subscribe": ""}
+
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.user_nyu
+        request.POST = form_data
+
+        book_club_details(request, self.nyu_book_club.id)
+
+        self.assertIn(self.user_nyu, self.nyu_book_club.members.all())
+
+    def test_nyu_user_can_subscribe_to_non_nyu_club(self):
+        self.assertTrue(self.user_nyu.status == "nyu")
+        self.assertTrue(self.library_non_nyu.NYU == "0")
+
+        form_data = {"subscribe": ""}
+
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.user_nyu
+        request.POST = form_data
+
+        book_club_details(request, self.non_nyu_book_club.id)
+
+        self.assertIn(self.user_nyu, self.non_nyu_book_club.members.all())
+
+    def test_non_nyu_user_cannot_subscribe_to_nyu_club(self):
+        self.assertTrue(self.user_non_nyu.status == "reader")
+        self.assertTrue(self.library_nyu.NYU == "1")
+
+        form_data = {"subscribe": ""}
+
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.user_non_nyu
+        request.POST = form_data
+
+        setattr(request, "session", "session")
+        messages = FallbackStorage(request)
+        setattr(request, "_messages", messages)
+
+        book_club_details(request, self.nyu_book_club.id)
+
+        self.assertNotIn(self.user_non_nyu, self.nyu_book_club.members.all())
+
+    def test_non_nyu_user_can_subscribe_to_non_nyu_club(self):
+        self.assertTrue(self.user_non_nyu.status == "reader")
+        self.assertTrue(self.library_non_nyu.NYU == "0")
+
+        form_data = {"subscribe": ""}
+
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.user_non_nyu
+        request.POST = form_data
+
+        book_club_details(request, self.non_nyu_book_club.id)
+
+        self.assertIn(self.user_non_nyu, self.non_nyu_book_club.members.all())
+
+    def test_user_can_unsubscribe(self):
+        self.non_nyu_book_club.members.add(self.user_nyu)
+        form_data = {"unsubscribe": ""}
+
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.user_nyu
+        request.POST = form_data
+
+        book_club_details(request, self.non_nyu_book_club.id)
+
+        self.assertNotIn(self.user_nyu, self.non_nyu_book_club.members.all())
+
+    def test_create_book_club_nyu_user_nyu_library(self):
+        request = self.factory.post("/create/", {"libraryId": self.library_nyu.id})
+        request.user = self.user_nyu
+        response = create_book_club(request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_create_book_club_non_nyu_user_nyu_library(self):
+        request = self.factory.post("/create/", {"libraryId": self.library_nyu.id})
+        request.user = self.user_non_nyu
+        response = create_book_club(request)
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_book_club_nyu_user_non_nyu_library(self):
+        request = self.factory.post("/create/", {"libraryId": self.library_non_nyu.id})
+        request.user = self.user_nyu
+        response = create_book_club(request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_create_book_club_non_nyu_user_non_nyu_library(self):
+        request = self.factory.post("/create/", {"libraryId": self.library_non_nyu.id})
+        request.user = self.user_non_nyu
+        response = create_book_club(request)
+        self.assertEqual(response.status_code, 200)
