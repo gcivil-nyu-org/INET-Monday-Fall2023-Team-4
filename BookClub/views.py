@@ -11,16 +11,15 @@ from smtplib import SMTPException
 from django.contrib.auth.decorators import login_required
 
 
-def checkIfAllowedToSubscribe(is_nyu_library, request):
-    if is_nyu_library == "0" or (
-        is_nyu_library == "1" and request.user.status == "nyu"
+def checkIfAllowedToSubscribe(bookclub, request):
+    if bookclub.libraryId.NYU == "0" or (
+        bookclub.libraryId.NYU == "1" and request.user.status == "nyu"
     ):
-        bc.members.add(request.user)
+        bookclub.members.add(request.user)
     else:
         messages.error(
             request, "You must be a NYU student to subscribe to this book club"
         )
-    return False
 
 
 def book_club_details(request, slug):
@@ -34,7 +33,7 @@ def book_club_details(request, slug):
     }
     if request.method == "POST":
         if "subscribe" in request.POST:
-            checkIfAllowedToSubscribe(bc.libraryId.NYU, request)
+            checkIfAllowedToSubscribe(bc, request)
             return redirect("details", slug=slug)
         elif "unsubscribe" in request.POST:
             bc.members.remove(request.user)
@@ -147,7 +146,7 @@ def edit_book_club(request, book_club_id):
                     settings.EMAIL_HOST_USER,
                 )
                 send_mail(subject, content, from_email, email_list, fail_silently=False)
-            except SMTPException as e:
+            except SMTPException:
                 messages.error(request, "Failed to notify members of your updates")
 
             return redirect("details", slug=book_club.id)

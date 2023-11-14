@@ -84,7 +84,7 @@ class LibraryView(View):
                         else:
                             bc.members.remove(request.user)
                     else:
-                        checkIfAllowedToSubscribe(bc.libraryId.NYU, request)
+                        checkIfAllowedToSubscribe(bc, request)
                 except ObjectDoesNotExist:
                     messages.error(
                         request,
