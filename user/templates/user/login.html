@@ -36,8 +36,19 @@
               margin-right: 2%;
             "
             >don't have account,sign up</a
-          ></sub
-        >
+          >
+          <a
+            href="{% url 'users:password-reset' %}"
+            style="
+              text-decoration: none;
+              color: blue;
+              padding: 2%;
+              cursor: pointer;
+              margin-right: 2%;
+            "
+            >Forgot your password?</a
+          >
+        </sub>
       </form>
     </center>
     {% else %}

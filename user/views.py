@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.views import PasswordChangeView, PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import UserRegisterForm, ValidateForm, UpdateUserForm
 from django.core.mail import send_mail
@@ -266,4 +266,16 @@ make sure you entered in the right code.",
 class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     template_name = "user/change_password.html"
     success_message = "Successfully Changed Your Password"
+    success_url = reverse_lazy("users:index")
+
+
+class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
+    template_name = "user/reset_password.html"
+    email_template_name = "user/password_reset_email.html"
+    success_message = (
+        "Instructions on how to reset your password were sent to you email. "
+        "If you have an existing account with us, you should receive the email shortly. "
+        "Make sure you have entered the correct email address and check your spam folder "
+        "if you didn't receive an email."
+    )
     success_url = reverse_lazy("users:index")
