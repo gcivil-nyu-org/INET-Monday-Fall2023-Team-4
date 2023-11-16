@@ -272,10 +272,11 @@ class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
 class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     template_name = "user/reset_password.html"
     email_template_name = "user/password_reset_email.html"
+    subject_template_name = "user/password_reset_subject.txt"
     success_message = (
         "Instructions on how to reset your password were sent to you email. "
         "If you have an existing account with us, you should receive the email shortly. "
         "Make sure you have entered the correct email address and check your spam folder "
         "if you didn't receive an email."
     )
-    success_url = reverse_lazy("users:index")
+    success_url = reverse_lazy("users:password-reset")

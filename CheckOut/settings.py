@@ -57,6 +57,9 @@ LOGGING = {
 INSTALLED_APPS = [
     "user.apps.UserConfig",
     "libraries.apps.LibrariesConfig",
+    "BookClub.apps.BookClubConfig",
+    "channels",
+    "chat",
     "crispy_forms",
     "crispy_bootstrap4",
     "django.contrib.admin",
@@ -67,9 +70,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "bootstrap5",
     "django_bootstrap_icons",
-    "BookClub.apps.BookClubConfig",
-    "channels",
-    "chat",
 ]
 
 AUTH_USER_MODEL = "user.CustomUser"
