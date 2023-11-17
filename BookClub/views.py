@@ -70,7 +70,6 @@ def create_book_club(request):
                 book_club.libraryId = library
                 book_club.save()
                 book_club.members.add(request.user)
-
                 return redirect("details", slug=book_club.id)
     else:
         form = BookClubForm()
