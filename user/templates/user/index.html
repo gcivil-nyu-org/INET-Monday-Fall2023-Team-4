@@ -56,7 +56,12 @@
 		<center><h1>Check Out</h1></center>
 		{% endif %}
 		<div>
-			<center><button type="button" class="btn btn-info"><a href="{% url 'libraries:library-list'%}">View Libraries</a></button></center>
+			<center>
+				<form method="get" action="{% url 'libraries:library-list'%}">
+					{% csrf_token %}
+					<button type='submit' class="btn btn-primary">View Libraries</button>
+				</form>
+			</center>
 		</div>
 		</br>
 	</div>
@@ -84,7 +89,7 @@
 							<div class="card-body">
 								<div class="card-title">
 									<div class='row'>
-										<div class='col-8'>
+										<div class='col-6'>
 											{% if club.admin == request.user %}
 												<p><span class="text-primary">OWNER</span> | <b>{{club.libraryId.branch}}</b></p>
 											{% else %}
@@ -92,16 +97,28 @@
 											{% endif %}
 											
 										</div>
-										<div class='col-4' style='float: right;'>
+										<div class='col-6' style='float: right;'>
 											<div style='float:right'>
 												{% if club.admin == request.user %}
-													<a href="{% url 'edit_book_club' club.id %}" class="btn btn-primary">Edit Book Club</a>
+													<div style='float:left;margin:2px'>
+													<a href="{% url 'edit_book_club' club.id %}" class="btn btn-primary">Edit</a>
+													</div>
 												{% endif %}
-												<form method="POST" action="{% url 'users:unsubscribe' club.id %}">
+												<form style='float:left;margin:2px' method="POST" action="{% url 'users:unsubscribe' club.id %}">
 													{% csrf_token %}
 													<button type="submit" class="btn btn-warning">Unsubscribe</button>
 												</form>
-
+												{% if request.user in club.silenceNotification.all %}
+													<form style='float:left;margin:2px' method="POST" action="{% url 'users:mute' club.id %}">
+														{% csrf_token %}
+														<button type="submit" name="unmute" class="btn btn-secondary">Unmute</button>
+													</form>
+												{% else %}
+													<form style='float:left;margin:2px' method="POST" action="{% url 'users:mute' club.id %}">
+														{% csrf_token %}
+														<button type="submit" name="mute" class="btn btn-secondary">Mute</button>
+													</form>
+												{% endif %}
 											</div>
 											
 										</div>
