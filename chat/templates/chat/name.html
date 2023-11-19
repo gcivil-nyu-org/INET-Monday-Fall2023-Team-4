@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Room Configuration</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        #container {
+            text-align: center;
+        }
+
+        #confirm-button {
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Additional styles can be added here */
+    </style>
+</head>
+<body>
+<div id="container">
+    <b>What name do you want to use in the chatroom?</b>
+    <br><br>
+    <input id="user-name-input" type="text" size="30" placeholder="Enter your name here">
+    <button id="confirm-button">Confirm</button>
+</div>
+
+<script>
+    // Function to get query parameters from the URL
+    function getQueryParam(param) {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    function getLastPartOfUrl() {
+        var path = window.location.pathname; // 获取路径部分
+        var parts = path.split('/'); // 按 '/' 分割路径
+
+        // 移除数组中的最后一个空元素（如果存在）
+        if (parts[parts.length - 1] === "") {
+            parts.pop();
+        }
+
+        return parts.length > 0 ? decodeURIComponent(parts[parts.length - 1]) : null; // 返回解码后的最后一个部分
+    }
+
+    var roomName = getLastPartOfUrl(); // 调用函数获取 URL 的最后一部分
+    // Set the room name from the URL parameter 'roomname'
+    {#var roomName = getQueryParam('roomname'); // Assuming 'roomname' is the query parameter#}
+    // Handle click event of the confirm button
+    document.getElementById('confirm-button').addEventListener('click', function () {
+        var userName = document.getElementById('user-name-input').value;
+        sessionStorage.setItem('userName', userName); // Save the user name to session storage
+
+        if (roomName) {
+            // Redirect to the new URL with the room name
+            window.location.href = '/chat/' + encodeURIComponent(roomName);
+        } else {
+            // Handle case where no room name is provided
+            alert('No room name provided.');
+        }
+    });
+</script>
+</body>
+</html>
