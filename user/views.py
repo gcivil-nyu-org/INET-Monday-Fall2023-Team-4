@@ -29,31 +29,30 @@ def index(request):
         {"title": "index", "subscriptions": bookclubs, "isfrontpage": True},
     )
 
-def mute(request,slug):
-    print('muting book club')
+
+def mute(request, slug):
+    print("muting book club")
     if request.user:
         bc = BookClub.objects.get(id=slug)
         print(bc)
         if request.method == "POST":
-            if 'mute' in request.POST:
+            if "mute" in request.POST:
                 bc.silenceNotification.add(request.user)
                 messages.info(
                     request,
-                    "Notifications Muted. You will no longer recieve notifications from this book club",
+                    "Notifications Muted. "
+                    + "You will no longer recieve notifications from this book club.",
                 )
-            elif 'unmute' in request.POST:
+            elif "unmute" in request.POST:
                 bc.silenceNotification.remove(request.user)
                 messages.info(
                     request,
                     "Notification Unmuted. You will now recieve notifications.",
                 )
     else:
-        messages.info(
-            request,
-            "You should not have been there"
-        )
+        messages.info(request, "You should not have been there")
     return redirect("users:index")
-		
+
 
 def unsubscribe(request, slug):
     print("unsubscribing")
