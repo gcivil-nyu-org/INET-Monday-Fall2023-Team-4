@@ -38,7 +38,7 @@
 						<form method="POST">
 							{% csrf_token %}
 							{% if user.is_authenticated %}
-								<button type="submit" name="chat" class="btn btn-primary">Chat Room</a></button>
+								<button onclick="location.href='{% url 'chat:name' roomname=bookclub.name %}'" type="button" class="btn btn-primary">Chat Room</button>
 								{% if subscribed %}
 								<button type="submit" name="unsubscribe" class="btn btn-primary">Unsubscribe</a></button>
 								{% else %}
