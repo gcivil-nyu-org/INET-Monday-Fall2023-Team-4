@@ -27,18 +27,11 @@
         <input id="chat-message-submit" type="button" style="padding: 10px 20px; border: none; background-color: #4CAF50; color: white; border-radius: 4px; cursor: pointer;" value="Send">
     </div>
 
-    <center><h2>Room: {{room_name}}</h2></center>
-
-    <textarea disabled id="chat-log" cols="130" rows="35"></textarea>
-    <br>
-    <input id="chat-message-input" type="text" size="40"></input>
-    <input id="chat-message-submit" type="button" value="Send">
-
     {{ room_name|json_script:"room-name" }}
 
     <script>
 
-        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const roomName = JSON.parse(document.getElementById('room-name').textContent).replace(/\s/g, '_');
         const chatSocket = new WebSocket(
             'ws://'
             + window.location.host
@@ -75,7 +68,8 @@
         document.querySelector('#chat-message-submit').onclick = function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
-            const username = sessionStorage['username'];
+            const username = sessionStorage['userName'];
+            // const username = sessionStorage['username'];
 
             // Send the msg object as a JSON-formatted string.
             chatSocket.send(JSON.stringify({

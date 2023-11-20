@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Room Configuration</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        #container {
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            background: #f9f9f9;
+            width: fit-content;
+        }
+
+        input[type="text"] {
+            font-size: 16px;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            width: calc(100% - 22px);
+        }
+
+        #confirm-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        #confirm-button:hover {
+            background-color: #45a049;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Additional styles can be added here */
+    </style>
+</head>
+<body>
+<div id="container">
+    <b>What name do you want to use in the chatroom?</b>
+    <br><br>
+    <input id="user-name-input" type="text" size="30" placeholder="Enter your name here">
+    <button id="confirm-button">Confirm</button>
+</div>
+
+<script>
+    // Function to get query parameters from the URL
+    function getQueryParam(param) {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    function getLastPartOfUrl() {
+        var path = window.location.pathname;
+        var parts = path.split('/');
+
+        if (parts[parts.length - 1] === "") {
+            parts.pop();
+        }
+
+        return parts.length > 0 ? decodeURIComponent(parts[parts.length - 1]) : null;
+    }
+
+    var roomName = getLastPartOfUrl();
+    document.getElementById('confirm-button').addEventListener('click', function () {
+        var userName = document.getElementById('user-name-input').value;
+        sessionStorage.setItem('userName', userName);
+
+        if (roomName) {
+            window.location.href = '/chat/' + encodeURIComponent(roomName);
+        } else {
+            alert('No room name provided.');
+        }
+    });
+</script>
+</body>
+</html>

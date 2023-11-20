@@ -1,6 +1,7 @@
 from django.test import TestCase, RequestFactory
 from django.template.loader import get_template
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.contrib.auth.models import AnonymousUser
 from django.test import Client
 from django.urls import reverse
 from django.http import HttpRequest
@@ -333,12 +334,23 @@ class LibraryViewTestCase(TestCase):
             link="https://github.com/gcivil-nyu-org/",
             NYU=1,
         )
+        self.book_club = BookClub.objects.create(
+            id=1,
+            name="Test Book Club",
+            description="This is a test book club",
+            currentBook="Sample Book",
+            meetingDay="monday",
+            meetingStartTime=datetime.time(18, 0),
+            meetingEndTime=datetime.time(18, 0),
+            meetingOccurence="one",
+            libraryId=self.library,
+            admin=self.user,
+        )
         self.client = Client()
         self.library_view = LibraryView()
         self.factory = RequestFactory()
 
     def test_get_method(self):
-        # Test the GET method of LibraryView
         request = self.factory.get(
             reverse("libraries:library-detail", kwargs={"pk": self.library.pk})
         )
@@ -358,14 +370,93 @@ class LibraryViewTestCase(TestCase):
         response = LibraryView.as_view()(request, pk=self.library.pk)
         self.assertEqual(response.status_code, 302)
 
-    def test_post_method_unjoin_owner(self):
+    def test_unjoin_member(self):
+        user = CustomUser.objects.create(
+            id=5,
+            username="Tester5",
+            email="testers5@nyu.edu",
+            first_name="Testing5",
+            last_name="Testing5",
+        )
         request = self.factory.post(
             reverse("libraries:library-detail", kwargs={"pk": self.library.pk}),
-            data={"user_id": self.user.id, "bookclub_id": [1], "unjoin": "true"},
+            data={
+                "user_id": user.id,
+                "bookclub_id": [self.book_club.id],
+                "unjoin": "true",
+            },
         )
-        request.user = self.user
-        setattr(request, "session", "session")
+        request.user = user
+        request.session = {}
         messages = FallbackStorage(request)
-        setattr(request, "_messages", messages)
+        request._messages = messages
         response = LibraryView.as_view()(request, pk=self.library.pk)
         self.assertEqual(response.status_code, 302)
+        self.book_club.refresh_from_db()
+        self.assertNotIn(self.user, self.book_club.members.all())
+
+    def test_join_member(self):
+        user = CustomUser.objects.create(
+            id=5,
+            username="Tester5",
+            email="testers5@nyu.edu",
+            first_name="Testing5",
+            last_name="Testing5",
+        )
+        request = self.factory.post(
+            reverse("libraries:library-detail", kwargs={"pk": self.library.pk}),
+            data={
+                "user_id": user.id,
+                "bookclub_id": [self.book_club.id],
+                "join": "true",
+            },
+        )
+        request.user = user
+        request.session = {}
+        messages = FallbackStorage(request)
+        request._messages = messages
+        response = LibraryView.as_view()(request, pk=self.library.pk)
+        self.assertEqual(response.status_code, 302)
+        self.book_club.refresh_from_db()
+        self.assertIn(user, self.book_club.members.all())
+
+    def test_unjoin_admin(self):
+        request = self.factory.post(
+            reverse("libraries:library-detail", kwargs={"pk": self.library.pk}),
+            data={
+                "user_id": self.user.id,
+                "bookclub_id": [self.book_club.id],
+                "unjoin": "true",
+            },
+        )
+        request.user = self.user
+        request.session = {}
+        messages = FallbackStorage(request)
+        request._messages = messages
+        response = LibraryView.as_view()(request, pk=self.library.pk)
+        self.assertEqual(response.status_code, 302)
+        self.book_club.refresh_from_db()
+        messages = list(messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            str(messages[0]),
+            "Owner cannot unsubscribe, please reassign ownership first",
+        )
+
+    def test_unjoin_user_not_logged_in(self):
+        request = self.factory.post(
+            reverse("libraries:library-detail", kwargs={"pk": self.library.pk}),
+            data={"user_id": -1, "bookclub_id": [999], "unjoin": "true"},
+        )
+        request.user = AnonymousUser()
+        request.session = {}
+        messages = FallbackStorage(request)
+        request._messages = messages
+        response = LibraryView.as_view()(request, pk=self.library.pk)
+        self.assertEqual(response.status_code, 302)
+        self.book_club.refresh_from_db()
+        messages = list(messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            str(messages[0]), "Please login/ sign up to subscribe to a bookclub!"
+        )
