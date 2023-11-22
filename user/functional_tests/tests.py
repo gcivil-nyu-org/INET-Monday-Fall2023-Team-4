@@ -249,16 +249,17 @@ class SilenceNotificationTestCase(TestCase):
             admin=self.user,
         )
         self.bc.members.add(self.user)
+
     def test_invalid_muting(self):
-        response = self.client.get(reverse("users:mute",args=[self.bc.id]), follow=True)
+        response = self.client.get(
+            reverse("users:mute", args=[self.bc.id]), follow=True
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_valid_muting(self):
         request = self.factory.post(
             reverse("users:mute", args=[self.bc.id]),
-            {
-                "mute": ""
-            },
+            {"mute": ""},
         )
         setattr(request, "session", "session")
         messages = FallbackStorage(request)
@@ -266,12 +267,11 @@ class SilenceNotificationTestCase(TestCase):
         request.user = self.user
         response = mute(request, slug=self.bc.id)
         self.assertEqual(response.status_code, 302)
+
     def test_valid_unmuting(self):
         request = self.factory.post(
             reverse("users:mute", args=[self.bc.id]),
-            {
-                "unmute": ""
-            },
+            {"unmute": ""},
         )
         setattr(request, "session", "session")
         messages = FallbackStorage(request)
@@ -279,6 +279,7 @@ class SilenceNotificationTestCase(TestCase):
         request.user = self.user
         response = mute(request, slug=self.bc.id)
         self.assertEqual(response.status_code, 302)
+
 
 class UnsubscribeTestCase(TestCase):
     def setUp(self):
