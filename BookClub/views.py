@@ -57,7 +57,7 @@ def create_book_club(request):
 
                 return redirect("details", slug=book_club.id)
         elif request.user.status != "nyu" and library.NYU == "1":
-            return redirect('error_page')
+            return redirect("error_page")
 
         else:
             if form.is_valid():
@@ -113,7 +113,7 @@ def edit_book_club(request, book_club_id):
     original_bc_name = book_club.name
 
     if request.user != book_club.admin:
-        return redirect('error_page')
+        return redirect("error_page")
 
     if request.method == "POST":
         form = BookClubEditForm(request.POST, instance=book_club)
