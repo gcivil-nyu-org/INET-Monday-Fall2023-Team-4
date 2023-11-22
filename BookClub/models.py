@@ -44,6 +44,9 @@ class BookClub(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name="book_club_admin"
     )
     members = models.ManyToManyField(CustomUser, related_name="book_clubs")
+    silenceNotification = models.ManyToManyField(
+        CustomUser, related_name="silence_notifications"
+    )
 
     def __str__(self):
         return self.name
