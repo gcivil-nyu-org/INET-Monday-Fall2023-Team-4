@@ -4,7 +4,7 @@ from django.urls import reverse
 from BookClub.models import BookClub
 from user.models import CustomUser
 from libraries.models import Library
-from user.views import user_profile, unsubscribe
+from user.views import user_profile, unsubscribe, mute
 from django.contrib.messages.storage.fallback import FallbackStorage
 from unittest.mock import patch
 from smtplib import SMTPException
@@ -207,6 +207,78 @@ class UserFormsTestCase(TestCase):
         form = ValidateForm(data)
         self.assertFalse(form.is_valid())
         self.assertIn("Only alphanumeric characters are allowed.", form.errors["code"])
+
+
+class SilenceNotificationTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.factory = RequestFactory()
+        self.user = CustomUser.objects.create(
+            username="TestMute",
+            email="TestMute@email.com",
+            first_name="Testing",
+            last_name="Testing",
+        )
+        self.library = Library.objects.create(
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.bc = BookClub.objects.create(
+            name="Test Book Club",
+            description="This is a test book club to mute",
+            currentBook="Sample Book",
+            meetingDay="monday",
+            meetingStartTime=datetime.time(18, 0),
+            meetingEndTime=datetime.time(18, 0),
+            meetingOccurence="one",
+            libraryId=self.library,
+            admin=self.user,
+        )
+        self.bc.members.add(self.user)
+
+    def test_invalid_muting(self):
+        response = self.client.get(
+            reverse("users:mute", args=[self.bc.id]), follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_valid_muting(self):
+        request = self.factory.post(
+            reverse("users:mute", args=[self.bc.id]),
+            {"mute": ""},
+        )
+        setattr(request, "session", "session")
+        messages = FallbackStorage(request)
+        setattr(request, "_messages", messages)
+        request.user = self.user
+        response = mute(request, slug=self.bc.id)
+        self.assertEqual(response.status_code, 302)
+
+    def test_valid_unmuting(self):
+        request = self.factory.post(
+            reverse("users:mute", args=[self.bc.id]),
+            {"unmute": ""},
+        )
+        setattr(request, "session", "session")
+        messages = FallbackStorage(request)
+        setattr(request, "_messages", messages)
+        request.user = self.user
+        response = mute(request, slug=self.bc.id)
+        self.assertEqual(response.status_code, 302)
 
 
 class UnsubscribeTestCase(TestCase):

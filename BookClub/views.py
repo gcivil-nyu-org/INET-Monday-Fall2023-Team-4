@@ -131,7 +131,12 @@ def edit_book_club(request, book_club_id):
                 changed_fields_and_data[i] = request.POST[i]
             try:
                 bc_members = book_club.members.all()
-                email_list = [mem.email for mem in bc_members]
+                email_list = [
+                    mem.email
+                    for mem in bc_members
+                    if not book_club.silenceNotification.contains(mem)
+                ]
+                print(email_list)
                 content = get_email_content(changed_fields_and_data, original_bc_name)
                 subject, content, from_email = (
                     "Check new updates from your book club!",
