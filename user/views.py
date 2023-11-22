@@ -31,10 +31,8 @@ def index(request):
 
 
 def mute(request, slug):
-    print("muting book club")
     if request.user:
         bc = BookClub.objects.get(id=slug)
-        print(bc)
         if request.method == "POST":
             if "mute" in request.POST:
                 bc.silenceNotification.add(request.user)
