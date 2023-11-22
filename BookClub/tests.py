@@ -226,7 +226,8 @@ class BookClubViewsTest(TestCase):
         request.user = self.non_member_user
 
         response = edit_book_club(request, book_club_id=self.book_club_id)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], '/bookclub/error/')
 
 
 class NYUStatusLogicTests(TestCase):
@@ -389,7 +390,8 @@ class NYUStatusLogicTests(TestCase):
         request = self.factory.post("/create/", {"libraryId": self.library_nyu.id})
         request.user = self.user_non_nyu
         response = create_book_club(request)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], '/bookclub/error/')
 
     def test_create_book_club_nyu_user_non_nyu_library(self):
         request = self.factory.post("/create/", {"libraryId": self.library_non_nyu.id})
