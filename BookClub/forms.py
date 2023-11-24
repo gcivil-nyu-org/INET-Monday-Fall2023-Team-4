@@ -17,27 +17,36 @@ class BookClubForm(ModelForm):
             "meetingOccurence",
         )
         labels = {
-            'currentBook': 'Current Book',
-            'meetingStartTime': 'Meeting Start Time',
-            'meetingEndTime': 'Meeting End Time',
+            "currentBook": "Current Book",
+            "meetingStartTime": "Meeting Start Time",
+            "meetingEndTime": "Meeting End Time",
             "meetingDay": "Meeting Day",
         }
+
     def __init__(self, *args, **kwargs):
         super(BookClubForm, self).__init__(*args, **kwargs)
-        self.fields['meetingDay'].required = True
-        self.fields['meetingOccurence'].required = True
-        self.fields['meetingStartTime'].widget = forms.TimeInput(format='%I:%M %p', attrs={'type': 'time'})
-        self.fields['meetingEndTime'].widget = forms.TimeInput(format='%I:%M %p', attrs={'type': 'time'})
+        self.fields["meetingDay"].required = True
+        self.fields["meetingOccurence"].required = True
+        self.fields["meetingStartTime"].widget = forms.TimeInput(
+            format="%I:%M %p", attrs={"type": "time"}
+        )
+        self.fields["meetingEndTime"].widget = forms.TimeInput(
+            format="%I:%M %p", attrs={"type": "time"}
+        )
+
     def clean(self):
         cleaned_data = super().clean()
         start_time = cleaned_data.get("meetingStartTime")
         end_time = cleaned_data.get("meetingEndTime")
 
         if start_time and end_time and end_time <= start_time:
-            raise ValidationError("Meeting end time must be after the meeting start time.")
+            raise ValidationError(
+                "Meeting end time must be after the meeting start time."
+            )
 
         return cleaned_data
-    
+
+
 class BookClubEditForm(ModelForm):
     class Meta:
         model = BookClub
