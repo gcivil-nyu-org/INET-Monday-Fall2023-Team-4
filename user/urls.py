@@ -7,8 +7,8 @@ app_name = "users"
 urlpatterns = [
     path("", views.index, name="index"),
     path("login/", views.user_login, name="login"),
-    path("register/", views.register, name="register"),
-    path("profile/", views.user_profile, name="user_profile"),
+    path("register", views.register, name="register"),
+    path("profile", views.user_profile, name="user_profile"),
     path("unsubscribe/<slug:slug>/", views.unsubscribe, name="unsubscribe"),
     path("mute/<slug:slug>/", views.mute, name="mute"),
     path("password-change/", ChangePasswordView.as_view(), name="password_change"),
@@ -35,4 +35,5 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+    path("notifications", views.manage_transfer_request, name="notifications")
 ]

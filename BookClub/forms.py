@@ -1,5 +1,7 @@
+from django import forms
 from django.forms import ModelForm
 from .models import BookClub
+from user.models import CustomUser
 
 
 class BookClubForm(ModelForm):
@@ -17,6 +19,7 @@ class BookClubForm(ModelForm):
 
 
 class BookClubEditForm(ModelForm):
+    new_admin = forms.ModelChoiceField(label="New Admin", queryset=CustomUser.objects.all())
     class Meta:
         model = BookClub
         fields = (
@@ -28,5 +31,6 @@ class BookClubEditForm(ModelForm):
             "meetingEndTime",
             "meetingOccurence",
             "libraryId",
-            "admin",
         )
+        
+        exclude = ["admin"]
