@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from libraries.models import Library
 from .models import BookClub
 from django.contrib import messages
-from django.http import HttpResponseForbidden
 from user.models import CustomUser
 from .forms import BookClubForm, BookClubEditForm
 from django.conf import settings
@@ -57,10 +56,7 @@ def create_book_club(request):
 
                 return redirect("details", slug=book_club.id)
         elif request.user.status != "nyu" and library.NYU == "1":
-            error_message = (
-                "You are not allowed to create a book club for NYU libraries."
-            )
-            return HttpResponseForbidden(error_message)
+            return redirect("error_page")
 
         else:
             if form.is_valid():
@@ -70,7 +66,6 @@ def create_book_club(request):
                 book_club.libraryId = library
                 book_club.save()
                 book_club.members.add(request.user)
-
                 return redirect("details", slug=book_club.id)
     else:
         form = BookClubForm()
@@ -117,9 +112,7 @@ def edit_book_club(request, book_club_id):
     original_bc_name = book_club.name
 
     if request.user != book_club.admin:
-        return HttpResponseForbidden(
-            "You don't have permission to edit this Book Club."
-        )
+        return redirect("error_page")
 
     if request.method == "POST":
         form = BookClubEditForm(request.POST, instance=book_club)
@@ -138,7 +131,12 @@ def edit_book_club(request, book_club_id):
                 changed_fields_and_data[i] = request.POST[i]
             try:
                 bc_members = book_club.members.all()
-                email_list = [mem.email for mem in bc_members]
+                email_list = [
+                    mem.email
+                    for mem in bc_members
+                    if not book_club.silenceNotification.contains(mem)
+                ]
+                print(email_list)
                 content = get_email_content(changed_fields_and_data, original_bc_name)
                 subject, content, from_email = (
                     "Check new updates from your book club!",
@@ -154,3 +152,7 @@ def edit_book_club(request, book_club_id):
         form = BookClubEditForm(instance=book_club)
 
     return render(request, "bookclub_edit.html", {"form": form, "book_club": book_club})
+
+
+def error_page(request):
+    return render(request, "bookclub_error_page.html")
