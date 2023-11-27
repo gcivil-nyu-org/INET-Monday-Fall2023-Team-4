@@ -18,7 +18,6 @@ script:
   - coverage run manage.py test --noinput
   - coverage xml
   - ./coverall/coveralls report --repo-token=$COVERALL_TOKEN ./coverage.xml
-  - daphne CheckOut.asgi:application
 
 deploy:
   provider: elasticbeanstalk
