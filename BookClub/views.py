@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from libraries.models import Library
 from BookClub.models import BookClub
 from django.contrib import messages
-from django.http import HttpResponseForbidden
 from user.models import CustomUser, TransferOwnershipRequest
 from .forms import BookClubForm, BookClubEditForm
 from django.conf import settings
