@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "user.apps.UserConfig",
     "libraries.apps.LibrariesConfig",
     "BookClub.apps.BookClubConfig",
+    "books.apps.BooksConfig",
     "channels",
     "chat",
     "crispy_forms",
