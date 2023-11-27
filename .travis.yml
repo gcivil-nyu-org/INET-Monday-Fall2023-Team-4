@@ -11,7 +11,6 @@ install:
 before_script:
   - python manage.py makemigrations
   - python manage.py migrate
-  - daphne CheckOut.asgi:application
 
 script:
   - black . --check
@@ -19,6 +18,7 @@ script:
   - coverage run manage.py test --noinput
   - coverage xml
   - ./coverall/coveralls report --repo-token=$COVERALL_TOKEN ./coverage.xml
+  - daphne CheckOut.asgi:application
 
 deploy:
   provider: elasticbeanstalk
