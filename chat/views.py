@@ -21,4 +21,4 @@ def room(request, room_name):
 
 def name(request, roomname):
     # Do any processing if needed, then pass the roomname to the template
-    return render(request, "chat/name.html", {"roomname": roomname})
+    return render(request, "chat/name.html", {"roomname": roomname, "username": request.user.username})
