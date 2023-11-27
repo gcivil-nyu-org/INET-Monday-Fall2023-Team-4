@@ -128,9 +128,15 @@ def edit_book_club(request, book_club_id):
             print(request.POST)
             if "new_admin" in request.POST:
                 new_admin = form.cleaned_data["new_admin"]
-                transferReq = TransferOwnershipRequest(original_owner=request.user, new_owner=new_admin, book_club=book_club,status="pending", date_created=date.today())
+                transferReq = TransferOwnershipRequest(
+                    original_owner=request.user,
+                    new_owner=new_admin,
+                    book_club=book_club,
+                    status="pending",
+                    date_created=date.today(),
+                )
                 transferReq.save()
-            
+
             form.save()
             fields_changed = form.changed_data
             changed_fields_and_data = {}

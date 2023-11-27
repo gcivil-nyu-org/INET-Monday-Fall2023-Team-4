@@ -35,5 +35,5 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
-    path("notifications", views.manage_transfer_request, name="notifications")
+    path("notifications", views.manage_transfer_request, name="notifications"),
 ]
