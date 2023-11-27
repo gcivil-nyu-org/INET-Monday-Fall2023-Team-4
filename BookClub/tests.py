@@ -180,7 +180,7 @@ class BookClubViewsTest(TestCase):
 
         response = edit_book_club(request, self.book_club_id)
 
-        updated_book_club = BookClub.objects.get(id=self.book_club_id)
+        # updated_book_club = BookClub.objects.get(id=self.book_club_id)
 
         # self.assertEqual(updated_book_club.admin, self.non_member_user)
         # self.assertIn(self.non_member_user, updated_book_club.members.all())
