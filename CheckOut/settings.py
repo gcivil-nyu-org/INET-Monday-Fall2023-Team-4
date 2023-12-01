@@ -182,8 +182,11 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 GOOGLE_API_KEY = env("GOOGLE_API_KEY")
 
-CHANNEL_LAYERS = {  # self
-    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [("red-5cdtdk.serverless.usw2.cache.amazonaws.com", 6379)]},
+    }
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
