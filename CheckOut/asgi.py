@@ -13,11 +13,9 @@ import os
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
-from django.conf import settings
 import chat.routing
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "CheckOut.settings")
-settings.configure()
 
 application = ProtocolTypeRouter(
     {
