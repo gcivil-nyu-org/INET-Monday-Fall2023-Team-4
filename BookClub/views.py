@@ -168,20 +168,6 @@ def error_page(request):
     return render(request, "bookclub_error_page.html")
 
 
-# @login_required
-# def delete_book_club(request):
-#     if request.method == 'POST':
-#         book_club_id = request.POST.get('book_club_id')
-#     book_club = get_object_or_404(BookClub, id=book_club_id)
-#     if request.user == book_club.admin:
-#         book_club.delete()
-#         messages.success(request, "Book club deleted successfully.")
-#         return redirect('deletion_confirmation')
-#     else:
-#         messages.error(request, "You are not authorized to delete this book club.")
-#         return redirect('bookclub_error_page.html')
-
-
 @login_required
 def delete_book_club(request):
     if request.method == "POST":

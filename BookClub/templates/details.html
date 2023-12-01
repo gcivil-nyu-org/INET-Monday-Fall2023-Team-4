@@ -36,7 +36,7 @@
                     <div class='container' style='margin-bottom:10px'>
                         <div class='row justify-content-center'>
                             <center>
-                                <!-- Main Form -->
+                                
                                 <form method="POST" style="display: inline-block;">
                                     {% csrf_token %}
                                     {% if user.is_authenticated %}
@@ -52,7 +52,7 @@
                                     {% endif %}
                                 </form>
 
-                                <!-- Separate Delete Form -->
+                               
                                 {% if bookclub.admin == user %}
                                     <form action="{% url 'delete_book_club' %}" method="post" style="display: inline-block;">
                                         {% csrf_token %}
