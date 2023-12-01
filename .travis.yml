@@ -9,7 +9,8 @@ install:
   - curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C ./coverall
 
 before_script:
-  - daphne CheckOut.asgi:application
+  - python manage.py makemigrations
+  - python manage.py migrate
 
 script:
   - black . --check
