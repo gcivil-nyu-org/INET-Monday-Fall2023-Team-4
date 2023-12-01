@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from libraries.models import Library
-from .models import BookClub
+from BookClub.models import BookClub
 from django.contrib import messages
-from user.models import CustomUser
+from user.models import CustomUser, TransferOwnershipRequest
 from .forms import BookClubForm, BookClubEditForm
 from django.conf import settings
 from django.core.mail import send_mail
 from smtplib import SMTPException
 from django.contrib.auth.decorators import login_required
+from datetime import date
 
 
 def checkIfAllowedToSubscribe(bookclub, request):
@@ -117,14 +118,23 @@ def edit_book_club(request, book_club_id):
     if request.method == "POST":
         form = BookClubEditForm(request.POST, instance=book_club)
         if form.is_valid():
-            new_admin = form.cleaned_data["admin"]
-            if new_admin not in book_club.members.all():
-                book_club.members.add(new_admin)
+            print(request.POST)
+            if "new_admin" in request.POST:
+                new_admin = form.cleaned_data["new_admin"]
+                transferReq = TransferOwnershipRequest(
+                    original_owner=request.user,
+                    new_owner=new_admin,
+                    book_club=book_club,
+                    status="pending",
+                    date_created=date.today(),
+                )
+                transferReq.save()
+
             form.save()
             fields_changed = form.changed_data
             changed_fields_and_data = {}
             for i in fields_changed:
-                if i == "admin":
+                if i == "new_admin":
                     new_admin = get_object_or_404(CustomUser, id=request.POST[i])
                     changed_fields_and_data[i] = new_admin.first_name
                     continue
@@ -136,7 +146,7 @@ def edit_book_club(request, book_club_id):
                     for mem in bc_members
                     if not book_club.silenceNotification.contains(mem)
                 ]
-                print(email_list)
+
                 content = get_email_content(changed_fields_and_data, original_bc_name)
                 subject, content, from_email = (
                     "Check new updates from your book club!",

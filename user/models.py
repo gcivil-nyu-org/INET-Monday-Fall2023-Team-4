@@ -34,3 +34,21 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class TransferOwnershipRequest(models.Model):
+    original_owner = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="old_admin"
+    )
+    new_owner = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="new_admin"
+    )
+    book_club = models.ForeignKey(
+        "BookClub.BookClub", on_delete=models.CASCADE, related_name="book_club_in_limbo"
+    )
+    status_types = ["accepted", "pending", "declined"]
+    status = models.CharField(status_types, max_length=30)
+    date_created = models.DateField("date created")
+
+    class Meta:
+        ordering = ["date_created"]
