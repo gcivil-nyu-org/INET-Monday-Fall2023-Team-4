@@ -185,7 +185,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-           "hosts": [(<primary_endpoint_url>, 6379)]
+           "hosts": [("red-5cdtdk.serverless.usw2.cache.amazonaws.com", 6379)]
         },
     }
 }
