@@ -10,7 +10,6 @@ from user.models import CustomUser
 from libraries.models import Library
 import datetime
 from django.core import mail
-from .views import delete_book_club
 
 
 class BookClubModelTest(TestCase):
