@@ -9,6 +9,7 @@ from .views import edit_book_club, book_club_details, create_book_club
 from user.models import CustomUser
 from libraries.models import Library
 import datetime
+from django.core import mail
 
 
 class BookClubModelTest(TestCase):
@@ -407,3 +408,77 @@ class NYUStatusLogicTests(TestCase):
         book_club = BookClub.objects.get(admin=self.user_non_nyu)
         self.assertEqual(book_club.admin, self.user_non_nyu)
         self.assertEqual(book_club.libraryId, self.library_non_nyu)
+
+
+class BookClubDeletionTest(TestCase):
+    def setUp(self):
+        self.library = Library.objects.create(
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.admin_user = CustomUser.objects.create(
+            username="admin",
+            email="admin@email.com",
+            first_name="test1first",
+            last_name="test1last",
+        )
+        self.member_user = CustomUser.objects.create(
+            username="member",
+            email="member@nyu.edu",
+            first_name="test2first",
+            last_name="test2last",
+        )
+        self.book_club = BookClub.objects.create(
+            name="Test Book Club",
+            description="This is a test book club",
+            currentBook="Sample Book",
+            meetingDay="monday",
+            meetingStartTime=timezone.now(),
+            meetingEndTime=timezone.now(),
+            meetingOccurence="one",
+            libraryId=self.library,
+            admin=self.admin_user,
+        )
+        self.book_club.members.add(self.admin_user, self.member_user)
+        self.delete_url = reverse("delete_book_club")
+
+    def test_delete_book_club_by_admin(self):
+        self.client.force_login(self.admin_user)
+        response = self.client.post(
+            self.delete_url, {"book_club_id": self.book_club.id}
+        )
+        with self.assertRaises(BookClub.DoesNotExist):
+            BookClub.objects.get(id=self.book_club.id)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "Book Club Deletion Notification")
+        recipients = [
+            self.admin_user.email,
+            self.member_user.email,
+        ]  # List all member emails
+        self.assertListEqual(mail.outbox[0].to, recipients)
+        self.assertRedirects(response, reverse("deletion_confirmation"))
+
+    def test_delete_book_club_by_non_admin(self):
+        self.client.force_login(self.member_user)
+        response = self.client.post(
+            self.delete_url, {"book_club_id": self.book_club.id}
+        )
+        self.assertTrue(BookClub.objects.filter(id=self.book_club.id).exists())
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/bookclub/error")
