@@ -1,0 +1,35 @@
+{% extends "user/base.html" %}
+<!DOCTYPE html>
+<html>
+	<head>
+	</head>
+	
+	<body>
+		{% block content %}
+		<div class='container'>
+			<center>
+				<h1>Create Next Book Poll</h1>
+				<p>What book would you want the club to vote on for the next read?</p>
+				<form method="POST">
+					{% csrf_token %}
+					<button type="submit" name="add">+</button>
+				</form>
+				<form method="POST">
+					{% csrf_token %}
+					<button type="submit" name="sub">-</button>
+				</form>
+				{% for i in amount %}
+					<div>
+						<p>Book {{i}}</p>
+						<input></input>
+					<div>
+				{% endfor %}
+				<form method="POST">
+					{% csrf_token %}
+					<button class="btn btn-primary" type="submit" name="submit">Submit</button>
+				</form>
+			</center>
+		</div>
+		{% endblock	%}
+	</body>
+</html>
