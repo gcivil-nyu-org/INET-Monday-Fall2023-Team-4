@@ -10,6 +10,18 @@ from smtplib import SMTPException
 from django.contrib.auth.decorators import login_required
 from datetime import date
 
+def voting_form(request,slug):
+    amount = request.session.get("book_poll_amount")
+    if(amount == None):
+        amount = 3
+    if request.method == "POST":
+        if "add" in request.POST:
+            amount+=1
+        if "sub" in request.POST:
+            amount-=1
+    request.session["book_poll_amount"] = amount
+    context = {"amount": range(amount)}
+    return render(request,"voting.html",context)
 
 def checkIfAllowedToSubscribe(bookclub, request):
     if bookclub.libraryId.NYU == "0" or (

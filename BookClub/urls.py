@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import create_book_club, edit_book_club, book_club_details, error_page
+from .views import create_book_club, edit_book_club, book_club_details, error_page,voting_form
 from django.contrib.auth.decorators import login_required
 
 
@@ -8,4 +8,5 @@ urlpatterns = [
     path("error", error_page, name="error_page"),
     path("<slug:slug>", book_club_details, name="details"),
     path("<int:book_club_id>/edit", edit_book_club, name="edit_book_club"),
+	path("voting/<slug:slug>",voting_form,name="voting"),
 ]

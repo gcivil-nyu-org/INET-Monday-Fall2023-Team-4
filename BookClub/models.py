@@ -4,6 +4,29 @@ from libraries.models import Library
 import datetime
 
 
+class PollChoice(models.Model):
+    name = models.CharField(max_length=200)
+    votes = models.PositiveSmallIntegerField()
+
+    def get_votes():
+        return votes
+    def __str__(self):
+        return self.name
+
+class VotingPoll(models.Model):
+    poll_set = models.BooleanField(default=False)
+    name = models.CharField(max_length=200)
+    choices = models.ManyToManyField(PollChoice,related_name="voting_choices")
+
+    def get_all_votes():
+        voted = 0
+        for choice in choices:
+            voted += choice.get_votes()
+        return voted
+
+    def __str__(self):
+        return self.name
+
 class BookClub(models.Model):
     DAYS_OF_THE_WEEK = [
         ("monday", "Monday"),
@@ -47,6 +70,7 @@ class BookClub(models.Model):
     silenceNotification = models.ManyToManyField(
         CustomUser, related_name="silence_notifications"
     )
+    poll = models.ForeignKey(VotingPoll,on_delete=models.CASCADE,related_name="voting_poll",default=None)
 
     def __str__(self):
         return self.name
