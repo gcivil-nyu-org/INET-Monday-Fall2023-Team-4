@@ -1,63 +1,74 @@
 {% extends "user/base.html" %}
 <!DOCTYPE html>
 <html>
-	<head>
-		{% load bootstrap5 %} {% bootstrap_css %}
-		
-	</head>
-	{% block content %}
-	<body>
-		{% if messages %}
-		{% for message in messages %}
-			<div class="container-fluid p-0">
-				<div class="alert alert-danger alert-dismissible fade show" role="alert" >
-					{{ message }}
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>
-			</div>
-		{% endfor %}
-		{% endif %}
-		<div class='container'>
-			{% if bookclub %}
-			<div class='container'>
-				<div class='row justify-content-center'>
-					<center><h1>{{bookclub.name}}</h1></center>
-				</div>
-				<div class='row justify-content-center'>
-					<center>
-					<p>{{bookclub.description}}</p>
-					<p>Current Book Reading: {{bookclub.currentBook}}</p>
-					<p>Meeting Time: {{bookclub.meetingDay}} , {{bookclub.meetingStartTime}} - {{bookclub.meetingEndTime}}</p>
-					<p>Current Amount of Members: {{member_count}}</p>
-					</center>
-				</div>
-			</div>
-			<div class='container' style='margin-bottom:10px'>
-				<div class='row justify-content-center'>
-					<center>
-						<form method="POST">
-							{% csrf_token %}
-							{% if user.is_authenticated %}
-								<button onclick="location.href='{% url 'chat:name' roomname=bookclub.name %}'" type="button" class="btn btn-primary">Chat Room</button>
-								{% if subscribed %}
-								<button type="submit" name="unsubscribe" class="btn btn-primary">Unsubscribe</a></button>
-								{% else %}
-								<button type="submit" name="subscribe" class="btn btn-primary">Subscribe</a></button>
-								{% endif %}
-								{% if bookclub.admin == user%}
-								<button onclick="location.href='{% url 'edit_book_club' bookclub.id %}'" type="button" class="btn btn-primary">Edit</button>
-								{% endif %}
-							{% endif %}
-						</form>
-					</center>
-				</div>
-			</div>
-			{% else %}
-			<div class='container'>
-				<center><h1>The Book Club you are trying to reach is either does not exist or you have no permission to view</h1></center>
-			</div>
-			{% endif %}
-		</div>
-	</body>
-	{% endblock %}
+    <head>
+        {% load bootstrap5 %} {% bootstrap_css %}
+    </head>
+    <body>
+        {% block content %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="container-fluid p-0">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class='container'>
+                {% if bookclub %}
+                    <div class='container'>
+                        <div class='row justify-content-center'>
+                            <center><h1>{{ bookclub.name }}</h1></center>
+                        </div>
+                        <div class='row justify-content-center'>
+                            <center>
+                                <p>{{ bookclub.description }}</p>
+                                <p>Current Book Reading: {{ bookclub.currentBook }}</p>
+                                <p>Meeting Time: {{ bookclub.meetingDay }} , {{ bookclub.meetingStartTime }} - {{ bookclub.meetingEndTime }}</p>
+                                <p>Current Amount of Members: {{ member_count }}</p>
+                            </center>
+                        </div>
+                    </div>
+
+                    <div class='container' style='margin-bottom:10px'>
+                        <div class='row justify-content-center'>
+                            <center>
+                                
+                                <form method="POST" style="display: inline-block;">
+                                    {% csrf_token %}
+                                    {% if user.is_authenticated %}
+                                        <button onclick="location.href='{% url 'chat:name' roomname=bookclub.name %}'" type="button" class="btn btn-primary">Chat Room</button>
+                                        {% if subscribed %}
+                                            <button type="submit" name="unsubscribe" class="btn btn-primary">Unsubscribe</button>
+                                        {% else %}
+                                            <button type="submit" name="subscribe" class="btn btn-primary">Subscribe</button>
+                                        {% endif %}
+                                        {% if bookclub.admin == user %}
+                                            <button onclick="location.href='{% url 'edit_book_club' bookclub.id %}'" type="button" class="btn btn-primary">Edit</button>
+                                        {% endif %}
+                                    {% endif %}
+                                </form>
+
+                               
+                                {% if bookclub.admin == user %}
+                                    <form action="{% url 'delete_book_club' %}" method="post" style="display: inline-block;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="book_club_id" value="{{ bookclub.id }}">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </center>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class='container'>
+                        <center><h1>The Book Club you are trying to reach either does not exist or you have no permission to view it.</h1></center>
+                    </div>
+                {% endif %}
+            </div>
+        {% endblock %}
+    </body>
 </html>
