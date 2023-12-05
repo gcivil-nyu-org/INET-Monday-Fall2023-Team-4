@@ -19,7 +19,7 @@ class TransferOwnershipNotif(Notification):
         CustomUser, on_delete=models.CASCADE, related_name="new_admin"
     )
     book_club = models.ForeignKey(
-        "BookClub.BookClub", on_delete=models.CASCADE, related_name="book_club"
+        "BookClub.BookClub", on_delete=models.CASCADE, related_name="transferred_book_club"
     )
     status_types = ["accepted", "pending", "declined"]
     status = models.CharField(status_types, max_length=30)
@@ -30,7 +30,7 @@ class BookClubUpdatesNotif(Notification):
         CustomUser, on_delete=models.CASCADE, related_name="receiving_user"
     )
     book_club = models.ForeignKey(
-        "BookClub.BookClub", on_delete=models.CASCADE, related_name="book_club"
+        "BookClub.BookClub", on_delete=models.CASCADE, related_name="updated_book_club"
     )
-    fields_changed = models.TextField(related_name="fields_changed")
+    fields_changed = models.TextField()
     

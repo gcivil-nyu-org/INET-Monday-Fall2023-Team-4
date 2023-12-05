@@ -15,7 +15,6 @@ from BookClub.models import BookClub, VotingPoll
 import time
 import random
 import string
-from .models import TransferOwnershipRequest
 from django.http import HttpResponseRedirect
 
 
