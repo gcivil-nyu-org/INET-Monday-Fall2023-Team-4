@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "channels",
     "chat",
     "crispy_forms",
+    "polymorphic",
     "crispy_bootstrap4",
     "django.contrib.admin",
     "django.contrib.auth",
