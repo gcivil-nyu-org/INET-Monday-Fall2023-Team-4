@@ -1,6 +1,8 @@
 import re
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from Notifications.models import Notification
+from django.db.models import Q
 
 
 class CustomUser(AbstractUser):
@@ -20,6 +22,11 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = [
         "email",
     ]
+    
+    def get_unread_notifications(self):
+        unread_notifications = Notification.objects.filter(Q(transferownershipnotif__new_owner=self.id, transferownershipnotif__status="pending", is_read=False) | Q(transferownershipnotif__original_owner=self.id, transferownershipnotif__status="declined", is_read=False) | Q(bookclubupdatesnotif__receiving_user=self.id, is_read=False)).count()
+        
+        return unread_notifications
 
     def get_user_status(email):
         domain = re.search(r"@[\w.]+", email).group()

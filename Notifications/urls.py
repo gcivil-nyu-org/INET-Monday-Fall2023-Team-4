@@ -4,5 +4,5 @@ from Notifications.views import NotificationListView
 app_name = "notifications"
 
 urlpatterns = [
-    path("", NotificationListView.as_view(), name='notification-list')
+    path("", NotificationListView.as_view(), name='notifications')
 ]

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from libraries.models import Library
 from BookClub.models import BookClub, VotingPoll, PollChoice
+from Notifications.models import TransferOwnershipNotif, BookClubUpdatesNotif
 from django.contrib import messages
 from user.models import CustomUser, TransferOwnershipRequest
 from .forms import BookClubForm, BookClubEditForm, BookClubVotingForm
@@ -153,9 +154,11 @@ def get_email_content(fields_changed, bc_name):
     # input is dict of fields and data changed by form
     # if name is changed, take old name as bc_name
     content = "Here are the latest updates from " + bc_name + "\n\r"
+    notif = ""
     index = 0
     list_bullet = "{index}.\t{bc_name}"
     result = "{new_data}. \n"
+    notif_r = "{new_data}--!!--"
     for k, v in fields_changed.items():
         index += 1
         if k == "name":
@@ -176,12 +179,13 @@ def get_email_content(fields_changed, bc_name):
             new_line = " is now associated with "
         else:
             new_line = " has a new admin: "
+        notif += bc_name + new_line + notif_r.format(new_data=v)
         content += (
             list_bullet.format(index=index, bc_name=bc_name)
             + new_line
             + result.format(new_data=v)
         )
-    return content
+    return content, notif
 
 
 def edit_book_club(request, book_club_id):
@@ -193,28 +197,36 @@ def edit_book_club(request, book_club_id):
 
     if request.method == "POST":
         form = BookClubEditForm(request.POST, instance=book_club)
+        if not form.has_changed():
+            form = BookClubEditForm(instance=book_club)
+            messages.error(request, "Please modify the fields before saving!")
+            return render(request, "bookclub_edit.html", {"form": form, "book_club": book_club})
         if form.is_valid():
-            # print(request.POST)
-            # if "new_admin" in request.POST:
-            #     new_admin = form.cleaned_data["new_admin"]
-            #     transferReq = TransferOwnershipRequest(
-            #         original_owner=request.user,
-            #         new_owner=new_admin,
-            #         book_club=book_club,
-            #         status="pending",
-            #         date_created=date.today(),
-            #     )
-            #     transferReq.save()
+            print(request.POST)
+            if "admin" in request.POST:
+                new_admin = form.cleaned_data["admin"]
+                if new_admin != book_club.admin:
+                    transferReq = TransferOwnershipNotif(
+                        original_owner=request.user,
+                        new_owner=new_admin,
+                        book_club=book_club,
+                        status="pending",
+                        date_created=date.today(),
+                    )
+                    transferReq.save()
 
             form.save()
             fields_changed = form.changed_data
             changed_fields_and_data = {}
             for i in fields_changed:
-                if i == "new_admin":
-                    new_admin = get_object_or_404(CustomUser, id=request.POST[i])
-                    changed_fields_and_data[i] = new_admin.first_name
+                if i == "admin":
                     continue
                 changed_fields_and_data[i] = request.POST[i]
+            
+            content, notif = get_email_content(changed_fields_and_data, original_bc_name)
+            
+            updateNotif = BookClubUpdatesNotif(safe_to_delete=True, date_created=date.today(), receiving_user=request.user, book_club=book_club, fields_changed=notif)
+            updateNotif.save()
             try:
                 bc_members = book_club.members.all()
                 email_list = [
@@ -222,11 +234,10 @@ def edit_book_club(request, book_club_id):
                     for mem in bc_members
                     if not book_club.silenceNotification.contains(mem)
                 ]
-
-                content = get_email_content(changed_fields_and_data, original_bc_name)
+                
                 subject, content, from_email = (
                     "Check new updates from your book club!",
-                    get_email_content(changed_fields_and_data, original_bc_name),
+                    content,
                     settings.EMAIL_HOST_USER,
                 )
                 send_mail(subject, content, from_email, email_list, fail_silently=False)

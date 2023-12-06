@@ -55,13 +55,10 @@ class BookClubForm(ModelForm):
 
 
 class BookClubEditForm(ModelForm):
-    new_admin = forms.ModelChoiceField(
-        label="New Admin", queryset=CustomUser.objects.all()
-    )
 
     class Meta:
         model = BookClub
-        fields = (
+        fields = [
             "name",
             "description",
             "currentBook",
@@ -70,6 +67,8 @@ class BookClubEditForm(ModelForm):
             "meetingEndTime",
             "meetingOccurence",
             "libraryId",
-        )
-
-        exclude = ["admin"]
+            "admin"
+        ]
+        labels = {
+            "admin": "New Admin",
+        }
