@@ -66,6 +66,8 @@ class BookClub(models.Model):
     name = models.CharField(max_length=150)
     description = models.TextField()
     currentBook = models.CharField(max_length=150)
+    currentAuthor = models.CharField(max_length=255, blank=True)
+    currentBookIsbn = models.BigIntegerField(null=True)
     meetingDay = models.CharField(
         choices=DAYS_OF_THE_WEEK,
         max_length=150,

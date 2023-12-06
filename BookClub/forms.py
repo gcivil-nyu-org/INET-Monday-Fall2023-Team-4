@@ -18,6 +18,8 @@ class BookClubForm(ModelForm):
             "name",
             "description",
             "currentBook",
+            "currentAuthor",
+            "currentBookIsbn",
             "meetingDay",
             "meetingStartTime",
             "meetingEndTime",
@@ -25,6 +27,8 @@ class BookClubForm(ModelForm):
         )
         labels = {
             "currentBook": "Current Book",
+            "currentAuthor": "Current Author",
+            "currentBookIsbn": "Current Book Isbn",
             "meetingStartTime": "Meeting Start Time",
             "meetingEndTime": "Meeting End Time",
             "meetingDay": "Meeting Day",
@@ -65,6 +69,8 @@ class BookClubEditForm(ModelForm):
             "name",
             "description",
             "currentBook",
+            "currentAuthor",
+            "currentBookIsbn",
             "meetingDay",
             "meetingStartTime",
             "meetingEndTime",
