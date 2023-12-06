@@ -242,3 +242,37 @@ def edit_book_club(request, book_club_id):
 
 def error_page(request):
     return render(request, "bookclub_error_page.html")
+
+
+@login_required
+def delete_book_club(request):
+    if request.method == "POST":
+        book_club_id = request.POST.get("book_club_id")
+        book_club = get_object_or_404(BookClub, id=book_club_id)
+
+        if request.user == book_club.admin:
+            member_emails = [member.email for member in book_club.members.all()]
+
+            book_club.delete()
+            messages.success(request, "Book club deleted successfully.")
+
+            subject = "Book Club Deletion Notification"
+            message = f"The book club '{book_club.name}' has been deleted by the admin."
+            from_email = settings.EMAIL_HOST_USER
+
+            try:
+                send_mail(
+                    subject, message, from_email, member_emails, fail_silently=False
+                )
+            except SMTPException:
+                messages.error(request, "Failed to notify members about the deletion.")
+
+            return redirect("deletion_confirmation")
+
+        else:
+            messages.error(request, "You are not authorized to delete this book club.")
+            return redirect("error_page")
+
+
+def deletion_confirmation(request):
+    return render(request, "bookclub_deletion.html")

@@ -1,16 +1,19 @@
-
 {% extends "user/base.html" %}
+
 {% block content %}
-<div class="container">
+<div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="alert alert-danger text-center" role="alert">
-                <h4 class="alert-heading">Access Denied!</h4>
-                <p>Sorry, you do not have the facilities for this.</p>
-                <hr>
-                <p class="mb-0">Please go back to your home page.</p>
+            <div class="card text-center">
+                <div class="card-header">
+                    <h1>Book Club Deletion</h1>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">The book club has been successfully deleted.</p>
+                    <a href="{% url 'home' %}" class="btn btn-primary">Return to Home</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}

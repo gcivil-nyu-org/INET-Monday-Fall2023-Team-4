@@ -49,6 +49,13 @@
 								<button onclick="location.href='{% url 'voting' bookclub.id %}'" type="button" class="btn btn-primary">Voting Form</button>
 								{% endif %}
 							{% endif %}
+							{% if bookclub.admin == user %}
+								<form action="{% url 'delete_book_club' %}" method="post" style="display: inline-block;">
+									{% csrf_token %}
+									<input type="hidden" name="book_club_id" value="{{ bookclub.id }}">
+									<button type="submit" class="btn btn-danger">Delete</button>
+								</form>
+                            {% endif %}
 						</form>
 					</center>
 				</div>
