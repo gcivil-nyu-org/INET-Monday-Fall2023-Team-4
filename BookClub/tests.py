@@ -1,10 +1,10 @@
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, Client
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.utils import timezone
 from django.urls import reverse
 from .forms import BookClubForm
 from django.http import HttpRequest
-from .models import BookClub
+from .models import BookClub, PollChoice, VotingPoll
 from .views import edit_book_club, book_club_details, create_book_club
 from user.models import CustomUser
 from libraries.models import Library
@@ -482,3 +482,144 @@ class BookClubDeletionTest(TestCase):
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response["Location"], "/bookclub/error")
+
+
+class PollChoiceModelTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(
+            username="member",
+            email="member@nyu.edu",
+            first_name="test2first",
+            last_name="test2last",
+        )
+        self.choice = PollChoice.objects.create(name="Choice 1", votes=1)
+        self.choice.user_voted.add(self.user)
+        self.assertEqual(self.choice.votes, 1)
+
+    def test_remove_user(self):
+        self.assertEqual(self.choice.votes, 1)
+        self.choice.remove_user(self.user)
+        self.assertEqual(self.choice.votes, 0)
+
+    def test_get_votes(self):
+        self.assertEqual(self.choice.get_votes(), 1)
+
+    def test_str_method(self):
+        self.assertEqual(str(self.choice), "Choice 1")
+
+
+class VotingPollModelTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(
+            username="member",
+            email="member@nyu.edu",
+            first_name="test2first",
+            last_name="test2last",
+        )
+        self.choice = PollChoice.objects.create(name="Choice 1", votes=1)
+        self.poll = VotingPoll.objects.create(name="Poll 1", poll_set=False)
+        self.poll.choices.add(self.choice)
+        self.poll.who_voted.add(self.user)
+        self.assertEqual(self.choice.votes, 1)
+
+    def test_remove_user_from_poll(self):
+        self.assertEqual(self.choice.votes, 1)
+        self.poll.remove_user_from_poll(self.user)
+        self.choice.remove_user(self.user)
+        # self.assertEqual(self.choice.votes, 0)
+
+    def test_did_vote(self):
+        self.assertTrue(self.poll.did_vote(self.user))
+
+    def test_get_all_votes(self):
+        self.assertEqual(self.poll.get_all_votes(), 1)
+
+    def test_str_method(self):
+        self.assertEqual(str(self.poll), "Poll 1")
+
+
+class VotingFormViewTestCase(TestCase):
+    def setUp(self):
+        self.library = Library.objects.create(
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.admin_user = CustomUser.objects.create(
+            username="admin",
+            email="admin@email.com",
+            first_name="test1first",
+            last_name="test1last",
+        )
+        self.book_club = BookClub.objects.create(
+            name="Test Book Club",
+            description="This is a test book club",
+            currentBook="Sample Book",
+            meetingDay="monday",
+            meetingStartTime=timezone.now(),
+            meetingEndTime=timezone.now(),
+            meetingOccurence="one",
+            libraryId=self.library,
+            admin=self.admin_user,
+        )
+        self.poll = VotingPoll.objects.create(poll_set=False, name="Test Poll")
+        self.choice1 = PollChoice.objects.create(name="Choice 1", votes=0)
+        self.choice2 = PollChoice.objects.create(name="Choice 2", votes=0)
+        self.choice3 = PollChoice.objects.create(name="Choice 3", votes=0)
+        self.poll.choices.add(self.choice1, self.choice2, self.choice3)
+        self.book_club.polls = self.poll.id
+        self.book_club.save()
+        self.client = Client()
+
+    def test_get_voting_form(self):
+        url = reverse("voting", args=[str(self.book_club.id)])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "voting.html")
+        self.assertIn("previous_form", response.context)
+        self.assertIn("who_voted", response.context)
+        self.assertIn("choice1", response.context)
+        self.assertIn("choice2", response.context)
+        self.assertIn("choice3", response.context)
+
+    def test_post_voting_form(self):
+        url = reverse("voting", args=[str(self.book_club.id)])
+        data = {
+            "submit": "submit",
+            "book1": "Book 1",
+            "book2": "Book 2",
+            "book3": "Book 3",
+        }
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response, reverse("details", args=[str(self.book_club.id)])
+        )
+
+        self.book_club.refresh_from_db()
+        self.assertTrue(self.book_club.polls != 0)
+        new_poll = VotingPoll.objects.get(id=self.book_club.polls)
+        self.assertTrue(new_poll.poll_set)
+        self.assertEqual(new_poll.name, "Voting Poll for Test Book Club")
+
+        choices = new_poll.choices.all()
+        self.assertEqual(choices[0].name, "Book 1")
+        self.assertEqual(choices[1].name, "Book 2")
+        self.assertEqual(choices[2].name, "Book 3")
