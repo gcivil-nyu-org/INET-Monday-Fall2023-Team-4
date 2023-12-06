@@ -189,6 +189,8 @@ class BookClubViewsTest(TestCase):
             "name": "Updated Book Club Name",
             "description": "Updated Description",
             "currentBook": "New Book",
+            "currentAuthor": "New Author",
+            "currentBookIsbn": 123456789,
             "meetingDay": "monday",
             "meetingStartTime": datetime.time(18, 0),
             "meetingEndTime": datetime.time(18, 0),
@@ -203,17 +205,17 @@ class BookClubViewsTest(TestCase):
 
         response = edit_book_club(request, self.book_club_id)
 
-        self.assertEqual(response.status_code, 200)
-        # self.assertEqual(
-        #     BookClub.objects.get(id=self.book_club_id).name, "Updated Book Club Name"
-        # )
-        # self.assertEqual(
-        #     BookClub.objects.get(id=self.book_club_id).description,
-        #     "Updated Description",
-        # )
-        # self.assertEqual(
-        #     BookClub.objects.get(id=self.book_club_id).currentBook, "New Book"
-        # )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            BookClub.objects.get(id=self.book_club_id).name, "Updated Book Club Name"
+        )
+        self.assertEqual(
+            BookClub.objects.get(id=self.book_club_id).description,
+            "Updated Description",
+        )
+        self.assertEqual(
+            BookClub.objects.get(id=self.book_club_id).currentBook, "New Book"
+        )
 
     def test_non_admin_access_edit_page(self):
         self.client.login(username="non_member_user", password="testpassword")
@@ -648,6 +650,14 @@ class BookClubDetailsViewTestCase(TestCase):
             link="https://github.com/gcivil-nyu-org/",
             NYU=1,
         )
+        self.choice1 = PollChoice.objects.create(name="Choice 1", votes=0)
+        self.choice2 = PollChoice.objects.create(name="Choice 2", votes=0)
+        self.choice3 = PollChoice.objects.create(name="Choice 3", votes=0)
+        self.poll = VotingPoll.objects.create(poll_set=True, name="Test Poll", id=1)
+        self.poll.choices.add(self.choice1)
+        self.poll.choices.add(self.choice2)
+        self.poll.choices.add(self.choice3)
+        self.poll.choices.add(self.choice1, self.choice2, self.choice3)
         self.book_club = BookClub.objects.create(
             name="Test Book Club",
             description="This is a test book club",
@@ -658,14 +668,10 @@ class BookClubDetailsViewTestCase(TestCase):
             meetingOccurence="one",
             libraryId=self.library,
             admin=self.user,
+            polls=self.poll.id,
         )
-        self.poll = VotingPoll.objects.create(poll_set=True, name="Test Poll")
-        self.choice1 = PollChoice.objects.create(name="Choice 1", votes=0)
-        self.choice2 = PollChoice.objects.create(name="Choice 2", votes=0)
-        self.choice3 = PollChoice.objects.create(name="Choice 3", votes=0)
-        self.poll.choices.add(self.choice1, self.choice2, self.choice3)
         self.book_club.polls = self.poll.id
-        self.book_club.members.add(self.user)
+        self.poll.save()
         self.client = Client()
 
     def test_get_book_club_details(self):
@@ -697,6 +703,36 @@ class BookClubDetailsViewTestCase(TestCase):
 
         self.book_club.refresh_from_db()
         self.assertTrue(self.user in self.book_club.members.all())
+
+    def test_post_choice1(self):
+        self.client.force_login(self.user)
+        url = reverse("details", args=[self.book_club.id])
+        data = {"choice1": "choice1"}
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("details", args=[self.book_club.id]))
+
+    def test_post_choice2(self):
+        self.client.force_login(self.user)
+        url = reverse("details", args=[self.book_club.id])
+        data = {"choice2": "choice2"}
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("details", args=[self.book_club.id]))
+
+    def test_post_choice3(self):
+        self.client.force_login(self.user)
+        url = reverse("details", args=[self.book_club.id])
+        data = {"choice3": "choice3"}
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("details", args=[self.book_club.id]))
 
 
 class GetBookInfoTestCase(TestCase):
