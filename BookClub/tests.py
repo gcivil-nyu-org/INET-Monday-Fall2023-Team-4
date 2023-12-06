@@ -5,7 +5,11 @@ from django.urls import reverse
 from .forms import BookClubForm
 from django.http import HttpRequest
 from .models import BookClub, PollChoice, VotingPoll
-from .views import edit_book_club, book_club_details, create_book_club
+from .views import (
+    edit_book_club,
+    book_club_details,
+    create_book_club,
+)
 from user.models import CustomUser
 from libraries.models import Library
 import datetime
@@ -623,3 +627,81 @@ class VotingFormViewTestCase(TestCase):
         self.assertEqual(choices[0].name, "Book 1")
         self.assertEqual(choices[1].name, "Book 2")
         self.assertEqual(choices[2].name, "Book 3")
+
+
+class BookClubDetailsViewTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(
+            username="admin",
+            email="admin@nyu.edu",
+            first_name="Admin",
+            last_name="Tester",
+        )
+        self.library = Library.objects.create(
+            id=1,
+            branch="Library Test Case Branch",
+            address="123 Test Unit Drive",
+            city="Coveralls",
+            postcode="65432",
+            phone="(123)456-7890",
+            monday="9:00AM - 5:00PM",
+            tuesday="9:00AM - 5:00PM",
+            wednesday="9:00AM - 5:00PM",
+            thursday="9:00AM - 5:00PM",
+            friday="9:00AM - 5:00PM",
+            saturday="9:00AM - 5:00PM",
+            sunday="9:00AM - 5:00PM",
+            latitude=0.0,
+            longitude=0.0,
+            link="https://github.com/gcivil-nyu-org/",
+            NYU=1,
+        )
+        self.book_club = BookClub.objects.create(
+            name="Test Book Club",
+            description="This is a test book club",
+            currentBook="Sample Book",
+            meetingDay="monday",
+            meetingStartTime=timezone.now(),
+            meetingEndTime=timezone.now(),
+            meetingOccurence="one",
+            libraryId=self.library,
+            admin=self.user,
+        )
+        self.poll = VotingPoll.objects.create(poll_set=True, name="Test Poll")
+        self.choice1 = PollChoice.objects.create(name="Choice 1", votes=0)
+        self.choice2 = PollChoice.objects.create(name="Choice 2", votes=0)
+        self.choice3 = PollChoice.objects.create(name="Choice 3", votes=0)
+        self.poll.choices.add(self.choice1, self.choice2, self.choice3)
+        self.book_club.polls = self.poll.id
+        self.book_club.members.add(self.user)
+        self.client = Client()
+
+    def test_get_book_club_details(self):
+        url = reverse("details", args=[str(self.book_club.id)])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "details.html")
+        self.assertIn("bookclub", response.context)
+        self.assertIn("member_count", response.context)
+        self.assertIn("subscribed", response.context)
+        self.assertIn("voting_poll", response.context)
+        self.assertIn("choices", response.context)
+        self.assertIn("amount_voted", response.context)
+        self.assertIn("voted", response.context)
+        self.assertIn("is_member", response.context)
+
+    def test_post_subscribe(self):
+        self.client.force_login(self.user)
+        url = reverse("details", args=[str(self.book_club.id)])
+        data = {"subscribe": "subscribe"}
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response, reverse("details", args=[str(self.book_club.id)])
+        )
+
+        self.book_club.refresh_from_db()
+        self.assertTrue(self.user in self.book_club.members.all())
