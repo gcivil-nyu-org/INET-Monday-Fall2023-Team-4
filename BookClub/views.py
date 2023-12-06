@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from libraries.models import Library
-from BookClub.models import BookClub
+from BookClub.models import BookClub, VotingPoll, PollChoice
 from django.contrib import messages
 from user.models import CustomUser, TransferOwnershipRequest
-from .forms import BookClubForm, BookClubEditForm
+from .forms import BookClubForm, BookClubEditForm, BookClubVotingForm
 from django.conf import settings
 from django.core.mail import send_mail
 from smtplib import SMTPException
@@ -11,16 +11,39 @@ from django.contrib.auth.decorators import login_required
 from datetime import date
 
 def voting_form(request,slug):
-    amount = request.session.get("book_poll_amount")
-    if(amount == None):
-        amount = 3
+    bc = BookClub.objects.get(id=slug)
+    context = {}
+    if bc.polls != 0:
+        poll = VotingPoll.objects.get(id=bc.polls)
+        choices = poll.choices.all()
+        context = {
+            "previous_form": True,
+            "who_voted": poll.who_voted.all(),
+            "choice1": {"name": choices[0].name,"votes": choices[0].votes},
+            "choice2": {"name": choices[1].name,"votes": choices[1].votes},
+            "choice3": {"name": choices[2].name,"votes": choices[2].votes},
+        }
     if request.method == "POST":
-        if "add" in request.POST:
-            amount+=1
-        if "sub" in request.POST:
-            amount-=1
-    request.session["book_poll_amount"] = amount
-    context = {"amount": range(amount)}
+        if "submit" in request.POST:
+            form = BookClubVotingForm(request.POST)
+            if form.is_valid():
+                bc = BookClub.objects.get(id=slug)
+                poll = VotingPoll.objects.create(poll_set=True,name="Voting Poll for " + bc.name)
+                ch1 = PollChoice.objects.create(name=form.cleaned_data["book1"],votes=0)
+                ch1.save()
+                poll.choices.add(ch1)
+                ch2 = PollChoice.objects.create(name=form.cleaned_data["book2"],votes=0)
+                ch2.save()
+                poll.choices.add(ch2)
+                ch3 = PollChoice.objects.create(name=form.cleaned_data["book3"],votes=0)
+                ch3.save()
+                poll.choices.add(ch3)
+                if(bc.polls != 0):
+                    VotingPoll.objects.filter(id=bc.polls).delete()
+                poll.save()
+                bc.polls = poll.id
+                bc.save()
+                return redirect("details",slug=slug)
     return render(request,"voting.html",context)
 
 def checkIfAllowedToSubscribe(bookclub, request):
@@ -36,12 +59,20 @@ def checkIfAllowedToSubscribe(bookclub, request):
 
 def book_club_details(request, slug):
     bc = BookClub.objects.get(id=slug)
+    poll = None
+    if bc.polls != 0:
+        poll = VotingPoll.objects.get(id=bc.polls)
     context = {
         "bookclub": bc,
         "member_count": bc.members.all().count(),
         "subscribed": bc.members.contains(request.user)
         if request.user.is_authenticated
         else False,
+        "voting_poll": poll,
+        "choices": poll.choices.all() if poll else None,
+        "amount_voted": poll.get_all_votes() if poll else None,
+        "voted": poll.did_vote(request.user) if poll else None,
+        "is_member": True if request.user in bc.members.all() else False,
     }
     if request.method == "POST":
         if "subscribe" in request.POST:
@@ -50,6 +81,24 @@ def book_club_details(request, slug):
         elif "unsubscribe" in request.POST:
             bc.members.remove(request.user)
             return redirect("details", slug=slug)
+        elif "choice1" in request.POST:
+            selected_choice = poll.choices.all()[0]
+            selected_choice.votes+=1
+            selected_choice.save()
+            poll.who_voted.add(request.user)
+            return redirect("details",slug=slug)
+        elif "choice2" in request.POST:
+            selected_choice = poll.choices.all()[1]
+            selected_choice.votes+=1
+            selected_choice.save()
+            poll.who_voted.add(request.user)
+            return redirect("details",slug=slug)
+        elif "choice3" in request.POST:
+            selected_choice = poll.choices.all()[2]
+            selected_choice.votes+=1
+            selected_choice.save()
+            poll.who_voted.add(request.user)
+            return redirect("details",slug=slug)
     return render(request, "details.html", context)
 
 

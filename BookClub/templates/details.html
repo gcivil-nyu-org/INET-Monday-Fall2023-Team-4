@@ -46,12 +46,33 @@
 								{% endif %}
 								{% if bookclub.admin == user%}
 								<button onclick="location.href='{% url 'edit_book_club' bookclub.id %}'" type="button" class="btn btn-primary">Edit</button>
+								<button onclick="location.href='{% url 'voting' bookclub.id %}'" type="button" class="btn btn-primary">Voting Form</button>
 								{% endif %}
 							{% endif %}
 						</form>
 					</center>
 				</div>
 			</div>
+			{% if voting_poll and is_member %}
+			<div class='container' style='margin-bottom:10px'>
+				<div class='row justify-content-center'>
+					<center>
+						<h2>Choose the next book you like to read at this book club</h2>
+						<p>Members voted: {{amount_voted}}/{{member_count}}</p>
+						{% if not voted %}
+						<form method="POST">
+							{% csrf_token %}
+							{% for choice in choices %}
+								<button type="submit" name='choice{{ forloop.counter }}' class="btn btn-secondary" >{{choice.name}}</button>
+							{% endfor %}
+						</form>
+						{% else %}
+						<p>You already voted.</p>
+						{% endif %}
+					</center>
+				</div>
+			</div>
+			{% endif %}
 			{% else %}
 			<div class='container'>
 				<center><h1>The Book Club you are trying to reach is either does not exist or you have no permission to view</h1></center>

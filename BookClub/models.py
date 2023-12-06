@@ -8,21 +8,27 @@ class PollChoice(models.Model):
     name = models.CharField(max_length=200)
     votes = models.PositiveSmallIntegerField()
 
-    def get_votes():
-        return votes
+    def get_votes(self):
+        return self.votes
     def __str__(self):
         return self.name
 
 class VotingPoll(models.Model):
     poll_set = models.BooleanField(default=False)
     name = models.CharField(max_length=200)
-    choices = models.ManyToManyField(PollChoice,related_name="voting_choices")
+    choices = models.ManyToManyField(PollChoice)
+    who_voted = models.ManyToManyField(CustomUser)
 
-    def get_all_votes():
-        voted = 0
-        for choice in choices:
-            voted += choice.get_votes()
-        return voted
+    def did_vote(self,customusr):
+        if customusr in self.who_voted.all():
+            return True
+        return False
+
+    def get_all_votes(self):
+        votes = 0
+        for choice in self.choices.all():
+            votes+=choice.get_votes()
+        return votes
 
     def __str__(self):
         return self.name
@@ -70,7 +76,7 @@ class BookClub(models.Model):
     silenceNotification = models.ManyToManyField(
         CustomUser, related_name="silence_notifications"
     )
-    poll = models.ForeignKey(VotingPoll,on_delete=models.CASCADE,related_name="voting_poll",default=None)
+    polls = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
