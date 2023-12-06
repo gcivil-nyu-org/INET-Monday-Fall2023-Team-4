@@ -5,6 +5,12 @@ from user.models import CustomUser
 from django.core.exceptions import ValidationError
 
 
+class BookClubVotingForm(forms.Form):
+    book1 = forms.CharField(label="book1", max_length=200)
+    book2 = forms.CharField(label="book2", max_length=200)
+    book3 = forms.CharField(label="book3", max_length=200)
+
+
 class BookClubForm(ModelForm):
     class Meta:
         model = BookClub

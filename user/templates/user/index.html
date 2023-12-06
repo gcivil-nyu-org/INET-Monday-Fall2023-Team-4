@@ -91,9 +91,9 @@
 									<div class='row'>
 										<div class='col-6'>
 											{% if club.admin == request.user %}
-												<p><span class="text-primary">OWNER</span> | <b>{{club.libraryId.branch}}</b></p>
+												<p><span class="text-primary">OWNER</span> | <a href="{% url 'details' club.id %}"> <b>{{club.libraryId.branch}}</b></a></p>
 											{% else %}
-												<p><span class="text-primary">MEMBER</span> | <b>{{club.libraryId.branch}}</b></p>
+												<p><span class="text-primary">MEMBER</span> | <a href="{% url 'details' club.id %}"><b>{{club.libraryId.branch}}</b></a></p>
 											{% endif %}
 											
 										</div>
