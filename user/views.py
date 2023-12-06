@@ -1,11 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import PasswordChangeView, PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.db.models import Q
 from .forms import UserRegisterForm, ValidateForm, UpdateUserForm
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
@@ -15,7 +14,6 @@ from BookClub.models import BookClub, VotingPoll
 import time
 import random
 import string
-from django.http import HttpResponseRedirect
 
 
 def index(request):

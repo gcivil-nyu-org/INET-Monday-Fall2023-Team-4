@@ -1,7 +1,6 @@
 from django import forms
 from django.forms import ModelForm
 from .models import BookClub
-from user.models import CustomUser
 from django.core.exceptions import ValidationError
 
 
@@ -55,7 +54,6 @@ class BookClubForm(ModelForm):
 
 
 class BookClubEditForm(ModelForm):
-
     class Meta:
         model = BookClub
         fields = [
@@ -67,7 +65,7 @@ class BookClubEditForm(ModelForm):
             "meetingEndTime",
             "meetingOccurence",
             "libraryId",
-            "admin"
+            "admin",
         ]
         labels = {
             "admin": "New Admin",

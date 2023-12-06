@@ -3,7 +3,6 @@ from libraries.models import Library
 from BookClub.models import BookClub, VotingPoll, PollChoice
 from Notifications.models import TransferOwnershipNotif, BookClubUpdatesNotif
 from django.contrib import messages
-from user.models import CustomUser, TransferOwnershipRequest
 from .forms import BookClubForm, BookClubEditForm, BookClubVotingForm
 from django.conf import settings
 from django.core.mail import send_mail
@@ -200,7 +199,9 @@ def edit_book_club(request, book_club_id):
         if not form.has_changed():
             form = BookClubEditForm(instance=book_club)
             messages.error(request, "Please modify the fields before saving!")
-            return render(request, "bookclub_edit.html", {"form": form, "book_club": book_club})
+            return render(
+                request, "bookclub_edit.html", {"form": form, "book_club": book_club}
+            )
         if form.is_valid():
             print(request.POST)
             if "admin" in request.POST:
@@ -222,10 +223,18 @@ def edit_book_club(request, book_club_id):
                 if i == "admin":
                     continue
                 changed_fields_and_data[i] = request.POST[i]
-            
-            content, notif = get_email_content(changed_fields_and_data, original_bc_name)
-            
-            updateNotif = BookClubUpdatesNotif(safe_to_delete=True, date_created=date.today(), receiving_user=request.user, book_club=book_club, fields_changed=notif)
+
+            content, notif = get_email_content(
+                changed_fields_and_data, original_bc_name
+            )
+
+            updateNotif = BookClubUpdatesNotif(
+                safe_to_delete=True,
+                date_created=date.today(),
+                receiving_user=request.user,
+                book_club=book_club,
+                fields_changed=notif,
+            )
             updateNotif.save()
             try:
                 bc_members = book_club.members.all()
@@ -234,7 +243,7 @@ def edit_book_club(request, book_club_id):
                     for mem in bc_members
                     if not book_club.silenceNotification.contains(mem)
                 ]
-                
+
                 subject, content, from_email = (
                     "Check new updates from your book club!",
                     content,
