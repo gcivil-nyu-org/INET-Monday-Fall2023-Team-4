@@ -11,7 +11,7 @@ from django.core.mail import send_mail
 from django.urls import reverse_lazy
 from smtplib import SMTPException
 from django.core.exceptions import ObjectDoesNotExist
-from BookClub.models import BookClub
+from BookClub.models import BookClub, VotingPoll
 import time
 import random
 import string
@@ -66,6 +66,9 @@ def unsubscribe(request, slug):
                     "Owner can not unsubscribe, please reassign ownership first",
                 )
                 return redirect("users:index")
+            if bc.polls != 0:
+                poll = VotingPoll.objects.get(id=bc.polls)
+                poll.remove_user_from_poll(request.user)
             bc.members.remove(request.user)
             messages.info(request, "Unsubscribe action complete")
         except ObjectDoesNotExist:

@@ -7,11 +7,20 @@ import datetime
 class PollChoice(models.Model):
     name = models.CharField(max_length=200)
     votes = models.PositiveSmallIntegerField()
+    user_voted = models.ManyToManyField(CustomUser)
+
+    def remove_user(self, customusr):
+        if customusr in self.user_voted.all():
+            self.user_voted.remove(customusr)
+            self.votes -= 1
+            self.save()
 
     def get_votes(self):
         return self.votes
+
     def __str__(self):
         return self.name
+
 
 class VotingPoll(models.Model):
     poll_set = models.BooleanField(default=False)
@@ -19,7 +28,11 @@ class VotingPoll(models.Model):
     choices = models.ManyToManyField(PollChoice)
     who_voted = models.ManyToManyField(CustomUser)
 
-    def did_vote(self,customusr):
+    def remove_user_from_poll(self, customusr):
+        for choice in self.choices.all():
+            choice.remove_user(customusr)
+
+    def did_vote(self, customusr):
         if customusr in self.who_voted.all():
             return True
         return False
@@ -27,11 +40,12 @@ class VotingPoll(models.Model):
     def get_all_votes(self):
         votes = 0
         for choice in self.choices.all():
-            votes+=choice.get_votes()
+            votes += choice.get_votes()
         return votes
 
     def __str__(self):
         return self.name
+
 
 class BookClub(models.Model):
     DAYS_OF_THE_WEEK = [

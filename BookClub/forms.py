@@ -10,6 +10,7 @@ class BookClubVotingForm(forms.Form):
     book2 = forms.CharField(label="book2", max_length=200)
     book3 = forms.CharField(label="book3", max_length=200)
 
+
 class BookClubForm(ModelForm):
     class Meta:
         model = BookClub
