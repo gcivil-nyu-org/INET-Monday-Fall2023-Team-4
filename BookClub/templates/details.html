@@ -2,8 +2,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta charset="UTF-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		{% load bootstrap5 %} {% bootstrap_css %}
-		
 	</head>
 	{% block content %}
 	<body>
@@ -27,6 +28,66 @@
 					<center>
 					<p>{{bookclub.description}}</p>
 					<p>Current Book Reading: {{bookclub.currentBook}}</p>
+					{% if book_cover %}
+						<img src="{{ book_cover }}" alt="Book Cover">
+					{% else %}
+						<p>Book cover not available</p>
+					{% endif %}
+					<p>Average rating: {{ average_rating }}</p>
+
+					{% if user.is_authenticated %}
+						<form method="post" action="{% url 'rate_book' pk=book.id %}">
+							{% csrf_token %}
+							<h3>Rate this book:</h3>
+							
+							<div class="rating">
+								<style>
+									.rating {
+										display: inline-block;
+										unicode-bidi: bidi-override;
+										direction: rtl;
+									}
+									.rating input {
+										display: none;
+									}
+									.rating label {
+										position: relative;
+										display: inline-block;
+										font-size: 25px;
+										color: #ffcc00;
+										cursor: pointer;
+										margin-right: 5px;
+									}
+									.rating label:before {
+										content: "\2605";
+										/* position: absolute; */
+									}
+									.rating label:hover:before,
+									.rating label:hover ~ label:before {
+										content: "\2605";
+										color: #ff9900;
+									}
+									.rating input:checked ~ label {
+										content: "\2605";
+										color: #ff9900;
+									}
+									.checked {
+										color: #ff9900;
+									}
+									form {
+										margin-bottom: 20px;
+									}
+								</style>
+								{% for i in "54321" %}
+									<input class="rating" type="radio" id="star{{ i }}" name="rating" value="{{ i }}">
+									<label class="rating" for="star{{ i }}"></label>
+								{% endfor %}
+							</div>
+					
+							<button type="submit" class="btn btn-light">Submit Rating</button>
+						</form>
+					{% endif %}
+
 					<p>Meeting Time: {{bookclub.meetingDay}} , {{bookclub.meetingStartTime}} - {{bookclub.meetingEndTime}}</p>
 					<p>Current number of Members: {{member_count}}</p>
 					</center>
