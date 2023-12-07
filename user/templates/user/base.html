@@ -21,18 +21,30 @@
     <nav class="navbar navbar-dark bg-dark navbar-expand-lg fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url "users:index" %}">Check Out</a>
-            <button class="navbar-toggler" data-toggle="collapse" data-target="#mainNavBar">
-                <span class="navbar-toggler-icon"></span>
-                <span class="navbar-toggler-icon"></span>
-                <span class="navbar-toggler-icon"></span>
-                <span class="navbar-toggler-icon"></span>
-            </button>
             <div class="collapse navbar-collapse" id="mainNavBar">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav">
                     <li class="nav-item">
                     <a class="nav-link active" href="{% url "users:index" %}">{% bs_icon 'house-door' %}Home</a>
                     </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
+                        <li>
+                            <a class="nav-link active" href="{% url "notifications:notifications" %}">{% bs_icon 'bell' %}
+                                {% if user.get_unread_notifications %}
+                                <span class="rounded-circle" style="position: absolute;
+                                top: 25 px;
+                                right: 120 px;
+                                padding: 5px 5px;
+                                border-radius: 50%;
+                                background: red;
+                                color: white;
+                                ">
+                                    <span class="visually-hidden">New alerts</span>
+                                </span>
+                                {% endif %}
+                            </a>
+                        </li class="nav-item">
                         <li>
                             <a class="nav-link active" href="{% url "users:user_profile" %}">{% bs_icon 'person-gear' %}User Profile</a>
                         </li class="nav-item">
