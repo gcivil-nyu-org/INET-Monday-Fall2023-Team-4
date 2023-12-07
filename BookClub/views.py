@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from libraries.models import Library
 from BookClub.models import BookClub, VotingPoll, PollChoice
+from books.models import Book
 from django.contrib import messages
 from user.models import CustomUser, TransferOwnershipRequest
 from .forms import BookClubForm, BookClubEditForm, BookClubVotingForm
@@ -9,6 +10,8 @@ from django.core.mail import send_mail
 from smtplib import SMTPException
 from django.contrib.auth.decorators import login_required
 from datetime import date
+from django.db.models import Q
+from books.utils import get_book_cover
 
 
 def voting_form(request, slug):
@@ -67,8 +70,25 @@ def checkIfAllowedToSubscribe(bookclub, request):
         )
 
 
+def getBookInfo(currentBook, currentAuthor, currentBookIsbn):
+    book_list = Book.objects.filter(
+        Q(title__icontains=currentBook) | Q(isbn__exact=currentBookIsbn)
+    )
+
+    if len(book_list) == 0:
+        book = Book.objects.create(
+            title=currentBook, author=currentAuthor, isbn=currentBookIsbn
+        )
+        return book
+    else:
+        return book_list[0]
+
+
 def book_club_details(request, slug):
     bc = BookClub.objects.get(id=slug)
+    book = getBookInfo(bc.currentBook, bc.currentAuthor, bc.currentBookIsbn)
+    book_cover = get_book_cover(book)
+    average = book.average_rating
     poll = None
     if bc.polls != 0:
         poll = VotingPoll.objects.get(id=bc.polls)
@@ -83,6 +103,9 @@ def book_club_details(request, slug):
         "amount_voted": poll.get_all_votes() if poll else None,
         "voted": poll.did_vote(request.user) if poll else None,
         "is_member": True if request.user in bc.members.all() else False,
+        "book": book,
+        "book_cover": book_cover,
+        "average_rating": average,
     }
     if request.method == "POST":
         if "subscribe" in request.POST:
