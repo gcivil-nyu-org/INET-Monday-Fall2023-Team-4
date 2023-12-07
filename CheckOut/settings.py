@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "user.apps.UserConfig",
     "libraries.apps.LibrariesConfig",
     "BookClub.apps.BookClubConfig",
+    "Notifications.apps.NotificationsConfig",
     "books.apps.BooksConfig",
     "chat",
     "daphne",
