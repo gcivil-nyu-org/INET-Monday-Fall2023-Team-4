@@ -91,9 +91,9 @@
 									<div class='row'>
 										<div class='col-6'>
 											{% if club.admin == request.user %}
-												<p><span class="text-primary">OWNER</span> | <a href="{% url 'details' club.id %}"> <b>{{club.libraryId.branch}}</b></a></p>
+												<p style="font-size:20px"><span class="text-primary">OWNER</span> | <a href="{% url 'details' club.id %}"> <b>{{club.name}}</b></a></p>
 											{% else %}
-												<p><span class="text-primary">MEMBER</span> | <a href="{% url 'details' club.id %}"><b>{{club.libraryId.branch}}</b></a></p>
+												<p style="font-size:20px"><span class="text-primary">MEMBER</span> | <a href="{% url 'details' club.id %}"><b>{{club.name}}</b></a></p>
 											{% endif %}
 											
 										</div>
@@ -125,9 +125,10 @@
 									</div>
 								</div>
 								<div class="card-text">
-									<b>Club Name: {{club.name}} - Meeting Day: {{club.meetingDay}} - Current Book: {{club.currentBook}}</b>
-									</br>
-									{{club.description}}
+									<b style="font-size:18px">{{club.libraryId.branch}}</b><br>
+									Meeting Day: {{club.meetingDay}}<br>
+									Current Book: {{club.currentBook}}<br>
+									Description: {{club.description}}
 								</div>
 							</div>
 						</div>
