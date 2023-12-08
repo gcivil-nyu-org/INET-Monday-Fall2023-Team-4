@@ -100,24 +100,26 @@
 							{% csrf_token %}
 							{% if user.is_authenticated %}
 								<button onclick="location.href='{% url 'chat:name' roomname=bookclub.name %}'" type="button" class="btn btn-primary">Chat Room</button>
-								{% if subscribed %}
-								<button type="submit" name="unsubscribe" class="btn btn-primary">Unsubscribe</a></button>
-								{% else %}
-								<button type="submit" name="subscribe" class="btn btn-primary">Subscribe</a></button>
+								{% if bookclub.admin != user %}
+									{% if subscribed %}
+										<button type="submit" name="unsubscribe" class="btn btn-primary">Unsubscribe</button>
+									{% else %}
+										<button type="submit" name="subscribe" class="btn btn-primary">Subscribe</button>
+									{% endif %}
 								{% endif %}
 								{% if bookclub.admin == user%}
 								<button onclick="location.href='{% url 'edit_book_club' bookclub.id %}'" type="button" class="btn btn-primary">Edit</button>
 								<button onclick="location.href='{% url 'voting' bookclub.id %}'" type="button" class="btn btn-primary">Voting Form</button>
 								{% endif %}
 							{% endif %}
-							{% if bookclub.admin == user %}
-								<form action="{% url 'delete_book_club' %}" method="post" style="display: inline-block;">
-									{% csrf_token %}
-									<input type="hidden" name="book_club_id" value="{{ bookclub.id }}">
-									<button type="submit" class="btn btn-danger">Delete</button>
-								</form>
-                            {% endif %}
-						</form>
+							</form>
+						{% if bookclub.admin == user %}
+							<form action="{% url 'delete_book_club' %}" method="post" style="display: inline-block;">
+								{% csrf_token %}
+								<input type="hidden" name="book_club_id" value="{{ bookclub.id }}">
+								<button type="submit" class="btn btn-danger">Delete</button>
+							</form>
+						{% endif %}
 					</center>
 				</div>
 			</div>
