@@ -35,14 +35,17 @@ def rate_book(request, pk):
                 request.META.get("HTTP_REFERER", reverse("book_detail", args=[pk]))
             )
 
-        try:
-            rating_value = int(rating_value)
-            if 1 <= rating_value <= 5:
-                Rating.objects.create(user=request.user, book=book, value=rating_value)
-            else:
+        if rating_value is not None:
+            try:
+                rating_value = int(rating_value)
+                if 1 <= rating_value <= 5:
+                    Rating.objects.create(
+                        user=request.user, book=book, value=rating_value
+                    )
+                else:
+                    return HttpResponseBadRequest("Invalid rating value")
+            except ValueError:
                 return HttpResponseBadRequest("Invalid rating value")
-        except ValueError:
-            return HttpResponseBadRequest("Invalid rating value")
 
         return redirect(reverse("book_detail", args=[pk]))
     else:
