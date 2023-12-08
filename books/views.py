@@ -28,14 +28,15 @@ def rate_book(request, pk):
         book = Book.objects.get(pk=pk)
         rating_value = request.POST.get("rating")
 
-        try:
-            rating_value = int(rating_value)
-            if 1 <= rating_value <= 5:
-                Rating.objects.create(user=request.user, book=book, value=rating_value)
-            else:
+        if rating_value != None:
+            try:
+                rating_value = int(rating_value)
+                if 1 <= rating_value <= 5:
+                    Rating.objects.create(user=request.user, book=book, value=rating_value)
+                else:
+                    return HttpResponseBadRequest("Invalid rating value")
+            except ValueError:
                 return HttpResponseBadRequest("Invalid rating value")
-        except ValueError:
-            return HttpResponseBadRequest("Invalid rating value")
 
         return redirect(reverse("book_detail", args=[pk]))
     else:

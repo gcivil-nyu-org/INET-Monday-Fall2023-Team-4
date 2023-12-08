@@ -55,15 +55,14 @@ LOGGING = {
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "user.apps.UserConfig",
     "libraries.apps.LibrariesConfig",
     "BookClub.apps.BookClubConfig",
     "Notifications.apps.NotificationsConfig",
     "books.apps.BooksConfig",
-    "chat",
-    "daphne",
+    "chat.apps.ChatConfig",
     "channels",
-    "channels_redis",
     "crispy_forms",
     "crispy_bootstrap4",
     "django.contrib.admin",
@@ -188,6 +187,9 @@ GOOGLE_API_KEY = env("GOOGLE_API_KEY")
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
+        # "CONFIG": {
+        #     "hosts": [("127.0.0.1", 6379)],
+        # },
         "CONFIG": {"hosts": [("red-5cdtdk.serverless.usw2.cache.amazonaws.com", 6379)]},
     }
 }
