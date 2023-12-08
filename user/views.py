@@ -1,22 +1,19 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import PasswordChangeView, PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.db.models import Q
 from .forms import UserRegisterForm, ValidateForm, UpdateUserForm
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
 from smtplib import SMTPException
 from django.core.exceptions import ObjectDoesNotExist
-from BookClub.models import BookClub
+from BookClub.models import BookClub, VotingPoll
 import time
 import random
 import string
-from .models import TransferOwnershipRequest
-from django.http import HttpResponseRedirect
 
 
 def index(request):
@@ -66,6 +63,9 @@ def unsubscribe(request, slug):
                     "Owner can not unsubscribe, please reassign ownership first",
                 )
                 return redirect("users:index")
+            if bc.polls != 0:
+                poll = VotingPoll.objects.get(id=bc.polls)
+                poll.remove_user_from_poll(request.user)
             bc.members.remove(request.user)
             messages.info(request, "Unsubscribe action complete")
         except ObjectDoesNotExist:
@@ -177,6 +177,8 @@ def user_login(request):
             form = login(request, user)
             messages.success(request, f"Welcome {user.username}!")
             return redirect("users:index")
+        else:
+            messages.info(request, "Account does not exist. Please sign up.")
     form = AuthenticationForm()
     return render(request, "user/login.html", {"form": form, "title": "log in"})
 
@@ -303,36 +305,3 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
         "if you didn't receive an email."
     )
     success_url = reverse_lazy("users:password-reset")
-
-
-@login_required
-def manage_transfer_request(request):
-    transfer_requests = TransferOwnershipRequest.objects.filter(
-        Q(new_owner=request.user, status="pending")
-        | Q(original_owner=request.user, status="declined")
-    )
-    print(transfer_requests)
-    context = {"transfer_requests": transfer_requests}
-    if request.method == "POST":
-        transferRequest = TransferOwnershipRequest.objects.get(
-            id=request.POST["transferRequest_id"]
-        )
-        print(request.POST)
-        if request.POST.get("status"):
-            req_status = request.POST.get("status")
-            print(req_status)
-            if req_status == "Accept":
-                new_owner = transferRequest.new_owner
-                book_club = get_object_or_404(BookClub, id=request.POST["book_club"])
-                if new_owner not in book_club.members.all():
-                    book_club.members.add(new_owner)
-                transferRequest.book_club.admin = new_owner
-                transferRequest.status = "accepted"
-            else:
-                transferRequest.status = "declined"
-            transferRequest.save()
-            return HttpResponseRedirect("#")
-        if request.POST.get("delete"):
-            transferRequest.delete()
-
-    return render(request, "user/notifications.html", context)

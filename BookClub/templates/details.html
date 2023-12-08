@@ -1,74 +1,152 @@
 {% extends "user/base.html" %}
 <!DOCTYPE html>
 <html>
-    <head>
-        {% load bootstrap5 %} {% bootstrap_css %}
-    </head>
-    <body>
-        {% block content %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="container-fluid p-0">
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
+	<head>
+		<meta charset="UTF-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		{% load bootstrap5 %} {% bootstrap_css %}
+	</head>
+	{% block content %}
+	<body>
+		{% if messages %}
+		{% for message in messages %}
+			<div class="container-fluid p-0">
+				<div class="alert alert-danger alert-dismissible fade show" role="alert" >
+					{{ message }}
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			</div>
+		{% endfor %}
+		{% endif %}
+		<div class='container'>
+			{% if bookclub %}
+			<div class='container'>
+				<div class='row justify-content-center'>
+					<center><h1>{{bookclub.name}}</h1></center>
+				</div>
+				<div class='row justify-content-center'>
+					<center>
+					<p>{{bookclub.description}}</p>
+					<p>Current Book Reading: {{bookclub.currentBook}}</p>
+					{% if book_cover %}
+						<img src="{{ book_cover }}" alt="Book Cover">
+					{% else %}
+						<p>Book cover not available</p>
+					{% endif %}
+					<p>Average rating: {{ average_rating }}</p>
 
-            <div class='container'>
-                {% if bookclub %}
-                    <div class='container'>
-                        <div class='row justify-content-center'>
-                            <center><h1>{{ bookclub.name }}</h1></center>
-                        </div>
-                        <div class='row justify-content-center'>
-                            <center>
-                                <p>{{ bookclub.description }}</p>
-                                <p>Current Book Reading: {{ bookclub.currentBook }}</p>
-                                <p>Meeting Time: {{ bookclub.meetingDay }} , {{ bookclub.meetingStartTime }} - {{ bookclub.meetingEndTime }}</p>
-                                <p>Current Amount of Members: {{ member_count }}</p>
-                            </center>
-                        </div>
-                    </div>
+					{% if user.is_authenticated %}
+						<form method="post" action="{% url 'rate_book' pk=book.id %}">
+							{% csrf_token %}
+							<h3>Rate this book:</h3>
+							
+							<div class="rating">
+								<style>
+									.rating {
+										display: inline-block;
+										unicode-bidi: bidi-override;
+										direction: rtl;
+									}
+									.rating input {
+										display: none;
+									}
+									.rating label {
+										position: relative;
+										display: inline-block;
+										font-size: 25px;
+										color: #ffcc00;
+										cursor: pointer;
+										margin-right: 5px;
+									}
+									.rating label:before {
+										content: "\2605";
+										/* position: absolute; */
+									}
+									.rating label:hover:before,
+									.rating label:hover ~ label:before {
+										content: "\2605";
+										color: #ff9900;
+									}
+									.rating input:checked ~ label {
+										content: "\2605";
+										color: #ff9900;
+									}
+									.checked {
+										color: #ff9900;
+									}
+									form {
+										margin-bottom: 20px;
+									}
+								</style>
+								{% for i in "54321" %}
+									<input class="rating" type="radio" id="star{{ i }}" name="rating" value="{{ i }}">
+									<label class="rating" for="star{{ i }}"></label>
+								{% endfor %}
+							</div>
+					
+							<button type="submit" class="btn btn-light">Submit Rating</button>
+						</form>
+					{% endif %}
 
-                    <div class='container' style='margin-bottom:10px'>
-                        <div class='row justify-content-center'>
-                            <center>
-                                
-                                <form method="POST" style="display: inline-block;">
-                                    {% csrf_token %}
-                                    {% if user.is_authenticated %}
-                                        <button onclick="location.href='{% url 'chat:name' roomname=bookclub.name %}'" type="button" class="btn btn-primary">Chat Room</button>
-                                        {% if subscribed %}
-                                            <button type="submit" name="unsubscribe" class="btn btn-primary">Unsubscribe</button>
-                                        {% else %}
-                                            <button type="submit" name="subscribe" class="btn btn-primary">Subscribe</button>
-                                        {% endif %}
-                                        {% if bookclub.admin == user %}
-                                            <button onclick="location.href='{% url 'edit_book_club' bookclub.id %}'" type="button" class="btn btn-primary">Edit</button>
-                                        {% endif %}
-                                    {% endif %}
-                                </form>
-
-                               
-                                {% if bookclub.admin == user %}
-                                    <form action="{% url 'delete_book_club' %}" method="post" style="display: inline-block;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="book_club_id" value="{{ bookclub.id }}">
-                                        <button type="submit" class="btn btn-danger">Delete</button>
-                                    </form>
-                                {% endif %}
-                            </center>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class='container'>
-                        <center><h1>The Book Club you are trying to reach either does not exist or you have no permission to view it.</h1></center>
-                    </div>
-                {% endif %}
-            </div>
-        {% endblock %}
-    </body>
+					<p>Meeting Time: {{bookclub.meetingDay}} , {{bookclub.meetingStartTime}} - {{bookclub.meetingEndTime}}</p>
+					<p>Current number of Members: {{member_count}}</p>
+					</center>
+				</div>
+			</div>
+			<div class='container' style='margin-bottom:10px'>
+				<div class='row justify-content-center'>
+					<center>
+						<form method="POST">
+							{% csrf_token %}
+							{% if user.is_authenticated %}
+								<button onclick="location.href='{% url 'chat:name' roomname=bookclub.name %}'" type="button" class="btn btn-primary">Chat Room</button>
+								{% if subscribed %}
+								<button type="submit" name="unsubscribe" class="btn btn-primary">Unsubscribe</a></button>
+								{% else %}
+								<button type="submit" name="subscribe" class="btn btn-primary">Subscribe</a></button>
+								{% endif %}
+								{% if bookclub.admin == user%}
+								<button onclick="location.href='{% url 'edit_book_club' bookclub.id %}'" type="button" class="btn btn-primary">Edit</button>
+								<button onclick="location.href='{% url 'voting' bookclub.id %}'" type="button" class="btn btn-primary">Voting Form</button>
+								{% endif %}
+							{% endif %}
+							{% if bookclub.admin == user %}
+								<form action="{% url 'delete_book_club' %}" method="post" style="display: inline-block;">
+									{% csrf_token %}
+									<input type="hidden" name="book_club_id" value="{{ bookclub.id }}">
+									<button type="submit" class="btn btn-danger">Delete</button>
+								</form>
+                            {% endif %}
+						</form>
+					</center>
+				</div>
+			</div>
+			{% if voting_poll and is_member %}
+			<div class='container' style='margin-bottom:10px'>
+				<div class='row justify-content-center'>
+					<center>
+						<h2>Choose the next book you like to read at this book club</h2>
+						<p>Members voted: {{amount_voted}}/{{member_count}}</p>
+						{% if not voted %}
+						<form method="POST">
+							{% csrf_token %}
+							{% for choice in choices %}
+								<button type="submit" name='choice{{ forloop.counter }}' class="btn btn-secondary" >{{choice.name}}</button>
+							{% endfor %}
+						</form>
+						{% else %}
+						<p>You already voted.</p>
+						{% endif %}
+					</center>
+				</div>
+			</div>
+			{% endif %}
+			{% else %}
+			<div class='container'>
+				<center><h1>The Book Club you are trying to reach is either does not exist or you have no permission to view</h1></center>
+			</div>
+			{% endif %}
+		</div>
+	</body>
+	{% endblock %}
 </html>

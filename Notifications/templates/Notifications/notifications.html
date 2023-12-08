@@ -1,0 +1,98 @@
+{% extends "user/base.html" %} 
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>{% block title %}Notifications{% endblock %}</title>
+    {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %} {% load bootstrap_icons %}
+  </head>
+{% block content %}
+{% if messages %}
+    {% for message in messages %}
+    <div class="container-fluid p-0">
+      <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    </div>
+    {% endfor %}
+{% endif %}
+<div class="container p-3">
+    <div class="row justify-content-center">
+    <h3 class="text-center"> Notifications </h3>
+    {% for notif in notifs %}
+        <div class="card m-2" style="width: 60rem;">
+            <div class="card-body">
+            {% if notif.transferownershipnotif %}
+                {% comment %} <div class="row">
+                <p>placeholder </p>
+                </div> {% endcomment %}
+                <div class="row">
+                    <div class="col-md-8">
+                    <h5 class="card-title">Admin Transfer Request</h5>
+                    </div>
+                    {% if notif.transferownershipnotif.safe_to_delete %}
+                    <div class="col-md-4">
+                            <div class="float-end">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="notif_type" value='transfer'>
+                                    <input type="hidden" name="id" value={{ notif.transferownershipnotif.id }}>
+                                    <input class="btn btn-close" type="submit" name="delete" value ='' aria-label="Close">
+                                </form>    
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if notif.transferownershipnotif.new_owner == request.user and notif.transferownershipnotif.status == 'pending' %}
+                    <div class="row">
+                        <div class="col-md-8">
+                            <p class="card-text">{{ notif.transferownershipnotif.original_owner}} wants to transfer the ownership of {{ notif.transferownershipnotif.book_club }} to you</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="float-end">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input class="btn btn-outline-success" type="submit" value="Accept" name="status">
+                                    <input class="btn btn-outline-danger" type="submit" value="Decline" name="status">
+                                    <input type="hidden" name="notif_type" value='transfer'>
+                                    <input type="hidden" name="id" value={{ notif.transferownershipnotif.id }}>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% elif notif.transferownershipnotif.original_owner == request.user and notif.transferownershipnotif.status == 'declined'%}
+                    <p class="card-text">{{notif.transferownershipnotif.new_owner}} has declined your request to take ownership of {{notif.transferownershipnotif.book_club}}. </p>
+                {% endif %}
+            {% elif notif.bookclubupdatesnotif %}
+                <div class="row">
+                    <div class="col-md-8">
+                    <h5 class="card-title">Updates from {{notif.bookclubupdatesnotif.book_club}}</h5>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="float-end">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="notif_type" value='update'>
+                                <input type="hidden" name="id" value={{ notif.bookclubupdatesnotif.id }}>
+                                <input class="btn btn-close" type="submit" name="delete" value ='' aria-label="Close">
+                            </form>    
+                        </div>
+                    </div>
+                </div>
+                <p>The following details have been updated for {{ notif.bookclubupdatesnotif.book_club }}</p>
+                <ol>
+                    {% for f in notif.bookclubupdatesnotif.fields_changed_to_list %}
+                    <li>{{f}}</li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>There are no notifications to view.</p>
+    {% endfor %}
+</div>
+<div>
+{% endblock content %}
+</html>

@@ -1,8 +1,13 @@
 from django import forms
 from django.forms import ModelForm
 from .models import BookClub
-from user.models import CustomUser
 from django.core.exceptions import ValidationError
+
+
+class BookClubVotingForm(forms.Form):
+    book1 = forms.CharField(label="book1", max_length=200)
+    book2 = forms.CharField(label="book2", max_length=200)
+    book3 = forms.CharField(label="book3", max_length=200)
 
 
 class BookClubForm(ModelForm):
@@ -12,6 +17,8 @@ class BookClubForm(ModelForm):
             "name",
             "description",
             "currentBook",
+            "currentAuthor",
+            "currentBookIsbn",
             "meetingDay",
             "meetingStartTime",
             "meetingEndTime",
@@ -19,6 +26,8 @@ class BookClubForm(ModelForm):
         )
         labels = {
             "currentBook": "Current Book",
+            "currentAuthor": "Current Author",
+            "currentBookIsbn": "Current Book Isbn",
             "meetingStartTime": "Meeting Start Time",
             "meetingEndTime": "Meeting End Time",
             "meetingDay": "Meeting Day",
@@ -49,21 +58,21 @@ class BookClubForm(ModelForm):
 
 
 class BookClubEditForm(ModelForm):
-    new_admin = forms.ModelChoiceField(
-        label="New Admin", queryset=CustomUser.objects.all()
-    )
-
     class Meta:
         model = BookClub
-        fields = (
+        fields = [
             "name",
             "description",
             "currentBook",
+            "currentAuthor",
+            "currentBookIsbn",
             "meetingDay",
             "meetingStartTime",
             "meetingEndTime",
             "meetingOccurence",
             "libraryId",
-        )
-
-        exclude = ["admin"]
+            "admin",
+        ]
+        labels = {
+            "admin": "New Admin",
+        }
