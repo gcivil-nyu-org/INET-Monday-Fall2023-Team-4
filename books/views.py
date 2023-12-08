@@ -31,7 +31,9 @@ def rate_book(request, pk):
         rating_value = request.POST.get("rating")
         if not rating_value:
             messages.error(request, "You must select a star rating.")
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse("book_detail", args=[pk])))
+            return HttpResponseRedirect(
+                request.META.get("HTTP_REFERER", reverse("book_detail", args=[pk]))
+            )
 
         try:
             rating_value = int(rating_value)
