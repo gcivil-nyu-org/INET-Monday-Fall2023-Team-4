@@ -1,7 +1,9 @@
 from django import forms
 from django.forms import ModelForm
 from .models import BookClub
+from user.models import CustomUser
 from django.core.exceptions import ValidationError
+from Notifications.models import TransferOwnershipNotif
 
 
 class BookClubVotingForm(forms.Form):
@@ -71,6 +73,10 @@ class BookClubForm(ModelForm):
 
 
 class BookClubEditForm(ModelForm):
+    new_admin = forms.ModelChoiceField(
+        label="New Admin", queryset=CustomUser.objects.all(), widget=forms.Select(attrs={"class": "form-control"})
+    )
+        
     class Meta:
         model = BookClub
         fields = [
@@ -84,8 +90,10 @@ class BookClubEditForm(ModelForm):
             "meetingEndTime",
             "meetingOccurence",
             "libraryId",
-            "admin",
         ]
+        
+        exclude = ["admin"]
+        
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(
@@ -103,7 +111,7 @@ class BookClubEditForm(ModelForm):
             ),
             "meetingOccurence": forms.Select(attrs={"class": "form-control"}),
             "libraryId": forms.Select(attrs={"class": "form-control"}),
-            "admin": forms.Select(attrs={"class": "form-control"}),
+            # "new_admin": forms.Select(attrs={"class": "form-control"}),
         }
         labels = {
             "name": "Name",
@@ -116,5 +124,16 @@ class BookClubEditForm(ModelForm):
             "meetingEndTime": "Meeting End Time",
             "meetingOccurence": "Meeting Frequency",
             "libraryId": "Library",
-            "admin": "New Admin",
         }
+        
+    def clean_new_admin(self):
+        # each book club should only have one pending request
+        new_admin = self.cleaned_data["new_admin"]
+        pending_req = TransferOwnershipNotif.objects.filter(book_club=self.instance, status="pending")
+        if pending_req:
+            raise ValidationError(
+                "You have already made a transfer admin request. Please wait for the previous request to be declined to make a new one."
+            )
+        return new_admin
+            
+        
