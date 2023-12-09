@@ -28,7 +28,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = "django-insecure-ha2r#15cuib7b$eh#!*%8dc#0t)s*v3n(g$yi&ep($kkgy&%j8"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "checkout-env.eba-a2fjneg3.us-west-2.elasticbeanstalk.com",
@@ -187,10 +187,10 @@ GOOGLE_API_KEY = env("GOOGLE_API_KEY")
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        # "CONFIG": {
-        #     "hosts": [("127.0.0.1", 6379)],
-        # },
-        "CONFIG": {"hosts": [("red-5cdtdk.serverless.usw2.cache.amazonaws.com", 6379)]},
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+        # "CONFIG": {"hosts": [("red-5cdtdk.serverless.usw2.cache.amazonaws.com", 6379)]},
     }
 }
 

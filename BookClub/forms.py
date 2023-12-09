@@ -73,6 +73,31 @@ class BookClubEditForm(ModelForm):
             "libraryId",
             "admin",
         ]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(
+                attrs={"class": "form-control", "cols": 50, "rows": 3}
+            ),
+            "currentBook": forms.TextInput(attrs={"class": "form-control"}),
+            "currentAuthor": forms.TextInput(attrs={"class": "form-control"}),
+            "currentBookIsbn": forms.TextInput(attrs={"class": "form-control"}),
+            "meetingDay": forms.Select(attrs={"class": "form-control"}),
+            "meetingStartTime": forms.TimeInput(attrs={"class": "form-control"}),
+            "meetingEndTime": forms.TimeInput(attrs={"class": "form-control"}),
+            "meetingOccurence": forms.Select(attrs={"class": "form-control"}),
+            "libraryId": forms.Select(attrs={"class": "form-control"}),
+            "admin": forms.Select(attrs={"class": "form-control"}),
+        }
         labels = {
+            "name": "Name",
+            "description": "Description",
+            "currentBook": "Current book pick",
+            "currentAuthor": "Current pick's author",
+            "currentBookIsbn": "Current pick's ISBN",
+            "meetingDay": "Meeting day",
+            "meetingStartTime": "Meeting Start Time",
+            "meetingEndTime": "Meeting End Time",
+            "meetingOccurence": "Meeting Frequency",
+            "libraryId": "Library",
             "admin": "New Admin",
         }
