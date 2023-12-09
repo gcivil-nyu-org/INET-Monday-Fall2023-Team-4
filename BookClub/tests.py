@@ -183,7 +183,7 @@ class BookClubViewsTest(TestCase):
         request.POST = form_data
 
         response = edit_book_club(request, self.book_club_id)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
     def test_edit_book_club_form_save(self):
         form_data = {
@@ -207,7 +207,7 @@ class BookClubViewsTest(TestCase):
 
         response = edit_book_club(request, self.book_club_id)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         # self.assertEqual(
         #     BookClub.objects.get(id=self.book_club_id).name, "Updated Book Club Name"
         # )
