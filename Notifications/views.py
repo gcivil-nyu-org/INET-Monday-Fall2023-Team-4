@@ -52,7 +52,11 @@ class NotificationListView(View):
                     book_club.save()
                     transferRequestNotif.status = "accepted"
                     bc_members = book_club.members.all()
-                    message = book_club.name + " has a new admin: " + book_club.admin.first_name
+                    message = (
+                        book_club.name
+                        + " has a new admin: "
+                        + book_club.admin.first_name
+                    )
                     for mem in bc_members:
                         if not book_club.silenceNotification.contains(mem):
                             updateNotif = BookClubUpdatesNotif(

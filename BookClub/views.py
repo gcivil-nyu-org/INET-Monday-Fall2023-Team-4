@@ -247,7 +247,7 @@ def edit_book_club(request, book_club_id):
             if changed_fields_and_data:
                 try:
                     content, notif = get_email_content(
-                    changed_fields_and_data, original_bc_name
+                        changed_fields_and_data, original_bc_name
                     )
                     bc_members = book_club.members.all()
                     for mem in bc_members:
@@ -272,13 +272,17 @@ def edit_book_club(request, book_club_id):
                         content,
                         settings.EMAIL_HOST_USER,
                     )
-                    send_mail(subject, content, from_email, email_list, fail_silently=False)
+                    send_mail(
+                        subject, content, from_email, email_list, fail_silently=False
+                    )
                 except SMTPException:
                     messages.error(request, "Failed to notify members of your updates")
 
             return redirect("details", slug=book_club.id)
     else:
-        form = BookClubEditForm(instance=book_club, initial={'new_admin':book_club.admin})
+        form = BookClubEditForm(
+            instance=book_club, initial={"new_admin": book_club.admin}
+        )
 
     return render(request, "bookclub_edit.html", {"form": form, "book_club": book_club})
 
