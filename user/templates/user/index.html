@@ -44,28 +44,37 @@
 
 </head>
 {% block content %}
-<body class="container-fluid">
+<body>
 
 {% include "user/base.html" %}
+<div class="container-fluid">
 <div class="row">
 	{% block start %}
 	{% if user.is_authenticated %}
-	<div class="container">
-		<center><h1>Welcome back {{user.first_name}}!</h1></center>
+		<div class="container">
+			<center><h3>Welcome back {{user.first_name}}!</h3></center>
 		{% else %}
-		<center><h1>Check Out</h1></center>
+			<center><h3>Check Out</h3></center>
 		{% endif %}
-		<div>
-			<center>
-				<form method="get" action="{% url 'libraries:library-list'%}">
-					{% csrf_token %}
-					<button type='submit' class="btn btn-primary">View Libraries</button>
+			</br>
+		</div>
+</div>
+</div>
+		<div class="container d-flex justify-content-md-center">
+				<form id="searchForm" class="row" action="{% url 'libraries:library-list' %}">
+					{% csrf_token%}
+					<div class="col-md-11">
+						<input class="form-control" id="searchInput" class="form-control" type="search" placeholder="Search or view all libraries" aria-label="Search" name="search" value="{{ search_value }}">
+					</div>	
+					<div class="col-md-1">
+						<button class="btn btn-primary" type="submit">Search</button>
+					</div>	
 				</form>
-			</center>
 		</div>
 		</br>
-	</div>
 	{% endblock %}
+	<div class="container-fluid">
+	<div class="row">
 	{% if user.is_authenticated and isfrontpage %}
 	{% block subscriptions %}
 		<div class="container">
@@ -79,8 +88,9 @@
 						</div>
 					{% endfor %}
 					{% endif %}
+
 					{% if subscriptions %}
-						<center><h2>Your Subscriptions</h2></center>
+						<center><h4>Your Subscriptions</h4></center>
 					{% else %}
 						<center>Looks like your not subscribed to any book clubs.</center>
 					{% endif %}
@@ -91,9 +101,9 @@
 									<div class='row'>
 										<div class='col-6'>
 											{% if club.admin == request.user %}
-												<p><span class="text-primary">OWNER</span> | <a href="{% url 'details' club.id %}"> <b>{{club.libraryId.branch}}</b></a></p>
+												<p style="font-size:16px"><span class="text-primary">OWNER</span> | <a href="{% url 'details' club.id %}"> <b>{{club.name}}</b></a></p>
 											{% else %}
-												<p><span class="text-primary">MEMBER</span> | <a href="{% url 'details' club.id %}"><b>{{club.libraryId.branch}}</b></a></p>
+												<p style="font-size:16px"><span class="text-primary">MEMBER</span> | <a href="{% url 'details' club.id %}"><b>{{club.name}}</b></a></p>
 											{% endif %}
 											
 										</div>
@@ -101,22 +111,22 @@
 											<div style='float:right'>
 												{% if club.admin == request.user %}
 													<div style='float:left;margin:2px'>
-													<a href="{% url 'edit_book_club' club.id %}" class="btn btn-primary">Edit</a>
+													<a href="{% url 'edit_book_club' club.id %}" class="btn btn-primary" style="font-size:14px">Edit</a>
 													</div>
 												{% endif %}
 												<form style='float:left;margin:2px' method="POST" action="{% url 'users:unsubscribe' club.id %}">
 													{% csrf_token %}
-													<button type="submit" class="btn btn-warning">Unsubscribe</button>
+													<button type="submit" class="btn btn-warning" style="font-size:14px">Unsubscribe</button>
 												</form>
 												{% if request.user in club.silenceNotification.all %}
 													<form style='float:left;margin:2px' method="POST" action="{% url 'users:mute' club.id %}">
 														{% csrf_token %}
-														<button type="submit" name="unmute" class="btn btn-secondary">Unmute</button>
+														<button type="submit" name="unmute" class="btn btn-secondary" style="font-size:14px">Unmute</button>
 													</form>
 												{% else %}
 													<form style='float:left;margin:2px' method="POST" action="{% url 'users:mute' club.id %}">
 														{% csrf_token %}
-														<button type="submit" name="mute" class="btn btn-secondary">Mute</button>
+														<button type="submit" name="mute" class="btn btn-secondary" style="font-size:14px">Mute</button>
 													</form>
 												{% endif %}
 											</div>
@@ -125,9 +135,10 @@
 									</div>
 								</div>
 								<div class="card-text">
-									<b>Club Name: {{club.name}} - Meeting Day: {{club.meetingDay}} - Current Book: {{club.currentBook}}</b>
-									</br>
-									{{club.description}}
+									<b style="font-size:16px">{{club.libraryId.branch}}</b><br>
+									Meeting Day: {{club.meetingDay}}<br>
+									Current Book: {{club.currentBook}}<br>
+									Description: {{club.description}}
 								</div>
 							</div>
 						</div>
@@ -141,6 +152,8 @@
 	{% if not user.is_authenticated and isfrontpage %}
 		<center>Login for to view subscriptions</center>
 	{% endif %}
+</div>
+</div>
 </div>
 </body>
 {% endblock %}

@@ -10,6 +10,7 @@ from .views import (
 )
 from django.contrib.auth.decorators import login_required
 
+# app_name = "bookclub"
 
 urlpatterns = [
     path("error", error_page, name="error_page"),
