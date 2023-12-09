@@ -95,8 +95,12 @@ class BookClubEditForm(ModelForm):
             "currentAuthor": forms.TextInput(attrs={"class": "form-control"}),
             "currentBookIsbn": forms.TextInput(attrs={"class": "form-control"}),
             "meetingDay": forms.Select(attrs={"class": "form-control"}),
-            "meetingStartTime": forms.TimeInput(attrs={"class": "form-control", "type": "time"}),
-            "meetingEndTime": forms.TimeInput(attrs={"class": "form-control", "type": "time"}),
+            "meetingStartTime": forms.TimeInput(
+                attrs={"class": "form-control", "type": "time"}
+            ),
+            "meetingEndTime": forms.TimeInput(
+                attrs={"class": "form-control", "type": "time"}
+            ),
             "meetingOccurence": forms.Select(attrs={"class": "form-control"}),
             "libraryId": forms.Select(attrs={"class": "form-control"}),
             "admin": forms.Select(attrs={"class": "form-control"}),
