@@ -11,7 +11,6 @@ from datetime import date
 # Create your views here.
 class NotificationListView(View):
     model = Notification
-    template_name = "Notifications/notifications.html"
 
     def get(self, request):
         object_list = Notification.objects.filter(
@@ -30,7 +29,7 @@ class NotificationListView(View):
             n.is_read = True
             n.save()
         return render(
-            request, "notifications/notifications.html", {"notifs": object_list}
+            request, "Notifications/notifications.html", {"notifs": object_list}
         )
 
     def post(self, request, *args, **kwargs):
