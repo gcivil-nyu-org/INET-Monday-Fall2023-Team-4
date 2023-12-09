@@ -15,7 +15,11 @@ class ChatConsumer(WebsocketConsumer):
 
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
-            {"type": "chat_message", "message": self.scope['user'].username + " has joined the chat!", "username": "System"},
+            {
+                "type": "chat_message",
+                "message": self.scope["user"].username + " has joined the chat!",
+                "username": "System",
+            },
         )
         self.accept()
 
