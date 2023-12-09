@@ -187,10 +187,10 @@ GOOGLE_API_KEY = env("GOOGLE_API_KEY")
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        # "CONFIG": {
-        #     "hosts": [("127.0.0.1", 6379)],
-        # },
-        "CONFIG": {"hosts": [("red-5cdtdk.serverless.usw2.cache.amazonaws.com", 6379)]},
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+        # "CONFIG": {"hosts": [("red-5cdtdk.serverless.usw2.cache.amazonaws.com", 6379)]},
     }
 }
 
