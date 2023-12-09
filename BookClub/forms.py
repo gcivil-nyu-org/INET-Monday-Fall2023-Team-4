@@ -75,7 +75,9 @@ class BookClubEditForm(ModelForm):
         ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
-            "description": forms.Textarea(attrs={"class": "form-control", "cols": 50, "rows": 3}),
+            "description": forms.Textarea(
+                attrs={"class": "form-control", "cols": 50, "rows": 3}
+            ),
             "currentBook": forms.TextInput(attrs={"class": "form-control"}),
             "currentAuthor": forms.TextInput(attrs={"class": "form-control"}),
             "currentBookIsbn": forms.TextInput(attrs={"class": "form-control"}),
