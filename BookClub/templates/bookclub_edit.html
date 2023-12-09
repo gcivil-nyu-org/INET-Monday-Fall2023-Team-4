@@ -33,7 +33,6 @@
                               {% if field.errors %}<li class="alert alert-danger">{{ field.errors|striptags }}</li> {% endif %}
                             </p>
                       {% endfor %}
-                      {% comment %} {{ form.as_p }} {% endcomment %}
                 
                       <label for="members">Members:</label>
                       {% for member in book_club.members.all %}
@@ -48,26 +47,6 @@
         </div>
     </div>
 </div>
-  {% comment %} <div class="container">
-      <div class="row justify-content-center">
-    <div class="card mx-auto">
-      <h2 class="card-title">Edit Book Club: {{ book_club.name }}</h2>
-      <div class="card-body">
-      <form method="POST">
-      {% csrf_token %} 
-      {{ form.as_p }}
-
-      <label for="members">Members:</label>
-      {% for member in book_club.members.all %}
-      <div class="col-sm-8">{{ member.username }}</div>
-      {% endfor %}
-
-      <button type="submit" class="btn btn-primary" {% if request.user != book_club.admin %}disabled{% endif %}>Save Changes</button>
-    </form>
-  </div>
-</div>
-</div>
-  </div> {% endcomment %}
   </body>
   {% endblock %}
 </html>

@@ -38,14 +38,14 @@ def mute(request, slug):
                 bc.silenceNotification.add(request.user)
                 messages.info(
                     request,
-                    "Notifications Muted. "
+                    "Notifications muted. "
                     + "You will no longer recieve notifications from this book club.",
                 )
             elif "unmute" in request.POST:
                 bc.silenceNotification.remove(request.user)
                 messages.info(
                     request,
-                    "Notification Unmuted. You will now recieve notifications.",
+                    "Notification unmuted. You will now recieve notifications.",
                 )
     else:
         messages.info(request, "You should not have been there")

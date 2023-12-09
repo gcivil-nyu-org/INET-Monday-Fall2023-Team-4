@@ -13,15 +13,15 @@
 </div>
 {% endif %}
 
-<div class="content-section col-lg-12 col-md-12 col-sm-12 tutorial-style" style="min-height:65vh;">
-  <legend class="border-bottom mb-4">Profile Information:</legend>
+<div class="content-section col-lg-12 col-md-12 col-sm-12 tutorial-style" style="min-height:50vh;">
+  <legend class="border-bottom mb-4" style="font-size:24px">Profile Information:</legend>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="media">
       <div class="media-body">
-          <h2 class="account-heading">{{ user_form.instance.username }}
+          <h3 class="account-heading">{{ user_form.instance.username }}
               <small class="text-muted">({{ user_form.instance.status }})</small>
-          </h2>
+          </h3>
           <p class="text-secondary">{{ user_form.instance.first_name }} {{ user_form.instance.last_name }}</p>
           <p class="text-secondary">{{ user_form.instance.email }}</p>
       </div>
@@ -38,10 +38,11 @@
           <label class="small mb-1">Email:</label>
           {{ user_form.email }}
         </div>
+        <br>
         <div class="form-group">
-          <button name="update" type="submit" class="btn btn-dark btn-lg">Save Changes</button>
-          <button type="reset" class="btn btn-dark btn-lg">Reset</button>
-          <button class="btn btn-dark btn-lg"><a href="{% url "users:password_change" %}">Change Password</button>
+          <button name="update" type="submit" class="btn btn-dark btn-md">Save Changes</button>
+          <button type="reset" class="btn btn-dark btn-md">Reset</button>
+          <a href="{% url "users:password_change" %}" class="btn btn-dark btn-md">Change Password</a>
         </div>
       </div>
     </div>

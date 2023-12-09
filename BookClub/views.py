@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from smtplib import SMTPException
 from django.contrib.auth.decorators import login_required
-from datetime import date
+from datetime import datetime
 from django.db.models import Q
 from books.utils import get_book_cover
 
@@ -226,59 +226,63 @@ def edit_book_club(request, book_club_id):
                 request, "bookclub_edit.html", {"form": form, "book_club": book_club}
             )
         if form.is_valid():
-            print(request.POST)
-            if "admin" in request.POST:
-                new_admin = form.cleaned_data["admin"]
+            if "new_admin" in request.POST:
+                new_admin = form.cleaned_data["new_admin"]
                 if new_admin != book_club.admin:
                     transferReq = TransferOwnershipNotif(
                         original_owner=request.user,
                         new_owner=new_admin,
                         book_club=book_club,
                         status="pending",
-                        date_created=date.today(),
+                        date_created=datetime.now(),
                     )
                     transferReq.save()
-
             form.save()
             fields_changed = form.changed_data
             changed_fields_and_data = {}
             for i in fields_changed:
-                if i == "admin":
+                if i == "new_admin":
                     continue
                 changed_fields_and_data[i] = request.POST[i]
+            if changed_fields_and_data:
+                try:
+                    content, notif = get_email_content(
+                        changed_fields_and_data, original_bc_name
+                    )
+                    bc_members = book_club.members.all()
+                    for mem in bc_members:
+                        if not book_club.silenceNotification.contains(mem):
+                            updateNotif = BookClubUpdatesNotif(
+                                safe_to_delete=True,
+                                date_created=datetime.now(),
+                                receiving_user=mem,
+                                book_club=book_club,
+                                fields_changed=notif,
+                            )
+                            updateNotif.save()
 
-            content, notif = get_email_content(
-                changed_fields_and_data, original_bc_name
-            )
+                    email_list = [
+                        mem.email
+                        for mem in bc_members
+                        if not book_club.silenceNotification.contains(mem)
+                    ]
 
-            updateNotif = BookClubUpdatesNotif(
-                safe_to_delete=True,
-                date_created=date.today(),
-                receiving_user=request.user,
-                book_club=book_club,
-                fields_changed=notif,
-            )
-            updateNotif.save()
-            try:
-                bc_members = book_club.members.all()
-                email_list = [
-                    mem.email
-                    for mem in bc_members
-                    if not book_club.silenceNotification.contains(mem)
-                ]
-
-                subject, content, from_email = (
-                    "Check new updates from your book club!",
-                    content,
-                    settings.EMAIL_HOST_USER,
-                )
-                send_mail(subject, content, from_email, email_list, fail_silently=False)
-            except SMTPException:
-                messages.error(request, "Failed to notify members of your updates")
+                    subject, content, from_email = (
+                        "Check new updates from your book club!",
+                        content,
+                        settings.EMAIL_HOST_USER,
+                    )
+                    send_mail(
+                        subject, content, from_email, email_list, fail_silently=False
+                    )
+                except SMTPException:
+                    messages.error(request, "Failed to notify members of your updates")
 
             return redirect("details", slug=book_club.id)
     else:
-        form = BookClubEditForm(instance=book_club)
+        form = BookClubEditForm(
+            instance=book_club, initial={"new_admin": book_club.admin}
+        )
 
     return render(request, "bookclub_edit.html", {"form": form, "book_club": book_club})
 

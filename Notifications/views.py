@@ -5,7 +5,7 @@ from django.views import View
 from django.db.models import Q
 from .models import Notification
 from Notifications.models import TransferOwnershipNotif, BookClubUpdatesNotif
-from datetime import date
+from datetime import datetime
 
 
 # Create your views here.
@@ -13,6 +13,8 @@ class NotificationListView(View):
     model = Notification
 
     def get(self, request):
+        if request.user.is_anonymous:
+            return render(request, "Notifications/error_page.html")
         object_list = Notification.objects.filter(
             Q(
                 transferownershipnotif__new_owner=self.request.user,
@@ -45,16 +47,25 @@ class NotificationListView(View):
                     book_club = transferRequestNotif.book_club
                     if new_owner not in book_club.members.all():
                         book_club.members.add(new_owner)
-                    transferRequestNotif.book_club.admin = new_owner
+                    book_club.admin = new_owner
+                    book_club.save()
                     transferRequestNotif.status = "accepted"
-                    updateNotif = BookClubUpdatesNotif(
-                        safe_to_delete=True,
-                        date_created=date.today(),
-                        receiving_user=request.user,
-                        book_club=book_club,
-                        fields_changed="new admin",
+                    bc_members = book_club.members.all()
+                    message = (
+                        book_club.name
+                        + " has a new admin: "
+                        + book_club.admin.first_name
                     )
-                    updateNotif.save()
+                    for mem in bc_members:
+                        if not book_club.silenceNotification.contains(mem):
+                            updateNotif = BookClubUpdatesNotif(
+                                safe_to_delete=True,
+                                date_created=datetime.now(),
+                                receiving_user=mem,
+                                book_club=book_club,
+                                fields_changed=message,
+                            )
+                            updateNotif.save()
                 else:
                     transferRequestNotif.status = "declined"
                     transferRequestNotif.is_read = False

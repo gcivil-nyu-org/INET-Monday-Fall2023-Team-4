@@ -19,17 +19,14 @@
 {% endif %}
 <div class="container p-3">
     <div class="row justify-content-center">
-    <h3 class="text-center"> Notifications </h3>
+    <h4 class="text-center"> Notifications </h4>
     {% for notif in notifs %}
         <div class="card m-2" style="width: 60rem;">
             <div class="card-body">
             {% if notif.transferownershipnotif %}
-                {% comment %} <div class="row">
-                <p>placeholder </p>
-                </div> {% endcomment %}
                 <div class="row">
                     <div class="col-md-8">
-                    <h5 class="card-title">Admin Transfer Request</h5>
+                    <h6 class="card-title">Admin Transfer Request</h6>
                     </div>
                     {% if notif.transferownershipnotif.safe_to_delete %}
                     <div class="col-md-4">
@@ -53,8 +50,8 @@
                             <div class="float-end">
                                 <form method="post">
                                     {% csrf_token %}
-                                    <input class="btn btn-outline-success" type="submit" value="Accept" name="status">
-                                    <input class="btn btn-outline-danger" type="submit" value="Decline" name="status">
+                                    <input class="btn btn-outline-success btn-md" type="submit" value="Accept" name="status">
+                                    <input class="btn btn-outline-danger btn-md" type="submit" value="Decline" name="status">
                                     <input type="hidden" name="notif_type" value='transfer'>
                                     <input type="hidden" name="id" value={{ notif.transferownershipnotif.id }}>
                                 </form>
@@ -67,7 +64,7 @@
             {% elif notif.bookclubupdatesnotif %}
                 <div class="row">
                     <div class="col-md-8">
-                    <h5 class="card-title">Updates from {{notif.bookclubupdatesnotif.book_club}}</h5>
+                    <h6 class="card-title">Updates from {{notif.bookclubupdatesnotif.book_club}}</h6>
                     </div>
                     <div class="col-md-4">
                         <div class="float-end">
@@ -80,18 +77,20 @@
                         </div>
                     </div>
                 </div>
-                <p>The following details have been updated for {{ notif.bookclubupdatesnotif.book_club }}</p>
+                <p style="font-size:15px">The following details have been updated for {{ notif.bookclubupdatesnotif.book_club }}:</p>
                 <ol>
                     {% for f in notif.bookclubupdatesnotif.fields_changed_to_list %}
-                    <li>{{f}}</li>
+                    <li style="font-size:14px">{{f}}</li>
                     {% endfor %}
                 </ol>
-                <a href="{% url 'details' notif.bookclubupdatesnotif.book_club.id %}">Click to view more details</a>
+                <a href="{% url 'details' notif.bookclubupdatesnotif.book_club.id %}" style="font-size:14px">Click to view more details</a>
             {% endif %}
             </div>
         </div>
     {% empty %}
+    <center>
         <p>There are no notifications to view.</p>
+    </center>
     {% endfor %}
 </div>
 <div>

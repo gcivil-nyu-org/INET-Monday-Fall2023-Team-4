@@ -15,13 +15,13 @@
       >
         {% csrf_token %}
         <fieldset class="form-group">{{ form | crispy}}</fieldset>
+        <br />
         <center>
           <button
-            style="background: black; font-size: 2rem; padding: 1%"
-            class="btn btn-outline-info"
             type="submit"
+            class="btn btn-dark"
           >
-            <span class="glyphicon glyphicon-log-in"></span> login
+          <span class="glyphicon glyphicon-log-in"></span>Login
           </button>
         </center>
         <br />

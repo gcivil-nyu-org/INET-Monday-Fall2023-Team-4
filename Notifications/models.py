@@ -10,7 +10,7 @@ class Notification(models.Model):
     # receiving_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     class Meta:
         # abstract = True
-        ordering = ["date_created"]
+        ordering = ["-date_created"]
 
 
 class TransferOwnershipNotif(Notification):
@@ -32,6 +32,8 @@ class TransferOwnershipNotif(Notification):
 class BookClubUpdatesNotif(Notification):
     def fields_changed_to_list(self):
         result = self.fields_changed.split("--!!--")
+        if len(result) == 1:
+            return result
         return result[:-1]
 
     receiving_user = models.ForeignKey(
