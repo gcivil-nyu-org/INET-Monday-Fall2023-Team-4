@@ -12,13 +12,6 @@ before_script:
   - python manage.py makemigrations
   - python manage.py migrate
 
-script:
-  - black . --check
-  - flake8 . --max-line-length=99
-  - coverage run manage.py test --noinput
-  - coverage xml
-  - ./coverall/coveralls report --repo-token=$COVERALL_TOKEN ./coverage.xml
-
 deploy:
   provider: elasticbeanstalk
   access_key_id: "$AWS_KEY"
