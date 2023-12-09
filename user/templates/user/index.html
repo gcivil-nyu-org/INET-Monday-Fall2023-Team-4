@@ -30,17 +30,6 @@
 
 <!-- message here -->
 
-{% if messages %}
-{% for message in messages %}
-
-<script>
-	alert("{{ message }}");
-</script>
-{{message}}
-
-{% endfor %}
-{% endif %}
-
 
 </head>
 {% block content %}
@@ -82,11 +71,14 @@
 				<div class='col-2'></div>
 				<div class="col-8">
 					{% if messages %}
-					{% for message in messages %}
-						<div class="alert alert-info" role="alert">
-						  {{message}}
+						{% for message in messages %}
+						<div class="container-fluid p-0">
+						<div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+							{{ message }}
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 						</div>
-					{% endfor %}
+						</div>
+						{% endfor %}
 					{% endif %}
 
 					{% if subscriptions %}

@@ -250,17 +250,19 @@ def edit_book_club(request, book_club_id):
             content, notif = get_email_content(
                 changed_fields_and_data, original_bc_name
             )
-
-            updateNotif = BookClubUpdatesNotif(
-                safe_to_delete=True,
-                date_created=date.today(),
-                receiving_user=request.user,
-                book_club=book_club,
-                fields_changed=notif,
-            )
-            updateNotif.save()
             try:
                 bc_members = book_club.members.all()
+                for mem in bc_members:
+                    if not book_club.silenceNotification.contains(mem):
+                        updateNotif = BookClubUpdatesNotif(
+                        safe_to_delete=True,
+                        date_created=date.today(),
+                        receiving_user=request.user,
+                        book_club=book_club,
+                        fields_changed=notif,
+                        )
+                        updateNotif.save()
+            
                 email_list = [
                     mem.email
                     for mem in bc_members

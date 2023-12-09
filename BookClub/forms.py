@@ -27,10 +27,23 @@ class BookClubForm(ModelForm):
         labels = {
             "currentBook": "Current Book",
             "currentAuthor": "Current Author",
-            "currentBookIsbn": "Current Book Isbn",
+            "currentBookIsbn": "Current Book ISBN",
             "meetingStartTime": "Meeting Start Time",
             "meetingEndTime": "Meeting End Time",
             "meetingDay": "Meeting Day",
+        }
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(
+                attrs={"class": "form-control", "cols": 50, "rows": 3}
+            ),
+            "currentBook": forms.TextInput(attrs={"class": "form-control"}),
+            "currentAuthor": forms.TextInput(attrs={"class": "form-control"}),
+            "currentBookIsbn": forms.TextInput(attrs={"class": "form-control"}),
+            "meetingDay": forms.Select(attrs={"class": "form-control"}),
+            "meetingOccurence": forms.Select(attrs={"class": "form-control"}),
+            "libraryId": forms.Select(attrs={"class": "form-control"}),
+            "admin": forms.Select(attrs={"class": "form-control"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -38,10 +51,10 @@ class BookClubForm(ModelForm):
         self.fields["meetingDay"].required = True
         self.fields["meetingOccurence"].required = True
         self.fields["meetingStartTime"].widget = forms.TimeInput(
-            format="%I:%M %p", attrs={"type": "time"}
+            format="%I:%M %p", attrs={"class": "form-control", "type": "time"}
         )
         self.fields["meetingEndTime"].widget = forms.TimeInput(
-            format="%I:%M %p", attrs={"type": "time"}
+            format="%I:%M %p", attrs={"class": "form-control", "type": "time"}
         )
 
     def clean(self):
@@ -82,8 +95,8 @@ class BookClubEditForm(ModelForm):
             "currentAuthor": forms.TextInput(attrs={"class": "form-control"}),
             "currentBookIsbn": forms.TextInput(attrs={"class": "form-control"}),
             "meetingDay": forms.Select(attrs={"class": "form-control"}),
-            "meetingStartTime": forms.TimeInput(attrs={"class": "form-control"}),
-            "meetingEndTime": forms.TimeInput(attrs={"class": "form-control"}),
+            "meetingStartTime": forms.TimeInput(attrs={"class": "form-control", "type": "time"}),
+            "meetingEndTime": forms.TimeInput(attrs={"class": "form-control", "type": "time"}),
             "meetingOccurence": forms.Select(attrs={"class": "form-control"}),
             "libraryId": forms.Select(attrs={"class": "form-control"}),
             "admin": forms.Select(attrs={"class": "form-control"}),
