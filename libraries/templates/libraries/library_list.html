@@ -9,10 +9,10 @@
   {% block content %}
   <body>
     <div class="container-fluid">
-      <h1 class="p-3">Find Your Library</h1>
+      <h3 class="p-3">Find Your Library</h3>
     </div>
 
-    <div class="container-fluid px-3">
+    <div class="container-fluid px-5">
       <form id="searchForm" class="form-inline my-2 my-lg-0" action="{% url 'libraries:library-list' %}">
           {% csrf_token%}
           <div class="row">
@@ -21,19 +21,19 @@
           </div>
       </form>
     </div>
-
+    <br>
     <div class="container-fluid">
       {% for library in page_obj %}
-      <h3 class="px-3"><a href="{{ library.get_absolute_url }}">{{ library.branch }}</a></h3>
+      <h5 class="px-3"><a href="{{ library.get_absolute_url }}">{{ library.branch }}</a></h5>
       <p>
-        <address class="fs-4 px-3"> 
+        <address class="fs-5 px-3"> 
         {{ library.address }}, {{ library.city }}, {{ library.postcode }}
         </address> 
-        <p class="fs-5 px-3">
+        <p class="fs-6 px-3">
         {% bs_icon 'telephone-fill' %} Phone: {{ library.phone }} <br />
         {% bs_icon 'alarm-fill' %} Today's Hours: {{ library.get_today_hours }} <br />
         </p>
-        <p class="fs-5 px-3" href="#opening_hours_{{library.id}}" data-bs-toggle="collapse">{% bs_icon 'calendar-event-fill' %}View all opening hours {% bs_icon 'chevron-down' %}</p>
+        <p class="fs-6 px-3" href="#opening_hours_{{library.id}}" data-bs-toggle="collapse">{% bs_icon 'calendar-event-fill' %}View all opening hours {% bs_icon 'chevron-down' %}</p>
         <p id="opening_hours_{{library.id}}" class="collapse px-3">
             Monday: {% if library.monday == null %} Closed {% else %} {{ library.monday }} {% endif %} <br />
             Tuesday: {% if library.tuesday == null %} Closed {% else %} {{library.tuesday}} {% endif %} <br />
@@ -43,7 +43,7 @@
             Saturday: {% if library.saturday == null %} Closed {% else %} {{ library.saturday }} {% endif %} <br />
             Sunday: {% if library.sunday == null %} Closed {% else %} {{ library.sunday }} {% endif %} <br />
         </p>
-        <p class="fs-5 px-3"><a href="{{ library.link }}" style="text-decoration:none; color: unset">{% bs_icon 'info-square-fill' %}Vist library's official page for more details</a></p>
+        <p class="fs-6 px-3"><a href="{{ library.link }}" style="text-decoration:none; color: unset">{% bs_icon 'info-square-fill' %}Vist library's official page for more details</a></p>
       </p>
       {% endfor %}
     </div>
