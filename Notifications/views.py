@@ -14,6 +14,8 @@ class NotificationListView(View):
     template_name = "Notifications/notifications.html"
 
     def get(self, request):
+        if request.user.is_anonymous:
+            return render(request, "Notifications/error_page.html")
         object_list = Notification.objects.filter(
             Q(
                 transferownershipnotif__new_owner=self.request.user,
