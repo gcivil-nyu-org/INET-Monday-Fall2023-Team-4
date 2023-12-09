@@ -134,8 +134,10 @@ class BookClubEditForm(ModelForm):
         pending_req = TransferOwnershipNotif.objects.filter(
             book_club=self.instance, status="pending"
         )
-        error_message = "You have already made a transfer admin request." \
+        error_message = (
+            "You have already made a transfer admin request."
             + "Please wait for the previous request to be declined to make a new one."
+        )
         if pending_req:
             raise ValidationError(error_message)
         return new_admin
