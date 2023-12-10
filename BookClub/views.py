@@ -183,6 +183,8 @@ def get_email_content(fields_changed, bc_name):
     notif_r = "{new_data}--!!--"
     for k, v in fields_changed.items():
         index += 1
+        if k == "currentAuthor" or k == "currentBookIsbn":
+            continue
         if k == "name":
             new_line = " changed its name to "
         elif k == "description":
@@ -199,6 +201,8 @@ def get_email_content(fields_changed, bc_name):
             new_line = " updated its meeting occurrence to "
         elif k == "libraryId":
             new_line = " is now associated with "
+        elif k == "currentBook":
+            new_line = " updated its current book pick to "
         else:
             new_line = " has a new admin: "
         notif += bc_name + new_line + notif_r.format(new_data=v)
